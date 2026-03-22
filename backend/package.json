@@ -1,0 +1,32 @@
+{
+  "name": "team-management-backend",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "deno task dev",
+    "start": "deno task start",
+    "build": "deno task build",
+    "prisma:generate": "deno task prisma:generate",
+    "prisma:push": "deno task prisma:push",
+    "seed": "deno task seed"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.8.0",
+    "@hono/swagger-ui": "^0.6.1",
+    "@hono/zod-validator": "^0.2.0",
+    "@prisma/client": "^5.20.0",
+    "bcryptjs": "^2.4.3",
+    "hono": "^4.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/node": "^25.5.0",
+    "prisma": "^5.20.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

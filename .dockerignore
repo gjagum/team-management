@@ -1,0 +1,14 @@
+node_modules
+.deno
+dist
+deploy/static
+deploy/node_modules
+deploy/prisma
+*.lock
+*.lockb
+deno.lock
+.env
+.git
+.gitignore
+*.md
+docs/

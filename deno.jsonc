@@ -1,0 +1,6 @@
+{
+  "deploy": {
+    "org": "gjagum",
+    "app": "team-management"
+  }
+}
