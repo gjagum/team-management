@@ -26,6 +26,8 @@ export interface LeaveRequest {
   startDate: string;
   endDate: string;
   days: number;
+  paidDays?: number;
+  unpaidDays?: number;
   reason: string | null;
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
   reviewedBy: number | null;

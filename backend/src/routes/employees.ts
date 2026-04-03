@@ -6,6 +6,30 @@ const employeesRouter = new Hono();
 
 employeesRouter.use('/*', authMiddleware);
 
+// Get current employee profile
+employeesRouter.get('/me', async (c) => {
+  const user = (c as any).user;
+  const employee = await prisma.employee.findUnique({
+    where: { userId: user.userId },
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          role: true,
+        },
+      },
+    },
+  });
+
+  if (!employee) {
+    return c.json({ error: 'Employee profile not found' }, 404);
+  }
+
+  return c.json(employee);
+});
+
 employeesRouter.get('/', requirePermission('employees.read'), async (c) => {
   const employees = await prisma.employee.findMany({
     include: {
@@ -15,6 +39,7 @@ employeesRouter.get('/', requirePermission('employees.read'), async (c) => {
           email: true,
           fullName: true,
           role: true,
+          isActive: true,
         },
       },
     },
@@ -34,6 +59,7 @@ employeesRouter.get('/:id', requirePermission('employees.read'), async (c) => {
           email: true,
           fullName: true,
           role: true,
+          isActive: true,
         },
       },
     },

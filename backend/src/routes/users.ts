@@ -43,18 +43,36 @@ usersRouter.post('/', requirePermission('users.create'), async (c) => {
   const data = await c.req.json();
   const passwordHash = await bcrypt.hash(data.password, 10);
 
-  const user = await prisma.user.create({
-    data: {
-      email: data.email,
-      passwordHash,
-      fullName: data.fullName,
-      role: data.role || 'EMPLOYEE',
-    },
+  const result = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({
+      data: {
+        email: data.email,
+        passwordHash,
+        fullName: data.fullName,
+        role: data.role || 'EMPLOYEE',
+      },
+    });
+
+    // Auto-generate employee code: EMP-<zero-padded user id>
+    const employeeCode = data.employeeCode || `EMP-${String(user.id).padStart(5, '0')}`;
+
+    const employee = await tx.employee.create({
+      data: {
+        userId: user.id,
+        employeeCode,
+        department: data.department || null,
+        position: data.position || null,
+        hireDate: data.hireDate ? new Date(data.hireDate) : new Date(),
+        salary: data.salary || null,
+      },
+    });
+
+    return { ...user, employee };
   });
 
-  await auditLog(c.user!.userId, 'CREATE', 'user', user.id, null, user);
+  await auditLog(c.user!.userId, 'CREATE', 'user', result.id, null, result);
 
-  return c.json(user, 201);
+  return c.json(result, 201);
 });
 
 usersRouter.put('/:id', requirePermission('users.update'), async (c) => {
@@ -93,4 +111,36 @@ usersRouter.delete('/:id', requirePermission('users.delete'), async (c) => {
   return c.json({ message: 'User deleted' });
 });
 
+// Create employee profile for an existing user who doesn't have one
+usersRouter.post('/:id/activate-employee', requirePermission('employees.create'), async (c) => {
+  const id = parseInt(c.req.param('id'));
+  const data = await c.req.json();
+
+  const user = await prisma.user.findUnique({
+    where: { id },
+    include: { employee: true },
+  });
+
+  if (!user) return c.json({ error: 'User not found' }, 404);
+  if (user.employee) return c.json({ error: 'User already has an employee profile' }, 400);
+
+  const employeeCode = data.employeeCode || `EMP-${String(user.id).padStart(5, '0')}`;
+
+  const employee = await prisma.employee.create({
+    data: {
+      userId: user.id,
+      employeeCode,
+      department: data.department || null,
+      position: data.position || null,
+      hireDate: data.hireDate ? new Date(data.hireDate) : new Date(),
+      salary: data.salary || null,
+    },
+  });
+
+  await auditLog(c.user!.userId, 'CREATE', 'employee', employee.id, null, employee);
+
+  return c.json(employee, 201);
+});
+
 export default usersRouter;
+

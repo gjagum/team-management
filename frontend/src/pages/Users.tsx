@@ -6,12 +6,19 @@ export default function Users() {
   const [users, setUsers] = useState<UserType[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showActivateModal, setShowActivateModal] = useState(false);
+  const [activatingUser, setActivatingUser] = useState<UserType | null>(null);
   const [editingUser, setEditingUser] = useState<UserType | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     fullName: '',
     role: 'EMPLOYEE',
+  });
+  const [activateData, setActivateData] = useState({
+    department: '',
+    position: '',
+    hireDate: new Date().toISOString().split('T')[0],
   });
 
   useEffect(() => {
@@ -43,6 +50,20 @@ export default function Users() {
       fetchUsers();
     } catch (error: any) {
       alert(error.response?.data?.error || 'Failed to save user');
+    }
+  };
+
+  const handleActivateEmployee = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activatingUser) return;
+    try {
+      await api.post(`/users/${activatingUser.id}/activate-employee`, activateData);
+      setShowActivateModal(false);
+      setActivatingUser(null);
+      setActivateData({ department: '', position: '', hireDate: new Date().toISOString().split('T')[0] });
+      fetchUsers();
+    } catch (error: any) {
+      alert(error.response?.data?.error || 'Failed to activate employee');
     }
   };
 
@@ -121,6 +142,7 @@ export default function Users() {
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Identity</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Email</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Access Level</th>
+                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Employee Profile</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Status</th>
                 <th className="px-8 py-6 text-right"></th>
               </tr>
@@ -143,6 +165,31 @@ export default function Users() {
                     <span className={`inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded ${getRoleBadge(user.role)}`}>
                       {user.role}
                     </span>
+                  </td>
+                  <td className="px-8 py-6">
+                    {user.employee ? (
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span className="text-xs font-bold text-green-700 uppercase">
+                          {user.employee.employeeCode}
+                        </span>
+                        {user.employee.department && (
+                          <span className="text-xs text-stone-400 ml-1">• {user.employee.department}</span>
+                        )}
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setActivatingUser(user);
+                          setActivateData({ department: '', position: '', hireDate: new Date().toISOString().split('T')[0] });
+                          setShowActivateModal(true);
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-sm">person_add</span>
+                        Activate as Employee
+                      </button>
+                    )}
                   </td>
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-2">
@@ -184,7 +231,7 @@ export default function Users() {
         </p>
       </div>
 
-      {/* Modal */}
+      {/* Create/Edit User Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-surface-container-lowest editorial-shadow-lg rounded-xl p-8 w-full max-w-md">
@@ -262,6 +309,78 @@ export default function Users() {
                   className="primary-gradient text-white px-6 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-primary/20"
                 >
                   {editingUser ? 'Update' : 'Create'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Activate Employee Modal */}
+      {showActivateModal && activatingUser && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-surface-container-lowest editorial-shadow-lg rounded-xl p-8 w-full max-w-md">
+            <div className="mb-6">
+              <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] block mb-1">
+                Employee Activation
+              </span>
+              <h2 className="text-2xl font-black text-on-surface tracking-tighter">
+                Activate {activatingUser.fullName}
+              </h2>
+              <p className="text-stone-500 text-sm mt-1">
+                Create an employee profile to enable scheduling, leave management, and payroll.
+              </p>
+            </div>
+            <form onSubmit={handleActivateEmployee} className="space-y-5">
+              <div>
+                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                  Department
+                </label>
+                <input
+                  type="text"
+                  value={activateData.department}
+                  onChange={(e) => setActivateData({ ...activateData, department: e.target.value })}
+                  placeholder="e.g. Engineering, Operations"
+                  className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                  Position
+                </label>
+                <input
+                  type="text"
+                  value={activateData.position}
+                  onChange={(e) => setActivateData({ ...activateData, position: e.target.value })}
+                  placeholder="e.g. Software Engineer, Manager"
+                  className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                  Hire Date
+                </label>
+                <input
+                  type="date"
+                  value={activateData.hireDate}
+                  onChange={(e) => setActivateData({ ...activateData, hireDate: e.target.value })}
+                  required
+                  className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => { setShowActivateModal(false); setActivatingUser(null); }}
+                  className="px-6 py-2.5 bg-surface-container-low text-stone-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="primary-gradient text-white px-6 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-primary/20"
+                >
+                  Activate
                 </button>
               </div>
             </form>

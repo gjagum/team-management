@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import api from '../services/api';
-import { LeaveRequest, LeaveBalance } from '../types';
-import { formatDate, getStatusColor } from '../utils/helpers';
-import { useAuth } from '../contexts/AuthContext';
+import api from '../services/api.ts';
+import { LeaveRequest, LeaveBalance } from '../types/index.ts';
+import { formatDate, getStatusColor } from '../utils/helpers.tsx';
+import { useAuth } from '../contexts/AuthContext.tsx';
+import { useNotification } from '../contexts/NotificationContext.tsx';
 
 export default function Leaves() {
+  const { showNotification } = useNotification();
   const [leaves, setLeaves] = useState<LeaveRequest[]>([]);
   const [balance, setBalance] = useState<LeaveBalance | null>(null);
   const [loading, setLoading] = useState(true);
@@ -17,25 +19,29 @@ export default function Leaves() {
   });
   const { user } = useAuth();
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = React.useCallback(async (signal?: AbortSignal) => {
     try {
       const currentYear = new Date().getFullYear();
       const [leavesRes, balanceRes] = await Promise.all([
-        api.get<LeaveRequest[]>('/leaves'),
-        api.get<LeaveBalance>(`/leaves/balance?year=${currentYear}`).catch(() => ({ data: null })),
+        api.get<LeaveRequest[]>('/leaves', { signal }),
+        api.get<LeaveBalance>(`/leaves/balance?year=${currentYear}`, { signal }).catch(() => ({ data: null })),
       ]);
       setLeaves(leavesRes.data);
       setBalance(balanceRes.data);
-    } catch (error) {
+    } catch (error: any) {
+      if (error.name === 'CanceledError' || error.name === 'AbortError') return;
       console.error('Failed to fetch leaves:', error);
+      showNotification('Failed to load leave records', 'error');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchData(controller.signal);
+    return () => controller.abort();
+  }, [fetchData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,18 +49,20 @@ export default function Leaves() {
       await api.post('/leaves', formData);
       setShowModal(false);
       setFormData({ leaveType: 'ANNUAL', startDate: '', endDate: '', reason: '' });
+      showNotification('Leave request submitted successfully', 'success');
       fetchData();
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Failed to create leave request');
+      showNotification(error.response?.data?.error || 'Failed to create leave request', 'error');
     }
   };
 
   const handleApproveReject = async (id: number, status: 'approved' | 'rejected', notes?: string) => {
     try {
       await api.patch(`/leaves/${id}/approve`, { status, reviewNotes: notes });
+      showNotification(`Leave request ${status} successfully`, 'success');
       fetchData();
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Failed to update leave request');
+      showNotification(error.response?.data?.error || 'Failed to update leave request', 'error');
     }
   };
 
@@ -62,9 +70,10 @@ export default function Leaves() {
     if (!confirm('Are you sure you want to cancel this leave request?')) return;
     try {
       await api.delete(`/leaves/${id}`);
+      showNotification('Leave request cancelled', 'success');
       fetchData();
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Failed to cancel leave request');
+      showNotification(error.response?.data?.error || 'Failed to cancel leave request', 'error');
     }
   };
 
@@ -106,21 +115,21 @@ export default function Leaves() {
           <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-40 border-b-4 border-primary/20">
             <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">Available Days</span>
             <div className="flex items-end justify-between">
-              <h3 className="text-5xl font-black text-on-surface tracking-tighter">{balance.availableLeaves}</h3>
+              <h3 className="text-5xl font-black text-on-surface tracking-tighter">{Number(balance.availableLeaves).toFixed(2)}</h3>
               <span className="text-green-600 text-xs font-bold mb-2">Remaining</span>
             </div>
           </div>
           <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-40 border-b-4 border-stone-300">
             <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">Used Days</span>
             <div className="flex items-end justify-between">
-              <h3 className="text-5xl font-black text-on-surface tracking-tighter">{balance.usedLeaves}</h3>
+              <h3 className="text-5xl font-black text-on-surface tracking-tighter">{Number(balance.usedLeaves).toFixed(2)}</h3>
               <span className="text-stone-500 text-xs font-bold mb-2">Consumed</span>
             </div>
           </div>
           <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-40 border-b-4 border-primary/20">
             <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">Total Allocation</span>
             <div className="flex items-end justify-between">
-              <h3 className="text-5xl font-black text-primary tracking-tighter">{balance.totalLeaves}</h3>
+              <h3 className="text-5xl font-black text-primary tracking-tighter">{Number(balance.totalLeaves).toFixed(2)}</h3>
               <span className="text-primary text-xs font-bold mb-2">Annual</span>
             </div>
           </div>
@@ -165,7 +174,7 @@ export default function Leaves() {
                     </p>
                   </td>
                   <td className="px-8 py-6">
-                    <p className="font-bold text-on-surface">{leave.days} day{leave.days !== 1 ? 's' : ''}</p>
+                    <p className="font-bold text-on-surface">{Number(leave.days).toFixed(2)} day{Number(leave.days) !== 1 ? 's' : ''}</p>
                   </td>
                   <td className="px-8 py-6">
                     <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded ${getStatusColor(leave.status)}`}>
@@ -174,7 +183,7 @@ export default function Leaves() {
                   </td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {leave.status === 'PENDING' && (
+                      {leave.status === 'PENDING' && (user?.role === 'ADMIN' || user?.role === 'MANAGER') && (
                         <>
                           <button
                             onClick={() => handleApproveReject(leave.id, 'approved')}
@@ -192,7 +201,7 @@ export default function Leaves() {
                           </button>
                         </>
                       )}
-                      {leave.status === 'PENDING' && leave.employeeId === user?.id && (
+                      {leave.status === 'PENDING' && leave.employeeId === user?.employee?.id && (
                         <button
                           onClick={() => handleCancel(leave.id)}
                           className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-500 hover:text-red-700 hover:bg-stone-100 rounded-lg transition-colors"

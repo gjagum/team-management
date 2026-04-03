@@ -1,0 +1,68 @@
+{
+  "hash": "c6ff9ba9",
+  "configHash": "5ef4182b",
+  "lockfileHash": "e3b0c442",
+  "browserHash": "b7037139",
+  "optimized": {
+    "axios": {
+      "src": "../../node_modules/.deno/axios@1.13.6/node_modules/axios/index.js",
+      "file": "axios.js",
+      "fileHash": "ba8f4e65",
+      "needsInterop": false
+    },
+    "clsx": {
+      "src": "../../node_modules/.deno/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs",
+      "file": "clsx.js",
+      "fileHash": "d9030fa5",
+      "needsInterop": false
+    },
+    "react-dom": {
+      "src": "../../node_modules/.deno/react-dom@19.2.4/node_modules/react-dom/index.js",
+      "file": "react-dom.js",
+      "fileHash": "d4126034",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/.deno/react-dom@19.2.4/node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "a7397f42",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/.deno/react-router-dom@7.13.1/node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "10d18b95",
+      "needsInterop": false
+    },
+    "react": {
+      "src": "../../node_modules/.deno/react@19.2.4/node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "20b638f0",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/.deno/react@19.2.4/node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "db9596e2",
+      "needsInterop": true
+    },
+    "react/jsx-runtime": {
+      "src": "../../node_modules/.deno/react@19.2.4/node_modules/react/jsx-runtime.js",
+      "file": "react_jsx-runtime.js",
+      "fileHash": "6801d9b6",
+      "needsInterop": true
+    },
+    "tailwind-merge": {
+      "src": "../../node_modules/.deno/tailwind-merge@2.6.1/node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+      "file": "tailwind-merge.js",
+      "fileHash": "54d6e3f5",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-BoAXSpZd": {
+      "file": "chunk-BoAXSpZd.js",
+      "isDynamicEntry": false
+    }
+  }
+}

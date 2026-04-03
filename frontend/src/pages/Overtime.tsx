@@ -3,8 +3,10 @@ import api from '../services/api';
 import { OvertimeRecord } from '../types';
 import { formatDate, formatDateTime, getStatusColor } from '../utils/helpers';
 import { useAuth } from '../contexts/AuthContext';
+import { useNotification } from '../contexts/NotificationContext';
 
 export default function Overtime() {
+  const { showNotification } = useNotification();
   const [overtimeRecords, setOvertimeRecords] = useState<OvertimeRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -26,6 +28,7 @@ export default function Overtime() {
       setOvertimeRecords(response.data);
     } catch (error) {
       console.error('Failed to fetch overtime records:', error);
+      showNotification('Failed to load overtime records', 'error');
     } finally {
       setLoading(false);
     }
@@ -34,21 +37,30 @@ export default function Overtime() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/overtime', formData);
+      const startDateTime = new Date(`${formData.date}T${formData.startTime}`);
+      const endDateTime = new Date(`${formData.date}T${formData.endTime}`);
+      
+      await api.post('/overtime', {
+        ...formData,
+        startTime: startDateTime.toISOString(),
+        endTime: endDateTime.toISOString(),
+      });
       setShowModal(false);
       setFormData({ date: '', startTime: '', endTime: '', description: '' });
+      showNotification('Overtime record submitted successfully', 'success');
       fetchData();
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Failed to create overtime record');
+      showNotification(error.response?.data?.error || 'Failed to create overtime record', 'error');
     }
   };
 
   const handleApproveReject = async (id: number, status: 'approved' | 'rejected', notes?: string) => {
     try {
       await api.patch(`/overtime/${id}/approve`, { status, approvalNotes: notes });
+      showNotification(`Overtime record ${status} successfully`, 'success');
       fetchData();
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Failed to update overtime record');
+      showNotification(error.response?.data?.error || 'Failed to update overtime record', 'error');
     }
   };
 
@@ -56,9 +68,10 @@ export default function Overtime() {
     if (!confirm('Are you sure you want to cancel this overtime record?')) return;
     try {
       await api.delete(`/overtime/${id}`);
+      showNotification('Overtime record cancelled', 'success');
       fetchData();
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Failed to cancel overtime record');
+      showNotification(error.response?.data?.error || 'Failed to cancel overtime record', 'error');
     }
   };
 
@@ -72,7 +85,7 @@ export default function Overtime() {
 
   const totalApprovedHours = overtimeRecords
     .filter(r => r.status === 'APPROVED')
-    .reduce((acc, curr) => acc + curr.hours, 0);
+    .reduce((acc, curr) => acc + Number(curr.hours), 0);
 
   const pendingCount = overtimeRecords.filter(r => r.status === 'PENDING').length;
 
@@ -249,7 +262,7 @@ export default function Overtime() {
                     Start Time
                   </label>
                   <input
-                    type="datetime-local"
+                    type="time"
                     value={formData.startTime}
                     onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
                     required
@@ -261,7 +274,7 @@ export default function Overtime() {
                     End Time
                   </label>
                   <input
-                    type="datetime-local"
+                    type="time"
                     value={formData.endTime}
                     onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
                     required

@@ -12,7 +12,7 @@ schedulesRouter.get('/', requirePermission('schedules.read'), async (c) => {
   const endDate = c.req.query('endDate');
   const employeeId = c.req.query('employeeId');
 
-  const where: Record<string, unknown> = {};
+  const where: Record<string, any> = {};
 
   if (startDate && endDate) {
     where.date = {
@@ -23,7 +23,18 @@ schedulesRouter.get('/', requirePermission('schedules.read'), async (c) => {
     where.date = { gte: new Date(startDate) };
   }
 
-  if (employeeId) {
+  // If user is an employee, they can only see their own schedule
+  if (c.user!.role === 'EMPLOYEE') {
+    const employee = await prisma.employee.findUnique({
+      where: { userId: c.user!.userId }
+    });
+    if (employee) {
+      where.employeeId = employee.id;
+    } else {
+      // If no employee profile, return empty
+      return c.json([]);
+    }
+  } else if (employeeId) {
     where.employeeId = parseInt(employeeId);
   }
 
@@ -50,10 +61,19 @@ schedulesRouter.get('/', requirePermission('schedules.read'), async (c) => {
 
 // Get my schedule
 schedulesRouter.get('/my-schedule', async (c) => {
+  const user = (c as any).user;
+  const employee = await prisma.employee.findUnique({
+    where: { userId: user.userId }
+  });
+
+  if (!employee) {
+    return c.json({ error: 'No employee profile found' }, 404);
+  }
+
   const startDate = c.req.query('startDate');
   const endDate = c.req.query('endDate');
 
-  const where: Record<string, unknown> = { employeeId: (c as any).user.userId };
+  const where: any = { employeeId: employee.id };
 
   if (startDate && endDate) {
     where.date = {

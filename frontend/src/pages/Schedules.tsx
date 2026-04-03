@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useNotification } from '../contexts/NotificationContext';
 
 interface Schedule {
   id: number;
@@ -70,10 +71,11 @@ function getWeekDates(baseDate: Date): Date[] {
 
 export default function Schedules() {
   const { user } = useAuth();
+  const { showNotification } = useNotification();
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'week' | 'month'>('month');
+  const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
   const [currentDate, setCurrentDate] = useState(new Date());
 
   // Modals
@@ -124,13 +126,16 @@ export default function Schedules() {
 
       const [scheduleRes, empRes] = await Promise.all([
         api.get<Schedule[]>(`/schedules?startDate=${startDate}&endDate=${endDate}`),
-        isAdmin ? api.get<Employee[]>('/employees') : Promise.resolve({ data: [] as Employee[] }),
+        isAdmin 
+          ? api.get<Employee[]>('/employees') 
+          : api.get<Employee>(`/employees/me`).then(res => ({ data: [res.data] as Employee[] })).catch(() => ({ data: [] as Employee[] })),
       ]);
 
       setSchedules(scheduleRes.data);
-      if (isAdmin) setEmployees(empRes.data);
+      setEmployees(empRes.data);
     } catch (error) {
       console.error('Failed to fetch schedule data:', error);
+      showNotification('Failed to load schedule data', 'error');
     } finally {
       setLoading(false);
     }
@@ -171,7 +176,7 @@ export default function Schedules() {
       setShowAddModal(false);
       fetchData();
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Failed to create schedule');
+      showNotification(error.response?.data?.error || 'Failed to create schedule', 'error');
     }
   };
 
@@ -181,7 +186,7 @@ export default function Schedules() {
       await api.delete(`/schedules/${id}`);
       fetchData();
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Failed to delete schedule');
+      showNotification(error.response?.data?.error || 'Failed to delete schedule', 'error');
     }
   };
 
@@ -240,7 +245,7 @@ export default function Schedules() {
       setShowDefaultsModal(false);
       fetchData();
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Failed to save defaults');
+      showNotification(error.response?.data?.error || 'Failed to save defaults', 'error');
     }
   };
 
@@ -267,7 +272,7 @@ export default function Schedules() {
       }
       fetchData();
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Failed to auto-populate');
+      showNotification(error.response?.data?.error || 'Failed to auto-populate', 'error');
     }
   };
 
@@ -286,7 +291,7 @@ export default function Schedules() {
     </div>
   );
 
-  const displayEmployees = isAdmin ? employees : [];
+  const displayEmployees = employees;
 
   // Month view: build calendar grid
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();

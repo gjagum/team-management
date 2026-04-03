@@ -25,30 +25,34 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+import { NotificationProvider } from './contexts/NotificationContext';
+
 function App() {
   return (
-    <AuthProvider>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <Layout />
-            </PrivateRoute>
-          }
-        >
-          <Route index element={<Dashboard />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="leaves" element={<Leaves />} />
-          <Route path="overtime" element={<Overtime />} />
-          <Route path="users" element={<Users />} />
-          <Route path="employees" element={<Employees />} />
-          <Route path="schedules" element={<Schedules />} />
-          <Route path="settings" element={<Settings />} />
-        </Route>
-      </Routes>
-    </AuthProvider>
+    <NotificationProvider>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <Layout />
+              </PrivateRoute>
+            }
+          >
+            <Route index element={<Dashboard />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="leaves" element={<Leaves />} />
+            <Route path="overtime" element={<Overtime />} />
+            <Route path="users" element={<Users />} />
+            <Route path="employees" element={<Employees />} />
+            <Route path="schedules" element={<Schedules />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+        </Routes>
+      </AuthProvider>
+    </NotificationProvider>
   );
 }
 

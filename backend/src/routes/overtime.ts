@@ -6,8 +6,21 @@ const overtimeRouter = new Hono();
 
 overtimeRouter.use('/*', authMiddleware);
 
+// Helper: get employee record from the authenticated user's ID
+async function getEmployeeByUserId(userId: number) {
+  return prisma.employee.findUnique({ where: { userId } });
+}
+
 overtimeRouter.get('/', requirePermission('overtime.read'), async (c) => {
+  const employee = await getEmployeeByUserId(c.user!.userId);
+
+  // Admins and managers see all; employees only see their own
+  const where = (c.user!.role === 'ADMIN' || c.user!.role === 'MANAGER')
+    ? {}
+    : { employeeId: employee?.id };
+
   const records = await prisma.overtimeRecord.findMany({
+    where,
     include: {
       employee: {
         include: {
@@ -37,8 +50,11 @@ overtimeRouter.get('/', requirePermission('overtime.read'), async (c) => {
 });
 
 overtimeRouter.get('/my-records', requirePermission('overtime.read'), async (c) => {
+  const employee = await getEmployeeByUserId(c.user!.userId);
+  if (!employee) return c.json({ error: 'No employee profile found' }, 400);
+
   const records = await prisma.overtimeRecord.findMany({
-    where: { employeeId: c.user!.userId },
+    where: { employeeId: employee.id },
     include: {
       approver: {
         include: {
@@ -57,15 +73,65 @@ overtimeRouter.get('/my-records', requirePermission('overtime.read'), async (c) 
 });
 
 overtimeRouter.post('/', requirePermission('overtime.create'), async (c) => {
+  const employee = await getEmployeeByUserId(c.user!.userId);
+  if (!employee) return c.json({ error: 'No employee profile found. Please ask an admin to activate your employee profile.' }, 400);
+
   const data = await c.req.json();
+  
+  if (!data.date || !data.startTime || !data.endTime) {
+    return c.json({ error: 'Date, start time, and end time are required' }, 400);
+  }
+
+  const date = new Date(data.date);
   const startTime = new Date(data.startTime);
   const endTime = new Date(data.endTime);
+
+  if (isNaN(date.getTime()) || isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
+    return c.json({ error: 'Invalid date or time format' }, 400);
+  }
+
+  if (endTime <= startTime) {
+    return c.json({ error: 'End time must be after start time' }, 400);
+  }
+
   const hours = parseFloat(((endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)).toFixed(2));
+
+  // --- OVERLAP CHECK WITH SCHEDULE ---
+  const schedule = await prisma.schedule.findUnique({
+    where: {
+      employeeId_date: {
+        employeeId: employee.id,
+        date: new Date(date.toISOString().split('T')[0]),
+      },
+    },
+  });
+
+  if (schedule) {
+    // Convert schedule string times (HH:mm) to minutes for comparison
+    const [shiftStartH, shiftStartM] = schedule.startTime.split(':').map(Number);
+    const [shiftEndH, shiftEndM] = schedule.endTime.split(':').map(Number);
+    const shiftStartTotal = shiftStartH * 60 + shiftStartM;
+    const shiftEndTotal = shiftEndH * 60 + shiftEndM;
+
+    // OT times to minutes (using the same local date)
+    const otStartTotal = startTime.getHours() * 60 + startTime.getMinutes();
+    const otEndTotal = endTime.getHours() * 60 + endTime.getMinutes();
+
+    // Check for overlap [otStart, otEnd] vs [shiftStart, shiftEnd]
+    const hasOverlap = (otStartTotal < shiftEndTotal && otEndTotal > shiftStartTotal);
+
+    if (hasOverlap) {
+      return c.json({ 
+        error: `Overtime overlaps with your regular shift (${schedule.startTime} - ${schedule.endTime}).` 
+      }, 400);
+    }
+  }
+  // ------------------------------------
 
   const record = await prisma.overtimeRecord.create({
     data: {
-      employeeId: c.user!.userId,
-      date: new Date(data.date),
+      employeeId: employee.id,
+      date,
       startTime,
       endTime,
       hours,
@@ -83,6 +149,9 @@ overtimeRouter.patch('/:id/approve', requirePermission('overtime.approve'), asyn
   const id = parseInt(c.req.param('id'));
   const data = await c.req.json();
 
+  const employee = await getEmployeeByUserId(c.user!.userId);
+  if (!employee) return c.json({ error: 'No employee profile found' }, 400);
+
   const oldRecord = await prisma.overtimeRecord.findUnique({ where: { id } });
   if (!oldRecord) return c.json({ error: 'Overtime record not found' }, 404);
 
@@ -90,7 +159,7 @@ overtimeRouter.patch('/:id/approve', requirePermission('overtime.approve'), asyn
     where: { id },
     data: {
       status: data.status === 'approved' ? 'APPROVED' : 'REJECTED',
-      approvedBy: c.user!.userId,
+      approvedBy: employee.id,
       approvedAt: new Date(),
       approvalNotes: data.approvalNotes,
     },

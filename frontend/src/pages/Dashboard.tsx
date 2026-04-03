@@ -3,8 +3,10 @@ import api from '../services/api';
 import { LeaveRequest, OvertimeRecord, LeaveBalance } from '../types';
 import { formatDate, getStatusColor } from '../utils/helpers';
 import { useAuth } from '../contexts/AuthContext';
+import { useNotification } from '../contexts/NotificationContext';
 
 export default function Dashboard() {
+  const { showNotification } = useNotification();
   const [leaveBalance, setLeaveBalance] = useState<LeaveBalance | null>(null);
   const [pendingLeaves, setPendingLeaves] = useState<LeaveRequest[]>([]);
   const [pendingOvertime, setPendingOvertime] = useState<OvertimeRecord[]>([]);
@@ -29,6 +31,7 @@ export default function Dashboard() {
       setPendingOvertime(overtimeRes.data.filter(o => o.status === 'PENDING'));
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
+      showNotification('Failed to load dashboard data', 'error');
     } finally {
       setLoading(false);
     }
@@ -94,7 +97,7 @@ export default function Dashboard() {
           </div>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-primary tracking-tighter">
-              {pendingOvertime.reduce((acc, curr) => acc + curr.hours, 0).toFixed(1)}
+              {pendingOvertime.reduce((acc, curr) => acc + Number(curr.hours), 0).toFixed(1)}
             </h3>
             <span className="text-primary text-xs font-bold mb-2">
               {pendingOvertime.length} Records

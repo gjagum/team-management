@@ -4,6 +4,16 @@
     "build": "deno run -A npm:vite build",
     "preview": "deno run -A npm:vite preview"
   },
+  "imports": {
+    "react": "npm:react@^19.2.4",
+    "react-dom": "npm:react-dom@^19.2.4",
+    "react-router-dom": "npm:react-router-dom@^7.13.1",
+    "axios": "npm:axios@^1.6.5",
+    "date-fns": "npm:date-fns@^3.0.6",
+    "lucide-react": "npm:lucide-react@^0.577.0",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^6.0.1",
+    "vite": "npm:vite@^8.0.1"
+  },
   "compilerOptions": {
     "lib": ["deno.window", "dom"],
     "jsx": "react-jsx",

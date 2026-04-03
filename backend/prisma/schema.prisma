@@ -88,8 +88,8 @@ model LeaveBalance {
   id             Int       @id @default(autoincrement())
   employeeId     Int       @map("employee_id")
   year           Int
-  totalLeaves    Int       @default(2) @map("total_leaves")
-  usedLeaves     Int       @default(0) @map("used_leaves")
+  totalLeaves    Decimal   @default(0) @map("total_leaves") @db.Decimal(10, 2)
+  usedLeaves     Decimal   @default(0) @map("used_leaves") @db.Decimal(10, 2)
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
   
@@ -105,7 +105,9 @@ model LeaveRequest {
   leaveType    String    @map("leave_type")
   startDate    DateTime  @map("start_date")
   endDate      DateTime  @map("end_date")
-  days         Int
+  days         Decimal   @db.Decimal(10, 2)
+  paidDays     Decimal   @default(0) @map("paid_days") @db.Decimal(10, 2)
+  unpaidDays   Decimal   @default(0) @map("unpaid_days") @db.Decimal(10, 2)
   reason       String?
   status       LeaveStatus @default(PENDING)
   reviewedBy   Int?      @map("reviewed_by")
