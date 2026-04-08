@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext.tsx';
+import { useSettings } from '../contexts/SettingsContext.tsx';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+   const { login } = useAuth();
+  const { getSetting } = useSettings();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,7 +33,7 @@ export default function Login() {
         {/* Logo area */}
         <div className="text-center mb-12">
           <h1 className="text-2xl font-bold tracking-tighter text-red-700 uppercase mb-2">
-            CANUBAS GLOBAL
+            {getSetting('company.name') || 'TEAM MANAGEMENT'}
           </h1>
           <p className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">
             Corporate Management Platform

@@ -4,6 +4,14 @@ import { prisma } from '../index.ts';
 
 const settingsRouter = new Hono();
 
+// Public settings (no auth required)
+settingsRouter.get('/public/company-name', async (c) => {
+  const setting = await (prisma as any).appSettings.findUnique({
+    where: { key: 'company.name' },
+  });
+  return c.json({ value: setting?.value || 'TEAM MANAGEMENT' });
+});
+
 settingsRouter.use('/*', authMiddleware);
 
 // Get all settings (any authenticated user can read)

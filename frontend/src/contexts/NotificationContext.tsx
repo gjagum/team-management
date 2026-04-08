@@ -8,14 +8,33 @@ interface Notification {
   message: string;
 }
 
+interface ConfirmOptions {
+  title?: string;
+  message: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  isDestructive?: boolean;
+}
+
 interface NotificationContextType {
   showNotification: (message: string, type?: NotificationType) => void;
+  confirm: (options: ConfirmOptions) => Promise<boolean>;
+  alert: (title: string, message: string) => Promise<void>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [confirmState, setConfirmState] = useState<{
+    options: ConfirmOptions;
+    resolve: (value: boolean) => void;
+  } | null>(null);
+  const [alertState, setAlertState] = useState<{
+    title: string;
+    message: string;
+    resolve: () => void;
+  } | null>(null);
 
   const showNotification = useCallback((message: string, type: NotificationType = 'info') => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -27,8 +46,34 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }, 5000);
   }, []);
 
+  const confirm = useCallback((options: ConfirmOptions) => {
+    return new Promise<boolean>((resolve) => {
+      setConfirmState({ options, resolve });
+    });
+  }, []);
+
+  const alert = useCallback((title: string, message: string) => {
+    return new Promise<void>((resolve) => {
+      setAlertState({ title, message, resolve });
+    });
+  }, []);
+
+  const handleConfirmClose = (value: boolean) => {
+    if (confirmState) {
+      confirmState.resolve(value);
+      setConfirmState(null);
+    }
+  };
+
+  const handleAlertClose = () => {
+    if (alertState) {
+      alertState.resolve();
+      setAlertState(null);
+    }
+  };
+
   return (
-    <NotificationContext.Provider value={{ showNotification }}>
+    <NotificationContext.Provider value={{ showNotification, confirm, alert }}>
       {children}
       
       {/* Notification Portal / Overlay */}
@@ -78,6 +123,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             </div>
             
             <button
+              type="button"
               onClick={() => setNotifications((prev) => prev.filter((notif) => notif.id !== n.id))}
               className="p-1 hover:bg-stone-100 rounded transition-colors text-stone-300 hover:text-stone-500"
             >
@@ -86,6 +132,55 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
           </div>
         ))}
       </div>
+
+      {/* Confirm/Alert Global Dialog Overlay */}
+      {(confirmState || alertState) && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in shadow-2xl">
+          <div className="bg-surface-container-lowest rounded-2xl editorial-shadow-lg w-full max-w-sm overflow-hidden animate-modal-in border border-stone-100">
+            <div className="p-10">
+              <h3 className="text-2xl font-black text-on-surface tracking-tighter mb-3">
+                {confirmState?.options.title || alertState?.title || 'Notification'}
+              </h3>
+              <p className="text-stone-500 text-sm leading-relaxed mb-10 font-medium">
+                {confirmState?.options.message || alertState?.message}
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3">
+                {confirmState ? (
+                  <>
+                    <button 
+                      type="button"
+                      onClick={() => handleConfirmClose(false)}
+                      className="flex-1 px-6 py-3.5 rounded-xl bg-stone-100 text-stone-600 font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-stone-200 transition-all border border-stone-200"
+                    >
+                      {confirmState.options.cancelLabel || 'No, Cancel'}
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => handleConfirmClose(true)}
+                      className={`flex-1 px-6 py-3.5 rounded-xl font-bold text-[10px] uppercase tracking-[0.2em] text-white transition-all transform active:scale-95 shadow-lg
+                        ${confirmState.options.isDestructive 
+                          ? 'bg-red-700 hover:bg-red-800 shadow-red-200' 
+                          : 'primary-gradient shadow-primary/20'}
+                      `}
+                    >
+                      {confirmState.options.confirmLabel || (confirmState.options.isDestructive ? 'Delete' : 'Confirm')}
+                    </button>
+                  </>
+                ) : (
+                  <button 
+                    type="button"
+                    onClick={handleAlertClose}
+                    className="w-full px-6 py-3.5 rounded-xl primary-gradient text-white font-bold text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-primary/20 transition-all transform active:scale-95"
+                  >
+                    Alright
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </NotificationContext.Provider>
   );
 }

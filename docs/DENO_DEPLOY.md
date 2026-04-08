@@ -2,7 +2,8 @@
 
 ## Architecture
 
-The application is deployed as a **single Deno server** that serves both the API and the built frontend.
+The application is deployed as a **single Deno server** that serves both the API
+and the built frontend.
 
 ```
 backend/
@@ -34,20 +35,20 @@ deno deploy create team-management
 
 In the Deno Deploy dashboard → Environment Variables:
 
-| Variable | Value |
-|---|---|
+| Variable       | Value                                  |
+| -------------- | -------------------------------------- |
 | `DATABASE_URL` | Your Neon PostgreSQL connection string |
-| `JWT_SECRET` | A strong random secret (32+ chars) |
+| `JWT_SECRET`   | A strong random secret (32+ chars)     |
 
 ### 3. Configure App Settings
 
 In the Deno Deploy dashboard → App Configuration:
 
-| Field | Value |
-|---|---|
-| **Install command** | `deno install --allow-scripts=npm:@prisma/client@5.22.0,npm:@prisma/engines@5.22.0` |
-| **Build command** | `deno run -A npm:prisma generate` |
-| **Entrypoint** | `src/index.ts` |
+| Field               | Value                                                                                                 |
+| ------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Install command** | `deno install --allow-scripts=npm:@prisma/client@5.22.0,npm:@prisma/engines@5.22.0,npm:prisma@5.22.0` |
+| **Build command**   | `deno run -A npm:prisma generate && deno run -A npm:prisma db push --accept-data-loss`                |
+| **Entrypoint**      | `src/index.ts`                                                                                        |
 
 ### 4. Push database schema
 
@@ -80,6 +81,7 @@ deno deploy --app=team-management --prod --allow-node-modules --no-wait
 ```
 
 `deno task build` does three things:
+
 1. Builds the React frontend via Vite (`frontend/dist/`)
 2. Copies built files to `backend/static/`
 3. Generates the Prisma client
@@ -88,10 +90,10 @@ deno deploy --app=team-management --prod --allow-node-modules --no-wait
 
 ## Default Users (after seeding)
 
-| Email | Password | Role |
-|---|---|---|
-| `admin@team.com` | `admin123` | ADMIN |
-| `manager@team.com` | `manager123` | MANAGER |
+| Email               | Password      | Role     |
+| ------------------- | ------------- | -------- |
+| `admin@team.com`    | `admin123`    | ADMIN    |
+| `manager@team.com`  | `manager123`  | MANAGER  |
 | `employee@team.com` | `employee123` | EMPLOYEE |
 
 ---
@@ -120,6 +122,7 @@ deno deploy logs --app=team-management
 
 - Verify `DATABASE_URL` is set in Deno Deploy environment variables
 - Ensure `?sslmode=require` is in the connection string
+- **Neon Pooler**: If your `DATABASE_URL` contains `-pooler`, you **must** append `&pgbounce=true` to avoid the "cached plan must not change result type" error after schema changes.
 - Check that Neon database is active (not suspended)
 
 ### Frontend not loading
@@ -129,5 +132,6 @@ deno deploy logs --app=team-management
 
 ### API returns HTML instead of JSON
 
-- API routes must be defined **before** the static file catch-all in `src/index.ts`
+- API routes must be defined **before** the static file catch-all in
+  `src/index.ts`
 - Check route paths match (e.g., `/api/users` not `/users`)

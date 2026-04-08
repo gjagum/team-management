@@ -73,3 +73,36 @@ export interface LeaveBalance {
   usedLeaves: number;
   availableLeaves: number;
 }
+
+export interface Permission {
+  id: number;
+  name: string;
+  description: string | null;
+  resource: string;
+  action: string;
+  createdAt: string;
+}
+
+export interface RolePermission {
+  id: number;
+  role: 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
+  permissionId: number;
+  createdAt: string;
+  permission: Permission;
+}
+
+export interface RoleSummary {
+  role: 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
+  permissions: {
+    id: number;
+    permissionId: number;
+    name: string;
+    resource: string;
+    action: string;
+  }[];
+}
+
+export interface RBACSummary {
+  roles: RoleSummary[];
+  allPermissions: Permission[];
+}

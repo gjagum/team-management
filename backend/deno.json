@@ -19,8 +19,7 @@
     "@std/assert": "jsr:@std/assert@^1.0.0"
   },
   "compilerOptions": {
-    "lib": ["deno.window"],
-    "allowImportingTsExtensions": true
+    "lib": ["deno.window"]
   },
   "nodeModulesDir": "auto",
   "allowScripts": [

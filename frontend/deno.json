@@ -7,17 +7,24 @@
   "imports": {
     "react": "npm:react@^19.2.4",
     "react-dom": "npm:react-dom@^19.2.4",
+    "@types/react": "npm:@types/react@^19.0.10",
+    "@types/react-dom": "npm:@types/react-dom@^19.0.4",
     "react-router-dom": "npm:react-router-dom@^7.13.1",
     "axios": "npm:axios@^1.6.5",
     "date-fns": "npm:date-fns@^3.0.6",
     "lucide-react": "npm:lucide-react@^0.577.0",
     "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^6.0.1",
+    "tailwindcss": "npm:tailwindcss@^3.4.0",
+    "autoprefixer": "npm:autoprefixer@^10.4.16",
+    "clsx": "npm:clsx@^2.1.0",
+    "tailwind-merge": "npm:tailwind-merge@^2.2.0",
     "vite": "npm:vite@^8.0.1"
   },
   "compilerOptions": {
     "lib": ["deno.window", "dom"],
     "jsx": "react-jsx",
-    "jsxImportSource": "react"
+    "jsxImportSource": "react",
+    "strict": true
   },
   "nodeModulesDir": "auto"
 }

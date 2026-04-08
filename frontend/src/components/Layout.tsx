@@ -1,9 +1,11 @@
 import React from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext.tsx';
+import { useSettings } from '../contexts/SettingsContext.tsx';
 
 export default function Layout() {
   const { user, logout } = useAuth();
+  const { getSetting } = useSettings();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -20,6 +22,7 @@ export default function Layout() {
     { name: 'Overtime', href: '/overtime', icon: 'schedule' },
     { name: 'Users', href: '/users', icon: 'admin_panel_settings', roles: ['ADMIN'] },
     { name: 'Employees', href: '/employees', icon: 'groups', roles: ['ADMIN'] },
+    { name: 'Access Control', href: '/rbac', icon: 'security', roles: ['ADMIN'] },
     { name: 'Settings', href: '/settings', icon: 'settings', roles: ['ADMIN'] },
   ];
 
@@ -44,7 +47,7 @@ export default function Layout() {
               <span className="material-symbols-outlined text-stone-600">menu</span>
             </button>
             <span className="text-xl font-bold tracking-tighter text-red-700 uppercase">
-              CANUBAS GLOBAL
+              {getSetting('company.name') || 'TEAM MANAGEMENT'}
             </span>
             {/* Search bar */}
             <div className="hidden md:flex items-center bg-stone-100 rounded-full px-4 py-1.5 gap-2">

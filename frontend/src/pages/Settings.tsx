@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
-import api from '../services/api';
-import { useAuth } from '../contexts/AuthContext';
+import api from '../services/api.ts';
+import { useAuth } from '../contexts/AuthContext.tsx';
+import { useSettings } from '../contexts/SettingsContext.tsx';
 
 interface AppSetting {
   id: number;
@@ -68,6 +69,7 @@ const inputChangedClass = 'ring-1 ring-primary/30 bg-primary/5';
 
 export default function Settings() {
   const { user } = useAuth();
+  const { refreshSettings } = useSettings();
   const [settings, setSettings] = useState<AppSetting[]>([]);
   const [editedValues, setEditedValues] = useState<Record<string, string>>({});
   const [originalValues, setOriginalValues] = useState<Record<string, string>>({});
@@ -116,6 +118,7 @@ export default function Settings() {
     try {
       const updates = changedKeys.map((key) => ({ key, value: editedValues[key] }));
       await api.put('/settings', { settings: updates });
+      await refreshSettings();
       setOriginalValues({ ...editedValues });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);

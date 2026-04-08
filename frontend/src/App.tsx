@@ -1,15 +1,18 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Login from './pages/Login';
-import Layout from './components/Layout';
-import Dashboard from './pages/Dashboard';
-import Leaves from './pages/Leaves';
-import Overtime from './pages/Overtime';
-import Users from './pages/Users';
-import Employees from './pages/Employees';
-import Schedules from './pages/Schedules';
-import Settings from './pages/Settings';
+import { AuthProvider, useAuth } from './contexts/AuthContext.tsx';
+import Login from './pages/Login.tsx';
+import { SettingsProvider } from './contexts/SettingsContext.tsx';
+import Layout from './components/Layout.tsx';
+import Dashboard from './pages/Dashboard.tsx';
+import Leaves from './pages/Leaves.tsx';
+import Overtime from './pages/Overtime.tsx';
+import Users from './pages/Users.tsx';
+import Employees from './pages/Employees.tsx';
+import Schedules from './pages/Schedules.tsx';
+import Settings from './pages/Settings.tsx';
+import RBACManagement from './pages/RBACManagement.tsx';
+import { NotificationProvider } from './contexts/NotificationContext.tsx';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -25,32 +28,34 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-import { NotificationProvider } from './contexts/NotificationContext';
 
 function App() {
   return (
     <NotificationProvider>
       <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/"
-            element={
-              <PrivateRoute>
-                <Layout />
-              </PrivateRoute>
-            }
-          >
-            <Route index element={<Dashboard />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="leaves" element={<Leaves />} />
-            <Route path="overtime" element={<Overtime />} />
-            <Route path="users" element={<Users />} />
-            <Route path="employees" element={<Employees />} />
-            <Route path="schedules" element={<Schedules />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
-        </Routes>
+        <SettingsProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/"
+              element={
+                <PrivateRoute>
+                  <Layout />
+                </PrivateRoute>
+              }
+            >
+              <Route index element={<Dashboard />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="leaves" element={<Leaves />} />
+              <Route path="overtime" element={<Overtime />} />
+              <Route path="users" element={<Users />} />
+              <Route path="employees" element={<Employees />} />
+              <Route path="schedules" element={<Schedules />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="rbac" element={<RBACManagement />} />
+            </Route>
+          </Routes>
+        </SettingsProvider>
       </AuthProvider>
     </NotificationProvider>
   );

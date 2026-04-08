@@ -26,5 +26,5 @@ api.interceptors.response.use(
   }
 );
 
-export type { User, LoginResponse } from '../types';
+export type { User, LoginResponse } from '../types/index.ts';
 export default api;
