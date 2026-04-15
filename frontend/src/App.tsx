@@ -12,6 +12,7 @@ import Employees from './pages/Employees.tsx';
 import Schedules from './pages/Schedules.tsx';
 import Settings from './pages/Settings.tsx';
 import RBACManagement from './pages/RBACManagement.tsx';
+import Timesheets from './pages/Timesheets.tsx';
 import { NotificationProvider } from './contexts/NotificationContext.tsx';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -53,6 +54,7 @@ function App() {
               <Route path="schedules" element={<Schedules />} />
               <Route path="settings" element={<Settings />} />
               <Route path="rbac" element={<RBACManagement />} />
+              <Route path="timesheets" element={<Timesheets />} />
             </Route>
           </Routes>
         </SettingsProvider>

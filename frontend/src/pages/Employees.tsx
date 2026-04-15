@@ -71,7 +71,7 @@ export default function Employees() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-stone-50">
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Employee Identity</th>
+                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Contractor Identity</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Division</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Designation</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Hire Date</th>

@@ -268,7 +268,7 @@ export default function Schedules() {
         alert(`${overwrite ? 'Updated' : 'Created'} ${res.data.populated} schedule entries!`);
       } else {
         const res = await api.post('/schedules/auto-populate-all', { year: currentYear, month: currentMonth + 1, overwrite });
-        alert(`${overwrite ? 'Updated' : 'Created'} ${res.data.populated} schedule entries for all employees!`);
+        alert(`${overwrite ? 'Updated' : 'Created'} ${res.data.populated} schedule entries for all contractors!`);
       }
       fetchData();
     } catch (error: any) {
@@ -364,7 +364,7 @@ export default function Schedules() {
           <thead>
             <tr className="bg-stone-50">
               <th className="px-4 py-3 text-left text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] sticky left-0 bg-stone-50 min-w-[160px] z-10">
-                Employee
+                Contractor
               </th>
               {displayDates.map(d => {
                 const isToday = formatDateKey(d) === formatDateKey(new Date());
@@ -458,7 +458,7 @@ export default function Schedules() {
               <tr>
                 <td colSpan={displayDates.length + 2} className="px-6 py-12 text-center text-stone-400">
                   <span className="material-symbols-outlined text-stone-300 text-4xl block mb-2">event_busy</span>
-                  No employees found
+                  No contractors found
                 </td>
               </tr>
             )}

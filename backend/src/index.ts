@@ -13,6 +13,8 @@ import overtimeRouter from './routes/overtime.ts';
 import schedulesRouter from './routes/schedules.ts';
 import settingsRouter from './routes/settings.ts';
 import rbacRouter from './routes/rbac.ts';
+import timesheetsRouter from './routes/timesheets.ts';
+
 
 export const prisma = new PrismaClient();
 
@@ -107,6 +109,8 @@ app.route('/api/overtime', overtimeRouter);
 app.route('/api/schedules', schedulesRouter);
 app.route('/api/settings', settingsRouter);
 app.route('/api/rbac', rbacRouter);
+app.route('/api/timesheets', timesheetsRouter);
+
 
 // --- Serve Built Frontend (for production / Deno Deploy) ---
 app.use('/assets/*', serveStatic({ root: './static' }));

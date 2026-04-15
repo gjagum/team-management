@@ -21,7 +21,8 @@ export default function Layout() {
     { name: 'Leave', href: '/leaves', icon: 'event_busy' },
     { name: 'Overtime', href: '/overtime', icon: 'schedule' },
     { name: 'Users', href: '/users', icon: 'admin_panel_settings', roles: ['ADMIN'] },
-    { name: 'Employees', href: '/employees', icon: 'groups', roles: ['ADMIN'] },
+    { name: 'Timesheets', href: '/timesheets', icon: 'receipt_long', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+    { name: 'Contractors', href: '/employees', icon: 'groups', roles: ['ADMIN'] },
     { name: 'Access Control', href: '/rbac', icon: 'security', roles: ['ADMIN'] },
     { name: 'Settings', href: '/settings', icon: 'settings', roles: ['ADMIN'] },
   ];

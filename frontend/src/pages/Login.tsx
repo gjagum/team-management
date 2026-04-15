@@ -122,7 +122,7 @@ export default function Login() {
               {[
                 { label: 'Admin', email: 'admin@team.com', pass: 'admin123' },
                 { label: 'Manager', email: 'manager@team.com', pass: 'manager123' },
-                { label: 'Employee', email: 'employee@team.com', pass: 'employee123' },
+                { label: 'Contractor', email: 'employee@team.com', pass: 'employee123' },
               ].map((demo) => (
                 <button
                   key={demo.label}

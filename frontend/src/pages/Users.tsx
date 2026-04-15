@@ -63,7 +63,7 @@ export default function Users() {
       setActivateData({ department: '', position: '', hireDate: new Date().toISOString().split('T')[0] });
       fetchUsers();
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Failed to activate employee');
+      alert(error.response?.data?.error || 'Failed to activate contractor');
     }
   };
 
@@ -142,7 +142,7 @@ export default function Users() {
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Identity</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Email</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Access Level</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Employee Profile</th>
+                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Contractor Profile</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Status</th>
                 <th className="px-8 py-6 text-right"></th>
               </tr>
@@ -187,7 +187,7 @@ export default function Users() {
                         className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors"
                       >
                         <span className="material-symbols-outlined text-sm">person_add</span>
-                        Activate as Employee
+                        Activate as Contractor
                       </button>
                     )}
                   </td>
@@ -277,7 +277,7 @@ export default function Users() {
                   onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
                   className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
                 >
-                  <option value="EMPLOYEE">Employee</option>
+                  <option value="EMPLOYEE">Contractor</option>
                   <option value="MANAGER">Manager</option>
                   <option value="ADMIN">Admin</option>
                 </select>
@@ -322,13 +322,13 @@ export default function Users() {
           <div className="bg-surface-container-lowest editorial-shadow-lg rounded-xl p-8 w-full max-w-md">
             <div className="mb-6">
               <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] block mb-1">
-                Employee Activation
+                Contractor Activation
               </span>
               <h2 className="text-2xl font-black text-on-surface tracking-tighter">
                 Activate {activatingUser.fullName}
               </h2>
               <p className="text-stone-500 text-sm mt-1">
-                Create an employee profile to enable scheduling, leave management, and payroll.
+                Create a contractor profile to enable scheduling, leave management, and payroll.
               </p>
             </div>
             <form onSubmit={handleActivateEmployee} className="space-y-5">

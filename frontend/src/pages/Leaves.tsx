@@ -142,7 +142,7 @@ export default function Leaves() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-stone-50">
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Employee</th>
+                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Contractor</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Category</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Period</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Duration</th>

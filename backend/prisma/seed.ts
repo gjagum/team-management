@@ -122,6 +122,8 @@ async function seed() {
     'overtime.create',
     'overtime.read',
     'schedules.read',
+    'reports.view',
+    'reports.export',
   ];
 
   for (const permName of employeePermissions) {
