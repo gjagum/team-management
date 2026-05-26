@@ -79,6 +79,7 @@ employeesRouter.post('/', requirePermission('employees.create'), async (c) => {
       position: data.position,
       hireDate: new Date(data.hireDate),
       salary: data.salary,
+      slackId: data.slackId || null,
     },
   });
 
@@ -99,6 +100,7 @@ employeesRouter.put('/:id', requirePermission('employees.update'), async (c) => 
   if (data.position) updateData.position = data.position;
   if (data.hireDate) updateData.hireDate = new Date(data.hireDate);
   if (data.salary) updateData.salary = data.salary;
+  if (data.slackId !== undefined) updateData.slackId = data.slackId;
 
   const employee = await prisma.employee.update({
     where: { id },

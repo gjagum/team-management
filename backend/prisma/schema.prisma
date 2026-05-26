@@ -37,15 +37,33 @@ model Employee {
   updatedAt     DateTime  @updatedAt @map("updated_at")
   
   user          User      @relation(fields: [userId], references: [id])
+  slackId       String?   @unique @map("slack_id")
   leaveBalances LeaveBalance[]
   leaveRequests LeaveRequest[]
   overtimeRecords OvertimeRecord[]
   schedules     Schedule[]
   defaultSchedules DefaultSchedule[]
+  timeLogs      TimeLog[]
   approvedLeaves LeaveRequest[] @relation("LeaveApprover")
   approvedOvertimes OvertimeRecord[] @relation("OvertimeApprover")
 
   @@map("employees")
+}
+
+model TimeLog {
+  id          Int       @id @default(autoincrement())
+  employeeId  Int       @map("employee_id")
+  date        DateTime  @db.Date
+  clockIn     DateTime? @map("clock_in")
+  clockOut    DateTime? @map("clock_out")
+  source      String    @default("SLACK")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  employee    Employee  @relation(fields: [employeeId], references: [id])
+
+  @@unique([employeeId, date])
+  @@map("time_logs")
 }
 
 model Schedule {

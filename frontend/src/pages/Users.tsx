@@ -14,11 +14,13 @@ export default function Users() {
     password: '',
     fullName: '',
     role: 'EMPLOYEE',
+    slackId: '',
   });
   const [activateData, setActivateData] = useState({
     department: '',
     position: '',
     hireDate: new Date().toISOString().split('T')[0],
+    slackId: '',
   });
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export default function Users() {
       }
       setShowModal(false);
       setEditingUser(null);
-      setFormData({ email: '', password: '', fullName: '', role: 'EMPLOYEE' });
+      setFormData({ email: '', password: '', fullName: '', role: 'EMPLOYEE', slackId: '' });
       fetchUsers();
     } catch (error: any) {
       alert(error.response?.data?.error || 'Failed to save user');
@@ -60,7 +62,7 @@ export default function Users() {
       await api.post(`/users/${activatingUser.id}/activate-employee`, activateData);
       setShowActivateModal(false);
       setActivatingUser(null);
-      setActivateData({ department: '', position: '', hireDate: new Date().toISOString().split('T')[0] });
+      setActivateData({ department: '', position: '', hireDate: new Date().toISOString().split('T')[0], slackId: '' });
       fetchUsers();
     } catch (error: any) {
       alert(error.response?.data?.error || 'Failed to activate contractor');
@@ -74,6 +76,7 @@ export default function Users() {
       password: '',
       fullName: user.fullName,
       role: user.role,
+      slackId: user.employee?.slackId || '',
     });
     setShowModal(true);
   };
@@ -143,6 +146,7 @@ export default function Users() {
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Email</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Access Level</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Contractor Profile</th>
+                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Slack ID</th>
                 <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Status</th>
                 <th className="px-8 py-6 text-right"></th>
               </tr>
@@ -190,6 +194,9 @@ export default function Users() {
                         Activate as Contractor
                       </button>
                     )}
+                  </td>
+                  <td className="px-8 py-6">
+                    <p className="text-xs text-stone-600 font-mono">{user.employee?.slackId || '—'}</p>
                   </td>
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-2">
@@ -282,6 +289,18 @@ export default function Users() {
                   <option value="ADMIN">Admin</option>
                 </select>
               </div>
+              <div>
+                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                  Slack User ID
+                </label>
+                <input
+                  type="text"
+                  value={formData.slackId}
+                  onChange={(e) => setFormData({ ...formData, slackId: e.target.value })}
+                  placeholder="e.g. U12345678"
+                  className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                />
+              </div>
               {!editingUser && (
                 <div>
                   <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
@@ -365,6 +384,18 @@ export default function Users() {
                   value={activateData.hireDate}
                   onChange={(e) => setActivateData({ ...activateData, hireDate: e.target.value })}
                   required
+                  className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                  Slack User ID
+                </label>
+                <input
+                  type="text"
+                  value={activateData.slackId}
+                  onChange={(e) => setActivateData({ ...activateData, slackId: e.target.value })}
+                  placeholder="e.g. U12345678"
                   className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
                 />
               </div>

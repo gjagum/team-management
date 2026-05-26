@@ -64,6 +64,7 @@ usersRouter.post('/', requirePermission('users.create'), async (c) => {
         position: data.position || null,
         hireDate: data.hireDate ? new Date(data.hireDate) : new Date(),
         salary: data.salary || null,
+        slackId: data.slackId || null,
       },
     });
 
@@ -134,6 +135,7 @@ usersRouter.post('/:id/activate-employee', requirePermission('employees.create')
       position: data.position || null,
       hireDate: data.hireDate ? new Date(data.hireDate) : new Date(),
       salary: data.salary || null,
+      slackId: data.slackId || null,
     },
   });
 

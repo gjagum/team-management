@@ -90,6 +90,18 @@ timesheetsRouter.get('/preview', requirePermission('reports.view'), async (c: an
     orderBy: { date: 'asc' },
   });
 
+  // Fetch Raw Time Logs (Clock In/Out)
+  const timeLogs = await prisma.timeLog.findMany({
+    where: {
+      employeeId,
+      date: {
+        gte: new Date(startDate),
+        lte: new Date(endDate),
+      },
+    },
+    orderBy: { date: 'asc' },
+  });
+
   // Get Settings
   const allSettings = await (prisma as any).appSettings.findMany();
   const settingsMap = new Map(allSettings.map((s: any) => [s.key, s.value]));
@@ -106,7 +118,7 @@ timesheetsRouter.get('/preview', requirePermission('reports.view'), async (c: an
     const durationMin = parseTimeToMinutes(s.endTime) - parseTimeToMinutes(s.startTime) - s.breakMinutes;
     const hours = Math.max(0, durationMin / 60);
     
-    if (!dailyLogs[dateStr]) dailyLogs[dateStr] = { date: dateStr, regular: 0, overtime: 0, notes: s.notes || '' };
+    if (!dailyLogs[dateStr]) dailyLogs[dateStr] = { date: dateStr, regular: 0, overtime: 0, clockIn: null, clockOut: null, notes: s.notes || '' };
     dailyLogs[dateStr].regular += hours;
   });
 
@@ -114,8 +126,15 @@ timesheetsRouter.get('/preview', requirePermission('reports.view'), async (c: an
     const dateStr = ot.date.toISOString().split('T')[0];
     const hours = Number(ot.hours);
     
-    if (!dailyLogs[dateStr]) dailyLogs[dateStr] = { date: dateStr, regular: 0, overtime: 0, notes: ot.description || '' };
+    if (!dailyLogs[dateStr]) dailyLogs[dateStr] = { date: dateStr, regular: 0, overtime: 0, clockIn: null, clockOut: null, notes: ot.description || '' };
     dailyLogs[dateStr].overtime += hours;
+  });
+
+  timeLogs.forEach(tl => {
+    const dateStr = tl.date.toISOString().split('T')[0];
+    if (!dailyLogs[dateStr]) dailyLogs[dateStr] = { date: dateStr, regular: 0, overtime: 0, clockIn: null, clockOut: null, notes: '' };
+    dailyLogs[dateStr].clockIn = tl.clockIn;
+    dailyLogs[dateStr].clockOut = tl.clockOut;
   });
 
   const logs = Object.values(dailyLogs).sort((a, b) => a.date.localeCompare(b.date));

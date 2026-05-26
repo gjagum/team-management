@@ -18,6 +18,8 @@ interface TimesheetLog {
   date: string;
   regular: number;
   overtime: number;
+  clockIn: string | null;
+  clockOut: string | null;
   notes: string;
 }
 
@@ -118,6 +120,15 @@ export default function Timesheets() {
 
   const formatCurrency = (val: number, currency: string = 'PHP') => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(val);
+  };
+
+  const formatTime = (isoString: string | null) => {
+    if (!isoString) return '—';
+    return new Date(isoString).toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true 
+    });
   };
 
   return (
@@ -227,6 +238,8 @@ export default function Timesheets() {
                 <thead>
                   <tr className="bg-stone-50">
                     <th className="px-8 py-5 text-label">Date</th>
+                    <th className="px-8 py-5 text-label text-center">Clock In</th>
+                    <th className="px-8 py-5 text-label text-center">Clock Out</th>
                     <th className="px-8 py-5 text-label text-center">Regular (hrs)</th>
                     <th className="px-8 py-5 text-label text-center">Overtime (hrs)</th>
                     <th className="px-8 py-5 text-label">Notes</th>
@@ -237,6 +250,16 @@ export default function Timesheets() {
                     <tr key={log.date} className="hover:bg-stone-50/50 transition-colors duration-200">
                       <td className="px-8 py-4">
                         <span className="font-bold text-on-surface">{new Date(log.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                      </td>
+                      <td className="px-8 py-4 text-center">
+                        <span className={`text-xs font-bold ${log.clockIn ? 'text-green-600' : 'text-stone-300'}`}>
+                          {formatTime(log.clockIn)}
+                        </span>
+                      </td>
+                      <td className="px-8 py-4 text-center">
+                        <span className={`text-xs font-bold ${log.clockOut ? 'text-amber-600' : 'text-stone-300'}`}>
+                          {formatTime(log.clockOut)}
+                        </span>
                       </td>
                       <td className="px-8 py-4 text-center">
                         <span className="text-sm font-medium text-stone-600">{log.regular.toFixed(2)}</span>
