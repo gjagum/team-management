@@ -19,6 +19,60 @@ export interface LoginResponse {
   user: User;
 }
 
+export interface Employee {
+  id: number;
+  userId: number;
+  employeeCode: string;
+  department: string | null;
+  position: string | null;
+  hireDate: string;
+  salary: number | null;
+  slackId: string | null;
+  user: User;
+}
+
+export interface EmployeeDocument {
+  id: number;
+  employeeId: number;
+  type: 'CONTRACT' | 'GOVERNMENT_ID' | 'TAX_FORM' | 'CERTIFICATE' | 'OTHER';
+  fileName: string;
+  filePath: string;
+  fileSize: number;
+  mimeType: string;
+  status: 'ACTIVE' | 'ARCHIVED' | 'EXPIRED';
+  notes: string | null;
+  expiresAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OnboardingTask {
+  id: number;
+  employeeId: number;
+  taskName: string;
+  category: string | null;
+  isRequired: boolean;
+  isCompleted: boolean;
+  completedAt: string | null;
+  completedBy: number | null;
+  sortOrder: number;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OnboardingProgress {
+  total: number;
+  completed: number;
+  required: number;
+  requiredCompleted: number;
+}
+
+export interface OnboardingResponse {
+  tasks: OnboardingTask[];
+  progress: OnboardingProgress;
+}
+
 export interface LeaveRequest {
   id: number;
   employeeId: number;

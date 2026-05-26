@@ -44,6 +44,8 @@ model Employee {
   schedules     Schedule[]
   defaultSchedules DefaultSchedule[]
   timeLogs      TimeLog[]
+  documents     EmployeeDocument[]
+  onboardingTasks OnboardingTask[]
   approvedLeaves LeaveRequest[] @relation("LeaveApprover")
   approvedOvertimes OvertimeRecord[] @relation("OvertimeApprover")
 
@@ -64,6 +66,44 @@ model TimeLog {
 
   @@unique([employeeId, date])
   @@map("time_logs")
+}
+
+model EmployeeDocument {
+  id          Int            @id @default(autoincrement())
+  employeeId  Int            @map("employee_id")
+  type        DocumentType
+  fileName    String         @map("file_name")
+  filePath    String         @map("file_path")
+  fileSize    Int            @map("file_size")
+  mimeType    String         @map("mime_type")
+  status      DocumentStatus @default(ACTIVE)
+  notes       String?
+  expiresAt   DateTime?      @map("expires_at")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  employee    Employee       @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("employee_documents")
+}
+
+model OnboardingTask {
+  id          Int       @id @default(autoincrement())
+  employeeId  Int       @map("employee_id")
+  taskName    String    @map("task_name")
+  category    String?
+  isRequired  Boolean   @default(true) @map("is_required")
+  isCompleted Boolean   @default(false) @map("is_completed")
+  completedAt DateTime? @map("completed_at")
+  completedBy Int?      @map("completed_by")
+  sortOrder   Int       @default(0) @map("sort_order")
+  notes       String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("onboarding_tasks")
 }
 
 model Schedule {
@@ -250,4 +290,18 @@ enum OvertimeStatus {
   APPROVED
   REJECTED
   CANCELLED
+}
+
+enum DocumentType {
+  CONTRACT
+  GOVERNMENT_ID
+  TAX_FORM
+  CERTIFICATE
+  OTHER
+}
+
+enum DocumentStatus {
+  ACTIVE
+  ARCHIVED
+  EXPIRED
 }

@@ -44,6 +44,15 @@ const permissions: Omit<any, 'id' | 'createdAt'>[] = [
   
   // Audit logs
   { name: 'audit.read', description: 'View audit logs', resource: 'audit', action: 'read' },
+
+  // Document management
+  { name: 'documents.read', description: 'View employee documents', resource: 'documents', action: 'read' },
+  { name: 'documents.upload', description: 'Upload employee documents', resource: 'documents', action: 'upload' },
+  { name: 'documents.delete', description: 'Delete employee documents', resource: 'documents', action: 'delete' },
+
+  // Onboarding management
+  { name: 'onboarding.read', description: 'View onboarding status', resource: 'onboarding', action: 'read' },
+  { name: 'onboarding.manage', description: 'Manage onboarding tasks', resource: 'onboarding', action: 'manage' },
 ];
 
 async function seed() {
@@ -91,8 +100,13 @@ async function seed() {
     'overtime.create',
     'overtime.read',
     'overtime.approve',
+    'schedules.read',
     'reports.view',
     'reports.export',
+    'documents.read',
+    'documents.upload',
+    'onboarding.read',
+    'onboarding.manage',
   ];
 
   for (const permName of managerPermissions) {
@@ -124,6 +138,8 @@ async function seed() {
     'schedules.read',
     'reports.view',
     'reports.export',
+    'documents.read',
+    'onboarding.read',
   ];
 
   for (const permName of employeePermissions) {

@@ -15,6 +15,8 @@ import settingsRouter from './routes/settings.ts';
 import rbacRouter from './routes/rbac.ts';
 import timesheetsRouter from './routes/timesheets.ts';
 import webhooksRouter from './routes/webhooks.ts';
+import documentsRouter from './routes/documents.ts';
+import onboardingRouter from './routes/onboarding.ts';
 
 
 export const prisma = new PrismaClient();
@@ -112,6 +114,8 @@ app.route('/api/settings', settingsRouter);
 app.route('/api/rbac', rbacRouter);
 app.route('/api/timesheets', timesheetsRouter);
 app.route('/api/webhooks', webhooksRouter);
+app.route('/api', documentsRouter);
+app.route('/api', onboardingRouter);
 
 
 // --- Serve Built Frontend (for production / Deno Deploy) ---

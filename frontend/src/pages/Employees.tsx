@@ -1,21 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { User as UserType } from '../types';
-
-interface Employee {
-  id: number;
-  userId: number;
-  employeeCode: string;
-  department: string | null;
-  position: string | null;
-  hireDate: string;
-  salary: number | null;
-  user: UserType;
-}
+import { Employee, User as UserType } from '../types';
 
 export default function Employees() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchEmployees();
@@ -80,7 +71,11 @@ export default function Employees() {
             </thead>
             <tbody className="divide-y divide-stone-100">
               {employees.map((employee) => (
-                <tr key={employee.id} className="hover:bg-stone-50 transition-colors duration-200 group">
+                <tr
+                  key={employee.id}
+                  onClick={() => navigate(`/employees/${employee.id}`)}
+                  className="hover:bg-stone-50 transition-colors duration-200 group cursor-pointer"
+                >
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-full bg-stone-200 flex items-center justify-center text-stone-600 font-bold text-lg group-hover:bg-primary group-hover:text-white transition-all duration-500">

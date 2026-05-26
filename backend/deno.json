@@ -1,7 +1,7 @@
 {
   "tasks": {
-    "dev": "deno run --allow-net --allow-read --allow-env --allow-ffi --watch src/index.ts",
-    "start": "deno run --allow-net --allow-read --allow-env --allow-ffi src/index.ts",
+    "dev": "deno run --allow-net --allow-read --allow-write --allow-env --allow-ffi --watch src/index.ts",
+    "start": "deno run --allow-net --allow-read --allow-write --allow-env --allow-ffi src/index.ts",
     "build": "cd ../frontend && deno task build && rm -rf ../backend/static && cp -r dist ../backend/static && cd ../backend && deno run -A npm:prisma generate",
     "prisma:generate": "deno run -A npm:prisma generate",
     "prisma:push": "deno run -A npm:prisma db push",
