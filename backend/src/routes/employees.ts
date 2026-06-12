@@ -42,6 +42,12 @@ employeesRouter.get('/', requirePermission('employees.read'), async (c) => {
           isActive: true,
         },
       },
+      team: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
     orderBy: { createdAt: 'desc' },
   });
@@ -62,6 +68,12 @@ employeesRouter.get('/:id', requirePermission('employees.read'), async (c) => {
           isActive: true,
         },
       },
+      team: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
   if (!employee) return c.json({ error: 'Employee not found' }, 404);
@@ -80,6 +92,7 @@ employeesRouter.post('/', requirePermission('employees.create'), async (c) => {
       hireDate: new Date(data.hireDate),
       salary: data.salary,
       slackId: data.slackId || null,
+      teamId: data.teamId || null,
     },
   });
 
@@ -101,6 +114,7 @@ employeesRouter.put('/:id', requirePermission('employees.update'), async (c) => 
   if (data.hireDate) updateData.hireDate = new Date(data.hireDate);
   if (data.salary) updateData.salary = data.salary;
   if (data.slackId !== undefined) updateData.slackId = data.slackId;
+  if (data.teamId !== undefined) updateData.teamId = data.teamId || null;
 
   const employee = await prisma.employee.update({
     where: { id },

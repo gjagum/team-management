@@ -17,6 +17,7 @@ import timesheetsRouter from './routes/timesheets.ts';
 import webhooksRouter from './routes/webhooks.ts';
 import documentsRouter from './routes/documents.ts';
 import onboardingRouter from './routes/onboarding.ts';
+import teamsRouter from './routes/teams.ts';
 
 
 export const prisma = new PrismaClient();
@@ -116,6 +117,7 @@ app.route('/api/timesheets', timesheetsRouter);
 app.route('/api/webhooks', webhooksRouter);
 app.route('/api', documentsRouter);
 app.route('/api', onboardingRouter);
+app.route('/api/teams', teamsRouter);
 
 
 // --- Serve Built Frontend (for production / Deno Deploy) ---

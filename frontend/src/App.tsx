@@ -13,6 +13,7 @@ import EmployeeDetail from './pages/EmployeeDetail.tsx';
 import Schedules from './pages/Schedules.tsx';
 import Settings from './pages/Settings.tsx';
 import RBACManagement from './pages/RBACManagement.tsx';
+import Teams from './pages/Teams.tsx';
 import Timesheets from './pages/Timesheets.tsx';
 import { NotificationProvider } from './contexts/NotificationContext.tsx';
 
@@ -57,6 +58,7 @@ function App() {
               <Route path="settings" element={<Settings />} />
               <Route path="rbac" element={<RBACManagement />} />
               <Route path="timesheets" element={<Timesheets />} />
+              <Route path="teams" element={<Teams />} />
             </Route>
           </Routes>
         </SettingsProvider>

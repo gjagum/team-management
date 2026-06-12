@@ -6,7 +6,7 @@ export interface AuthContext extends Context {
   user?: {
     userId: number;
     email: string;
-    role: 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
+    role: 'ADMIN' | 'MANAGER' | 'TEAM_LEADER' | 'EMPLOYEE';
   };
 }
 
@@ -67,7 +67,7 @@ export function requirePermission(requiredPermission: string) {
   };
 }
 
-export function requireRole(...roles: ('ADMIN' | 'MANAGER' | 'EMPLOYEE')[]) {
+export function requireRole(...roles: ('ADMIN' | 'MANAGER' | 'TEAM_LEADER' | 'EMPLOYEE')[]) {
   return async (c: AuthContext, next: Next) => {
     if (!c.user || !roles.includes(c.user.role)) {
       return c.json({ error: 'Unauthorized - insufficient role' }, 403);

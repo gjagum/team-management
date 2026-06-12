@@ -233,8 +233,26 @@ leavesRouter.patch('/:id/approve', requirePermission('leaves.approve'), async (c
   const employee = await getEmployeeByUserId(c.user!.userId);
   if (!employee) return c.json({ error: 'No employee profile found' }, 400);
 
-  const oldLeave = await prisma.leaveRequest.findUnique({ where: { id } });
+  const oldLeave = await prisma.leaveRequest.findUnique({
+    where: { id },
+    include: { employee: { select: { teamId: true } } },
+  });
   if (!oldLeave) return c.json({ error: 'Leave request not found' }, 404);
+
+  // Team-based approval check: TEAM_LEADER can only approve their team members
+  if (c.user!.role === 'TEAM_LEADER') {
+    const team = await prisma.team.findUnique({
+      where: { id: employee.teamId! },
+      select: { teamLeaderId: true, alternateApproverId: true },
+    });
+    if (!team || (team.teamLeaderId !== employee.id && team.alternateApproverId !== employee.id)) {
+      return c.json({ error: 'You can only approve leave requests from your team members' }, 403);
+    }
+    const requestor = oldLeave.employee;
+    if (!requestor.teamId || requestor.teamId !== employee.teamId) {
+      return c.json({ error: 'You can only approve leave requests from your team members' }, 403);
+    }
+  }
 
   const leave = await prisma.leaveRequest.update({
     where: { id },

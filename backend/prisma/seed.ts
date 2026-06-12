@@ -53,6 +53,12 @@ const permissions: Omit<any, 'id' | 'createdAt'>[] = [
   // Onboarding management
   { name: 'onboarding.read', description: 'View onboarding status', resource: 'onboarding', action: 'read' },
   { name: 'onboarding.manage', description: 'Manage onboarding tasks', resource: 'onboarding', action: 'manage' },
+
+  // Team management
+  { name: 'teams.create', description: 'Create teams', resource: 'teams', action: 'create' },
+  { name: 'teams.read', description: 'View teams', resource: 'teams', action: 'read' },
+  { name: 'teams.update', description: 'Update teams', resource: 'teams', action: 'update' },
+  { name: 'teams.delete', description: 'Delete teams', resource: 'teams', action: 'delete' },
 ];
 
 async function seed() {
@@ -155,6 +161,43 @@ async function seed() {
         update: {},
         create: {
           role: 'EMPLOYEE',
+          permissionId: permission.id,
+        },
+      });
+    }
+  }
+
+  // Team Leader gets approval permissions for team members
+  console.log('Assigning permissions to TEAM_LEADER role...');
+  const teamLeaderPermissions = [
+    'employees.read',
+    'leaves.create',
+    'leaves.read',
+    'leaves.approve',
+    'overtime.create',
+    'overtime.read',
+    'overtime.approve',
+    'schedules.read',
+    'reports.view',
+    'reports.export',
+    'documents.read',
+    'onboarding.read',
+    'teams.read',
+  ];
+
+  for (const permName of teamLeaderPermissions) {
+    const permission = allPermissions.find(p => p.name === permName);
+    if (permission) {
+      await prisma.rolePermission.upsert({
+        where: {
+          role_permissionId: {
+            role: 'TEAM_LEADER',
+            permissionId: permission.id,
+          },
+        },
+        update: {},
+        create: {
+          role: 'TEAM_LEADER',
           permissionId: permission.id,
         },
       });
@@ -331,10 +374,73 @@ async function seed() {
     });
   }
 
+  // Create a team leader user
+  console.log('Creating team leader user...');
+  const tlPasswordHash = await bcrypt.hash('leader123', 10);
+  const tlUser = await prisma.user.upsert({
+    where: { email: 'leader@team.com' },
+    update: {},
+    create: {
+      email: 'leader@team.com',
+      passwordHash: tlPasswordHash,
+      fullName: 'Team Leader',
+      role: 'TEAM_LEADER',
+    },
+  });
+
+  await prisma.employee.upsert({
+    where: { employeeCode: 'EMP004' },
+    update: {},
+    create: {
+      userId: tlUser.id,
+      employeeCode: 'EMP004',
+      department: 'Engineering',
+      position: 'Team Leader',
+      hireDate: new Date('2022-01-01'),
+      salary: 85000.00,
+    },
+  });
+
+  await prisma.leaveBalance.upsert({
+    where: {
+      employeeId_year: {
+        employeeId: tlUser.id,
+        year: currentYear,
+      },
+    },
+    update: {},
+    create: {
+      employeeId: tlUser.id,
+      year: currentYear,
+      totalLeaves: 2,
+      usedLeaves: 0,
+    },
+  });
+
+  // Create a sample team
+  console.log('Creating sample team...');
+  const engineeringTeam = await prisma.team.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      name: 'Engineering',
+      description: 'Engineering department team',
+      teamLeaderId: tlUser.id,
+      alternateApproverId: (await prisma.user.findUnique({ where: { email: 'manager@team.com' } }))?.employee?.id || null,
+    },
+  });
+
+  // Assign employee to the engineering team
+  await prisma.employee.update({
+    where: { userId: employeeUser.id },
+    data: { teamId: engineeringTeam.id },
+  });
+
   console.log('Database seeding completed successfully!');
   console.log('\nDefault users created:');
   console.log('  Admin: admin@team.com / admin123');
   console.log('  Manager: manager@team.com / manager123');
+  console.log('  Team Leader: leader@team.com / leader123');
   console.log('  Employee: employee@team.com / employee123');
 }
 

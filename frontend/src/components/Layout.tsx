@@ -23,6 +23,7 @@ export default function Layout() {
     { name: 'Users', href: '/users', icon: 'admin_panel_settings', roles: ['ADMIN'] },
     { name: 'Timesheets', href: '/timesheets', icon: 'receipt_long', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
     { name: 'Contractors', href: '/employees', icon: 'groups', roles: ['ADMIN'] },
+    { name: 'Teams', href: '/teams', icon: 'group_work', roles: ['ADMIN', 'MANAGER'] },
     { name: 'Access Control', href: '/rbac', icon: 'security', roles: ['ADMIN'] },
     { name: 'Settings', href: '/settings', icon: 'settings', roles: ['ADMIN'] },
   ];

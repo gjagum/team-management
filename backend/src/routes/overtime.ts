@@ -152,8 +152,26 @@ overtimeRouter.patch('/:id/approve', requirePermission('overtime.approve'), asyn
   const employee = await getEmployeeByUserId(c.user!.userId);
   if (!employee) return c.json({ error: 'No employee profile found' }, 400);
 
-  const oldRecord = await prisma.overtimeRecord.findUnique({ where: { id } });
+  const oldRecord = await prisma.overtimeRecord.findUnique({
+    where: { id },
+    include: { employee: { select: { teamId: true } } },
+  });
   if (!oldRecord) return c.json({ error: 'Overtime record not found' }, 404);
+
+  // Team-based approval check: TEAM_LEADER can only approve their team members
+  if (c.user!.role === 'TEAM_LEADER') {
+    const team = await prisma.team.findUnique({
+      where: { id: employee.teamId! },
+      select: { teamLeaderId: true, alternateApproverId: true },
+    });
+    if (!team || (team.teamLeaderId !== employee.id && team.alternateApproverId !== employee.id)) {
+      return c.json({ error: 'You can only approve overtime requests from your team members' }, 403);
+    }
+    const requestor = oldRecord.employee;
+    if (!requestor.teamId || requestor.teamId !== employee.teamId) {
+      return c.json({ error: 'You can only approve overtime requests from your team members' }, 403);
+    }
+  }
 
   const record = await prisma.overtimeRecord.update({
     where: { id },

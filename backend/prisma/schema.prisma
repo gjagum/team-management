@@ -37,6 +37,8 @@ model Employee {
   updatedAt     DateTime  @updatedAt @map("updated_at")
   
   user          User      @relation(fields: [userId], references: [id])
+  teamId        Int?      @map("team_id")
+  team          Team?     @relation(fields: [teamId], references: [id])
   slackId       String?   @unique @map("slack_id")
   leaveBalances LeaveBalance[]
   leaveRequests LeaveRequest[]
@@ -48,8 +50,26 @@ model Employee {
   onboardingTasks OnboardingTask[]
   approvedLeaves LeaveRequest[] @relation("LeaveApprover")
   approvedOvertimes OvertimeRecord[] @relation("OvertimeApprover")
+  leaderOfTeam     Team?     @relation("TeamLeader")
+  alternateForTeam Team?     @relation("AlternateApprover")
 
   @@map("employees")
+}
+
+model Team {
+  id                 Int       @id @default(autoincrement())
+  name               String
+  description        String?
+  teamLeaderId       Int?      @unique @map("team_leader_id")
+  alternateApproverId Int?     @unique @map("alternate_approver_id")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  teamLeader         Employee? @relation("TeamLeader", fields: [teamLeaderId], references: [id])
+  alternateApprover  Employee? @relation("AlternateApprover", fields: [alternateApproverId], references: [id])
+  members            Employee[]
+
+  @@map("teams")
 }
 
 model TimeLog {
@@ -268,6 +288,7 @@ model AppSettings {
 enum Role {
   ADMIN
   MANAGER
+  TEAM_LEADER
   EMPLOYEE
 }
 

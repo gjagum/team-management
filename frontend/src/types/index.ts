@@ -2,7 +2,7 @@ export interface User {
   id: number;
   email: string;
   fullName: string;
-  role: 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
+  role: 'ADMIN' | 'MANAGER' | 'TEAM_LEADER' | 'EMPLOYEE';
   isActive?: boolean;
   employee?: {
     id: number;
@@ -139,14 +139,14 @@ export interface Permission {
 
 export interface RolePermission {
   id: number;
-  role: 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
+  role: 'ADMIN' | 'MANAGER' | 'TEAM_LEADER' | 'EMPLOYEE';
   permissionId: number;
   createdAt: string;
   permission: Permission;
 }
 
 export interface RoleSummary {
-  role: 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
+  role: 'ADMIN' | 'MANAGER' | 'TEAM_LEADER' | 'EMPLOYEE';
   permissions: {
     id: number;
     permissionId: number;
@@ -159,4 +159,35 @@ export interface RoleSummary {
 export interface RBACSummary {
   roles: RoleSummary[];
   allPermissions: Permission[];
+}
+
+export interface TeamMember {
+  id: number;
+  userId: number;
+  employeeCode: string;
+  department: string | null;
+  position: string | null;
+  hireDate: string;
+  salary: number | null;
+  slackId: string | null;
+  teamId: number | null;
+  user: {
+    id: number;
+    fullName: string;
+    email: string;
+    role: string;
+  };
+}
+
+export interface Team {
+  id: number;
+  name: string;
+  description: string | null;
+  teamLeaderId: number | null;
+  alternateApproverId: number | null;
+  createdAt: string;
+  updatedAt: string;
+  teamLeader: TeamMember | null;
+  alternateApprover: TeamMember | null;
+  members: TeamMember[];
 }

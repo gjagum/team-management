@@ -12,7 +12,10 @@ Full system access with all permissions.
 ### 2. MANAGER
 Limited administrative access, can approve/reject requests and view reports.
 
-### 3. EMPLOYEE
+### 3. TEAM_LEADER
+Team-level approval access. Can approve/reject leave and overtime requests from their own team members. Can read employee and team information.
+
+### 4. EMPLOYEE
 Basic access, can create requests and view own data.
 
 ## Permissions
@@ -48,35 +51,50 @@ Basic access, can create requests and view own data.
 - `reports.view` - View reports and analytics
 - `reports.export` - Export reports
 
+### Team Management
+- `teams.create` - Create teams
+- `teams.read` - View team information
+- `teams.update` - Update team information
+- `teams.delete` - Delete teams
+
 ### Audit Logs
 - `audit.read` - View audit logs
 
 ## Permission Matrix
 
-| Permission | ADMIN | MANAGER | EMPLOYEE |
-|------------|-------|---------|----------|
-| users.create | ✓ | ✗ | ✗ |
-| users.read | ✓ | ✓ | ✗ |
-| users.update | ✓ | ✗ | ✗ |
-| users.delete | ✓ | ✗ | ✗ |
-| employees.create | ✓ | ✗ | ✗ |
-| employees.read | ✓ | ✓ | ✗ |
-| employees.update | ✓ | ✗ | ✗ |
-| employees.delete | ✓ | ✗ | ✗ |
-| leaves.create | ✓ | ✓ | ✓ |
-| leaves.read | ✓ | ✓ | ✓ |
-| leaves.update | ✓ | ✗ | ✗ |
-| leaves.delete | ✓ | ✗ | ✗ |
-| leaves.approve | ✓ | ✓ | ✗ |
-| leaves.manage_balances | ✓ | ✗ | ✗ |
-| overtime.create | ✓ | ✓ | ✓ |
-| overtime.read | ✓ | ✓ | ✓ |
-| overtime.update | ✓ | ✗ | ✗ |
-| overtime.delete | ✓ | ✗ | ✗ |
-| overtime.approve | ✓ | ✓ | ✗ |
-| reports.view | ✓ | ✓ | ✗ |
-| reports.export | ✓ | ✓ | ✗ |
-| audit.read | ✓ | ✗ | ✗ |
+| Permission | ADMIN | MANAGER | TEAM_LEADER | EMPLOYEE |
+|------------|-------|---------|-------------|----------|
+| users.create | ✓ | ✗ | ✗ | ✗ |
+| users.read | ✓ | ✓ | ✗ | ✗ |
+| users.update | ✓ | ✗ | ✗ | ✗ |
+| users.delete | ✓ | ✗ | ✗ | ✗ |
+| employees.create | ✓ | ✗ | ✗ | ✗ |
+| employees.read | ✓ | ✓ | ✓ | ✗ |
+| employees.update | ✓ | ✗ | ✗ | ✗ |
+| employees.delete | ✓ | ✗ | ✗ | ✗ |
+| leaves.create | ✓ | ✓ | ✓ | ✓ |
+| leaves.read | ✓ | ✓ | ✓ | ✓ |
+| leaves.update | ✓ | ✗ | ✗ | ✗ |
+| leaves.delete | ✓ | ✗ | ✗ | ✗ |
+| leaves.approve* | ✓ | ✓ | ✓ | ✗ |
+| leaves.manage_balances | ✓ | ✗ | ✗ | ✗ |
+| overtime.create | ✓ | ✓ | ✓ | ✓ |
+| overtime.read | ✓ | ✓ | ✓ | ✓ |
+| overtime.update | ✓ | ✗ | ✗ | ✗ |
+| overtime.delete | ✓ | ✗ | ✗ | ✗ |
+| overtime.approve* | ✓ | ✓ | ✓ | ✗ |
+| reports.view | ✓ | ✓ | ✓ | ✗ |
+| reports.export | ✓ | ✓ | ✓ | ✗ |
+| schedules.read | ✓ | ✓ | ✓ | ✗ |
+| documents.read | ✓ | ✓ | ✓ | ✗ |
+| onboarding.read | ✓ | ✓ | ✓ | ✗ |
+| teams.create | ✓ | ✗ | ✗ | ✗ |
+| teams.read | ✓ | ✗ | ✓ | ✗ |
+| teams.update | ✓ | ✗ | ✗ | ✗ |
+| teams.delete | ✓ | ✗ | ✗ | ✗ |
+| audit.read | ✓ | ✗ | ✗ | ✗ |
+
+> *TEAM_LEADER approval permissions are scoped to their own team members only.*
 
 ## Implementation
 
