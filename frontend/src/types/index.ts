@@ -2,7 +2,7 @@ export interface User {
   id: number;
   email: string;
   fullName: string;
-  role: 'ADMIN' | 'MANAGER' | 'TEAM_LEADER' | 'EMPLOYEE';
+  role: "ADMIN" | "MANAGER" | "TEAM_LEADER" | "EMPLOYEE";
   isActive?: boolean;
   employee?: {
     id: number;
@@ -28,18 +28,19 @@ export interface Employee {
   hireDate: string;
   salary: number | null;
   slackId: string | null;
+  team?: { id: number; name: string } | null;
   user: User;
 }
 
 export interface EmployeeDocument {
   id: number;
   employeeId: number;
-  type: 'CONTRACT' | 'GOVERNMENT_ID' | 'TAX_FORM' | 'CERTIFICATE' | 'OTHER';
+  type: "CONTRACT" | "GOVERNMENT_ID" | "TAX_FORM" | "CERTIFICATE" | "OTHER";
   fileName: string;
   filePath: string;
   fileSize: number;
   mimeType: string;
-  status: 'ACTIVE' | 'ARCHIVED' | 'EXPIRED';
+  status: "ACTIVE" | "ARCHIVED" | "EXPIRED";
   notes: string | null;
   expiresAt: string | null;
   createdAt: string;
@@ -83,7 +84,7 @@ export interface LeaveRequest {
   paidDays?: number;
   unpaidDays?: number;
   reason: string | null;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
   reviewedBy: number | null;
   reviewedAt: string | null;
   reviewNotes: string | null;
@@ -105,7 +106,7 @@ export interface OvertimeRecord {
   endTime: string;
   hours: number;
   description: string | null;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
   approvedBy: number | null;
   approvedAt: string | null;
   approvalNotes: string | null;
@@ -139,14 +140,14 @@ export interface Permission {
 
 export interface RolePermission {
   id: number;
-  role: 'ADMIN' | 'MANAGER' | 'TEAM_LEADER' | 'EMPLOYEE';
+  role: "ADMIN" | "MANAGER" | "TEAM_LEADER" | "EMPLOYEE";
   permissionId: number;
   createdAt: string;
   permission: Permission;
 }
 
 export interface RoleSummary {
-  role: 'ADMIN' | 'MANAGER' | 'TEAM_LEADER' | 'EMPLOYEE';
+  role: "ADMIN" | "MANAGER" | "TEAM_LEADER" | "EMPLOYEE";
   permissions: {
     id: number;
     permissionId: number;

@@ -89,7 +89,7 @@ Basic access, can create requests and view own data.
 | documents.read | ✓ | ✓ | ✓ | ✗ |
 | onboarding.read | ✓ | ✓ | ✓ | ✗ |
 | teams.create | ✓ | ✗ | ✗ | ✗ |
-| teams.read | ✓ | ✗ | ✓ | ✗ |
+| teams.read | ✓ | ✓ | ✓ | ✗ |
 | teams.update | ✓ | ✗ | ✗ | ✗ |
 | teams.delete | ✓ | ✗ | ✗ | ✗ |
 | audit.read | ✓ | ✗ | ✗ | ✗ |
