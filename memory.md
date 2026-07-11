@@ -27,6 +27,7 @@
 | — | Docker Compose single-container deployment | DevOps | ✅ |
 | 2026-07-04 | Custom opencode commands for task governance (task-start, task-end, task-progress, task-update-documents) | Governance | ✅ |
 | 2026-07-11 | Rewrote 5 session-* opencode commands from Cursor (md-file) format to opencode-native frontmatter + $ARGUMENTS wired to aitivity-ledger MCP | Governance | ✅ |
+| 2026-07-11 | Refreshed README — features (all 12 modules), 4-role RBAC, full project structure tree, complete API endpoint tables (13 route groups) | Docs | ✅ |
 
 ## Active Task
 

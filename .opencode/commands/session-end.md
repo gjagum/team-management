@@ -1,9 +1,18 @@
 ---
-description: Close the active developer session — records handover notes, merge readiness, and releases file locks.
+description: Wrap up or close a developer session — records handover notes, and (after merge to develop) releases file locks.
 agent: main
 ---
 
-Close the active developer session using the **aitivity-ledger** MCP tools.
+Manage the end of a developer session using the **aitivity-ledger** MCP tools.
+
+This command has **two phases**:
+
+| Phase | Trigger | What happens | Locks |
+|-------|---------|--------------|-------|
+| **Wrap-up** | `/session-end <notes>` | Records handover notes, marks ready-to-merge | Stay active |
+| **Close** | `/session-end --merged <notes>` | Verifies merge to develop, closes session | Released |
+
+Locks are only released **after** the branch is merged into the development branch. This prevents another developer from grabbing a file while your changes are still unreviewed.
 
 ## Pre-flight: Verify MCP connectivity
 
@@ -42,14 +51,14 @@ Call `aitivity-ledger_developer_list` first. This lightweight read-only call con
 
 $ARGUMENTS
 
-**Format:** `[handover notes] [--merge] [--credits N] [--blockers <text>]`
+**Format:** `[handover notes] [--merged] [--credits N] [--blockers <text>]`
 
 - **handover notes** — free text for the next developer. Everything that isn't a flag.
-- `--merge` — mark the session as ready to merge into main.
+- `--merged` — signals the branch has been merged into the development branch. Triggers **Close** phase (session_end + lock release).
 - `--credits N` — credits consumed this session (number).
 - `--blockers <text>` — any blockers to record.
 
-**If no arguments were provided**, ask the user for a brief handover note. Do not close the session until you have at least a one-line summary of what was done.
+**If no arguments were provided**, ask the user for a brief handover note before proceeding.
 
 ## Steps
 
@@ -59,28 +68,80 @@ $ARGUMENTS
 2. **Find the open session.**
    Call `aitivity-ledger_session_list` with `status: "open"`. Filter for sessions where `developer_name` matches the git user name.
    - If **none found**: respond `No active session to close.` and stop.
-   - If **multiple found**: list them (session number, module, branch) and ask the user which to close.
+   - If **multiple found**: list them (session number, module, branch) and ask the user which one.
 
-3. **Parse arguments.**
-   - Extract `--merge` (boolean flag), `--credits N` (number), and `--blockers <text>` (string until the next flag or end).
-   - Everything remaining after removing flags is the handover note.
+3. **Determine the phase** from `$ARGUMENTS`:
+   - If `--merged` is **present** → go to **Phase B: Close**.
+   - If `--merged` is **absent** → go to **Phase A: Wrap-up**.
 
-4. **Close the session.**
+---
+
+### Phase A — Wrap-up (no `--merged`)
+
+Locks stay active. The session stays open.
+
+4a. **Parse remaining arguments.**
+   Extract `--credits N` and `--blockers <text>` if present. Everything else is the handover note.
+
+5a. **Update the session** (do NOT close it).
+   Call `aitivity-ledger_session_update` with:
+   - `session_id` — from the matched session
+   - `handover_notes` — the handover text
+   - `ready_to_merge` — `true` (the developer is wrapping up)
+   - `credits_used` — the `--credits` value if present (otherwise omit)
+   - `blockers` — the `--blockers` text if present (otherwise omit)
+
+6a. **Report back.**
+   ```
+   Session #N updated. Ready to merge.
+   Locks are still ACTIVE — they will be released after merge.
+   Run: /session-end --merged <brief note>
+   ```
+
+---
+
+### Phase B — Close (with `--merged`)
+
+Releases locks via `session_end`. Requires the branch to be merged into the development branch first.
+
+4b. **Verify the merge.**
+   Run `git branch --show-current` to get the current branch, then verify it has been merged:
+   ```bash
+   git branch --merged develop
+   ```
+   (Also try `origin/develop` if `develop` doesn't exist locally.)
+   - If the branch appears in the merged list → proceed to step 5b.
+   - If **NOT merged**: respond:
+     ```
+     Branch <branch> has not been merged into develop yet.
+     Locks will stay active until merge is complete.
+     Merge first, then re-run: /session-end --merged
+     ```
+     Stop — do not close the session.
+
+5b. **Parse remaining arguments.**
+   Extract `--credits N` and `--blockers <text>` if present. Everything else is the handover note.
+
+6b. **Close the session.**
    Call `aitivity-ledger_session_end` with:
    - `session_id` — from the matched session
    - `status` — `"closed"`
    - `handover_notes` — the handover text
-   - `ready_to_merge` — `true` if `--merge` was present, otherwise `false`
+   - `ready_to_merge` — `true`
    - `credits_used` — the `--credits` value if present (otherwise omit)
    - `blockers` — the `--blockers` text if present (otherwise omit)
 
-   Note: `session_end` automatically releases all file locks owned by this session.
+   `session_end` automatically releases all file locks owned by this session.
 
-5. **Report back.**
-   One-line confirmation: `Session #N closed. Merge: <YES/NO>. Credits: <N>. File locks released.`
-   If `--merge` was set, include the merge reason from the handover notes.
+7b. **Report back.**
+   ```
+   Session #N closed. Merged to develop. Locks released.
+   Credits: <N>. Ready to merge: YES.
+   ```
 
 ## Rules
 
+- **Never call `session_end` without `--merged`** — it releases locks prematurely.
+- In Phase A, use `session_update` only — the session stays open and locks stay active.
+- In Phase B, verify the git merge before calling `session_end`. If the branch is not merged, stop and tell the user.
 - Do not write to `memory.md`, `COMPLETION_REPORT.md`, or any governance markdown file — all state lives in the aitivity-ledger.
-- Do not manually call `lock_release` — `session_end` handles lock cleanup automatically.
