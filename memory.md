@@ -25,3 +25,23 @@
 | — | Professional UI with responsive sidebar navigation, modals, status badges | UI | ✅ |
 | — | Database seeding with default users (admin/manager/employee) | Data | ✅ |
 | — | Docker Compose single-container deployment | DevOps | ✅ |
+| 2026-07-04 | Custom opencode commands for task governance (task-start, task-end, task-progress, task-update-documents) | Governance | ✅ |
+| 2026-07-11 | Rewrote 5 session-* opencode commands from Cursor (md-file) format to opencode-native frontmatter + $ARGUMENTS wired to aitivity-ledger MCP | Governance | ✅ |
+
+## Active Task
+
+<!--
+  Managed by the `task-start` skill.
+  `/task-start <plan> | <module>` overwrites this section.
+  `/task-done` moves it to the Task Log below.
+  Also available as custom opencode commands:
+  - `/task-start <plan> | <module>`
+  - `/task-end [note]`
+  - `/task-progress <update>`
+  - `/task-update-documents [summary]`
+-->
+
+## Task Log
+
+| Started | Done | Targeted module | Activity plan | Note |
+| ------- | ---- | --------------- | ------------- | ---- |
