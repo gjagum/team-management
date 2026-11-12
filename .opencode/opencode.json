@@ -1,0 +1,15 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "aitivity-ledger": {
+      "type": "remote",
+      "url": "http://localhost:3001/mcp",
+      "headers": {
+        "Authorization": "Bearer f773715ff4a3bf9327a06965d45500e73d32b546db03139e38d2745ad7402cd6"
+      },
+      "oauth": false,
+      "enabled": true,
+      "timeout": 5000
+    }
+  }
+}

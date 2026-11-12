@@ -1,4 +1,6 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
+
+const assertEquals = (actual: unknown, expected: unknown) => expect(actual).toEqual(expected);
 import { Hono } from "hono";
 
 // ---------------------------------------------------------------------------
@@ -62,7 +64,7 @@ function createTestApp(
   // ---- Replicate the leaves router inline (with mock prisma) ----
   // We duplicate the route handlers from leaves.ts but use our mock prisma.
   // This keeps the test self‑contained and avoids importing things that
-  // pull in the real PrismaClient / Deno.env / etc.
+  // pull in the real PrismaClient / process.env / etc.
 
   const prisma = mockPrismaClient;
 
@@ -217,14 +219,14 @@ function createTestApp(
 // --------------------------------
 // GET / – List all leave requests
 // --------------------------------
-Deno.test("GET / – returns an empty list when no leave requests exist", async () => {
+test("GET / – returns an empty list when no leave requests exist", async () => {
   const app = createTestApp();
   const res = await app.request("/");
   assertEquals(res.status, 200);
   assertEquals(await res.json(), []);
 });
 
-Deno.test("GET / – returns leave requests from the database", async () => {
+test("GET / – returns leave requests from the database", async () => {
   const mockLeaves = [
     { id: 1, employeeId: 1, leaveType: "SICK", startDate: "2026-03-20", endDate: "2026-03-21", days: 2, status: "PENDING" },
     { id: 2, employeeId: 2, leaveType: "VACATION", startDate: "2026-04-01", endDate: "2026-04-05", days: 5, status: "APPROVED" },
@@ -248,7 +250,7 @@ Deno.test("GET / – returns leave requests from the database", async () => {
 // --------------------------------
 // GET /my-requests
 // --------------------------------
-Deno.test("GET /my-requests – returns only the current user's requests", async () => {
+test("GET /my-requests – returns only the current user's requests", async () => {
   const userLeaves = [
     { id: 3, employeeId: 1, leaveType: "PERSONAL", days: 1, status: "PENDING" },
   ];
@@ -276,7 +278,7 @@ Deno.test("GET /my-requests – returns only the current user's requests", async
 // --------------------------------
 // GET /balance
 // --------------------------------
-Deno.test("GET /balance – returns defaults when no balance record exists", async () => {
+test("GET /balance – returns defaults when no balance record exists", async () => {
   const app = createTestApp(); // findUnique returns null by default
   const res = await app.request("/balance");
   assertEquals(res.status, 200);
@@ -286,7 +288,7 @@ Deno.test("GET /balance – returns defaults when no balance record exists", asy
   assertEquals(body.availableLeaves, 2);
 });
 
-Deno.test("GET /balance – returns balance with calculated available leaves", async () => {
+test("GET /balance – returns balance with calculated available leaves", async () => {
   const app = createTestApp({
     leaveBalance: {
       ...createMockPrisma().leaveBalance,
@@ -302,7 +304,7 @@ Deno.test("GET /balance – returns balance with calculated available leaves", a
   assertEquals(body.availableLeaves, 10);
 });
 
-Deno.test("GET /balance – respects the year query parameter", async () => {
+test("GET /balance – respects the year query parameter", async () => {
   let capturedYear: number | undefined;
 
   const app = createTestApp({
@@ -322,7 +324,7 @@ Deno.test("GET /balance – respects the year query parameter", async () => {
 // --------------------------------
 // POST / – Create leave request
 // --------------------------------
-Deno.test("POST / – creates a leave request and returns 201", async () => {
+test("POST / – creates a leave request and returns 201", async () => {
   let capturedData: any;
   const app = createTestApp({
     leaveRequest: {
@@ -354,7 +356,7 @@ Deno.test("POST / – creates a leave request and returns 201", async () => {
   assertEquals(capturedData.reason, "Family trip");
 });
 
-Deno.test("POST / – calculates days correctly", async () => {
+test("POST / – calculates days correctly", async () => {
   let capturedDays: number | undefined;
   const app = createTestApp({
     leaveRequest: {
@@ -381,7 +383,7 @@ Deno.test("POST / – calculates days correctly", async () => {
   assertEquals(capturedDays, 5);
 });
 
-Deno.test("POST / – single-day leave calculates as 1 day", async () => {
+test("POST / – single-day leave calculates as 1 day", async () => {
   let capturedDays: number | undefined;
   const app = createTestApp({
     leaveRequest: {
@@ -407,7 +409,7 @@ Deno.test("POST / – single-day leave calculates as 1 day", async () => {
   assertEquals(capturedDays, 1);
 });
 
-Deno.test("POST / – creates an audit log entry", async () => {
+test("POST / – creates an audit log entry", async () => {
   let auditCreated = false;
   const app = createTestApp({
     auditLog: {
@@ -437,7 +439,7 @@ Deno.test("POST / – creates an audit log entry", async () => {
 // --------------------------------
 // PATCH /:id/approve
 // --------------------------------
-Deno.test("PATCH /:id/approve – approves a leave request", async () => {
+test("PATCH /:id/approve – approves a leave request", async () => {
   let balanceUpdated = false;
   const app = createTestApp({
     leaveRequest: {
@@ -481,7 +483,7 @@ Deno.test("PATCH /:id/approve – approves a leave request", async () => {
   assertEquals(balanceUpdated, true);
 });
 
-Deno.test("PATCH /:id/approve – rejects a leave request without updating balance", async () => {
+test("PATCH /:id/approve – rejects a leave request without updating balance", async () => {
   let balanceUpdated = false;
   const app = createTestApp({
     leaveRequest: {
@@ -522,7 +524,7 @@ Deno.test("PATCH /:id/approve – rejects a leave request without updating balan
   assertEquals(balanceUpdated, false);
 });
 
-Deno.test("PATCH /:id/approve – returns 404 when leave not found", async () => {
+test("PATCH /:id/approve – returns 404 when leave not found", async () => {
   const app = createTestApp(); // findUnique returns null by default
 
   const res = await app.request("/999/approve", {
@@ -536,7 +538,7 @@ Deno.test("PATCH /:id/approve – returns 404 when leave not found", async () =>
   assertEquals(body.error, "Leave request not found");
 });
 
-Deno.test("PATCH /:id/approve – creates an audit log entry", async () => {
+test("PATCH /:id/approve – creates an audit log entry", async () => {
   let auditAction: string | undefined;
   const app = createTestApp({
     leaveRequest: {
@@ -576,7 +578,7 @@ Deno.test("PATCH /:id/approve – creates an audit log entry", async () => {
 // --------------------------------
 // DELETE /:id – Cancel leave
 // --------------------------------
-Deno.test("DELETE /:id – cancels a PENDING leave request", async () => {
+test("DELETE /:id – cancels a PENDING leave request", async () => {
   let updatedStatus: string | undefined;
   const app = createTestApp({
     leaveRequest: {
@@ -600,7 +602,7 @@ Deno.test("DELETE /:id – cancels a PENDING leave request", async () => {
   assertEquals(updatedStatus, "CANCELLED");
 });
 
-Deno.test("DELETE /:id – does not update status for non-PENDING leave", async () => {
+test("DELETE /:id – does not update status for non-PENDING leave", async () => {
   let updateCalled = false;
   const app = createTestApp({
     leaveRequest: {
@@ -622,7 +624,7 @@ Deno.test("DELETE /:id – does not update status for non-PENDING leave", async 
   assertEquals(updateCalled, false);
 });
 
-Deno.test("DELETE /:id – returns 404 when leave not found", async () => {
+test("DELETE /:id – returns 404 when leave not found", async () => {
   const app = createTestApp(); // findUnique returns null by default
 
   const res = await app.request("/999", { method: "DELETE" });
@@ -631,7 +633,7 @@ Deno.test("DELETE /:id – returns 404 when leave not found", async () => {
   assertEquals(body.error, "Leave request not found");
 });
 
-Deno.test("DELETE /:id – creates a CANCEL audit log entry", async () => {
+test("DELETE /:id – creates a CANCEL audit log entry", async () => {
   let auditAction: string | undefined;
   const app = createTestApp({
     leaveRequest: {

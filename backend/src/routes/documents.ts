@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { authMiddleware, requirePermission, auditLog } from '../middleware/auth.ts';
 import { prisma } from '../index.ts';
 
@@ -21,7 +22,7 @@ documentsRouter.get('/employees/:employeeId/documents/:docId/download', requireP
   if (!doc) return c.json({ error: 'Document not found' }, 404);
 
   try {
-    const file = await Deno.readFile(doc.filePath);
+    const file = await readFile(doc.filePath);
     return new Response(file, {
       status: 200,
       headers: {
@@ -50,14 +51,14 @@ documentsRouter.post('/employees/:employeeId/documents', requirePermission('docu
   if (!file) return c.json({ error: 'No file provided' }, 400);
 
   const uploadsDir = `uploads/documents/${employeeId}`;
-  await Deno.mkdir(uploadsDir, { recursive: true });
+  await mkdir(uploadsDir, { recursive: true });
 
   const timestamp = Date.now();
   const safeFileName = `${timestamp}_${file.name}`;
   const filePath = `${uploadsDir}/${safeFileName}`;
 
   const buffer = await file.arrayBuffer();
-  await Deno.writeFile(filePath, new Uint8Array(buffer));
+  await writeFile(filePath, new Uint8Array(buffer));
 
   const document = await prisma.employeeDocument.create({
     data: {
@@ -87,7 +88,7 @@ documentsRouter.delete('/employees/:employeeId/documents/:docId', requirePermiss
   const doc = await prisma.employeeDocument.findUnique({ where: { id: docId } });
   if (!doc) return c.json({ error: 'Document not found' }, 404);
 
-  try { await Deno.remove(doc.filePath); } catch { /* file may already be gone */ }
+  try { await rm(doc.filePath); } catch { /* file may already be gone */ }
   await prisma.employeeDocument.delete({ where: { id: docId } });
 
   await auditLog(c.user!.userId, 'DELETE', 'employee_document', docId, doc, null);

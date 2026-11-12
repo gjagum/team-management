@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../services/api.ts';
 import { Permission, RolePermission, RoleSummary, RBACSummary } from '../types/index.ts';
 
-const ROLES = ['ADMIN', 'MANAGER', 'EMPLOYEE'] as const;
+const ROLES = ['ADMIN', 'MANAGER', 'TEAM_LEADER', 'EMPLOYEE'] as const;
 type Role = typeof ROLES[number];
 
 export default function RBACManagement() {

@@ -59,15 +59,17 @@ docker run -d \
 
 ```bash
 cd backend
-deno task prisma:push
-deno task seed
+bun install
+bun run prisma:push
+bun run seed
 ```
 
 ### Start the server
 
 ```bash
-cd backend
-deno task start
+cd ..
+bun run build
+bun run start
 ```
 
 ---

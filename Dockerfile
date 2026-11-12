@@ -1,65 +1,50 @@
-# ---- Stage 1: Build Frontend ----
-FROM denoland/deno:2.2.3 AS frontend-builder
+# syntax=docker/dockerfile:1
 
-WORKDIR /app/frontend
-
-# Copy frontend files
-COPY frontend/package.json frontend/deno.json ./
-COPY frontend/postcss.config.cjs frontend/tailwind.config.cjs frontend/tsconfig.json frontend/tsconfig.node.json frontend/vite.config.ts frontend/index.html ./
-RUN deno install
-
-COPY frontend/src ./src
-COPY frontend/public ./public
-
-RUN deno task build
-
-# ---- Stage 2: Setup Backend ----
-FROM denoland/deno:2.2.3 AS backend-builder
-
-WORKDIR /app/backend
-
-# Copy backend dependency files
-COPY backend/package.json backend/deno.json ./
-RUN deno install
-
-# Approve prisma build scripts and generate client
-COPY backend/prisma ./prisma
-RUN echo '{ "packages": { "npm:@prisma/client@5.22.0": true, "npm:@prisma/engines@5.22.0": true, "npm:prisma@5.22.0": true, "npm:esbuild@0.27.4": true } }' > /app/backend/deno.permissions.json && \
-    deno install && \
-    deno run -A npm:prisma generate
-
-# Copy backend source
-COPY backend/src ./src
-COPY backend/tsconfig.json ./
-
-# ---- Stage 3: Production Runner ----
-FROM denoland/deno:2.2.3 AS runner
-
+# ---- Stage 1: install + build (frontend bundle, Prisma client) ----
+FROM oven/bun:1.4.2 AS builder
 WORKDIR /app
 
-ENV DENO_DIR=/deno-dir
-ENV NODE_ENV=production
+# Prisma's engines need OpenSSL to detect the right binary target
+RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
-RUN addgroup --system --gid 1001 deno && \
-    adduser --system --uid 1001 --gid 1001 deno
+# Install dependencies first so this layer is cached across source changes
+COPY package.json bun.lock ./
+COPY backend/package.json backend/package.json
+COPY frontend/package.json frontend/package.json
+COPY backend/prisma backend/prisma
+RUN bun install --frozen-lockfile
 
-# Copy backend source and dependencies
-COPY --from=backend-builder /app/backend/src ./src
-COPY --from=backend-builder /app/backend/prisma ./prisma
-COPY --from=backend-builder /app/backend/package.json /app/backend/deno.json ./
-COPY --from=backend-builder /app/backend/node_modules ./node_modules
+COPY frontend frontend
+COPY backend backend
+RUN bun run build
 
-# Copy built frontend
-COPY --from=frontend-builder /app/frontend/dist ./static
+# ---- Stage 2: runtime ----
+FROM oven/bun:1.4.2-slim AS runner
+WORKDIR /app
 
-# Cache deno dependencies
-RUN deno install
+RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN chown -R deno:deno /app /deno-dir
+ENV NODE_ENV=production \
+    PORT=3001
 
-USER deno
+# Workspace layout is preserved: backend/node_modules symlinks into /app/node_modules/.bun
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/backend/package.json ./backend/
+COPY --from=builder /app/backend/node_modules ./backend/node_modules
+COPY --from=builder /app/backend/prisma ./backend/prisma
+COPY --from=builder /app/backend/src ./backend/src
+COPY --from=builder /app/backend/static ./backend/static
+
+WORKDIR /app/backend
+RUN mkdir -p uploads && chown -R bun:bun uploads
+
+# `bun` user ships with the oven/bun image
+USER bun
 
 EXPOSE 3001
+VOLUME ["/app/backend/uploads"]
 
-CMD ["deno", "run", "--allow-net", "--allow-read", "--allow-env", "--allow-ffi", "src/index.ts"]
+CMD ["bun", "src/index.ts"]

@@ -24,6 +24,8 @@ services:
     environment:
       DATABASE_URL: postgres://teamuser:teampass@postgres:5432/teammanagement
       JWT_SECRET: your-secret-key-change-in-production
+    volumes:
+      - uploads:/app/backend/uploads
     ports:
       - "3001:3001"
     depends_on:
@@ -32,3 +34,4 @@ services:
 
 volumes:
   postgres_data:
+  uploads:

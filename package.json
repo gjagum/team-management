@@ -1,0 +1,21 @@
+{
+  "name": "team-management",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:backend": "bun run --filter @team-management/backend dev",
+    "dev:frontend": "bun run --filter @team-management/frontend dev",
+    "build": "bun run --filter @team-management/backend build",
+    "start": "bun run --filter @team-management/backend start",
+    "test": "bun run --filter @team-management/backend test"
+  },
+  "trustedDependencies": [
+    "@prisma/client",
+    "@prisma/engines",
+    "prisma",
+    "esbuild"
+  ]
+}

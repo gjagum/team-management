@@ -100,7 +100,7 @@ rbacRouter.delete('/role-permissions/:id', async (c) => {
 // ===================== ROLE SUMMARY =====================
 
 rbacRouter.get('/roles/summary', async (c) => {
-  const roles = ['ADMIN', 'MANAGER', 'EMPLOYEE'] as const;
+  const roles = ['ADMIN', 'MANAGER', 'TEAM_LEADER', 'EMPLOYEE'] as const;
   const permissions = await prisma.permission.findMany({ orderBy: { resource: 'asc' } });
   const rolePermissions = await prisma.rolePermission.findMany({
     include: { permission: true },
