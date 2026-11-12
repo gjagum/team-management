@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { authMiddleware, requirePermission, requireRole, auditLog } from '../middleware/auth.ts';
-import { prisma } from '../index.ts';
+import { prisma } from '../db.ts';
 import bcrypt from 'bcryptjs';
 
 const usersRouter = new Hono();

@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { authMiddleware, requireRole, auditLog } from '../middleware/auth.ts';
-import { prisma } from '../index.ts';
+import { prisma } from '../db.ts';
 
 const rbacRouter = new Hono();
 

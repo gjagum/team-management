@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { documentStorage } from '../storage.ts';
 import { authMiddleware, requirePermission, auditLog } from '../middleware/auth.ts';
-import { prisma } from '../index.ts';
+import { prisma } from '../db.ts';
 
 const documentsRouter = new Hono();
 
@@ -21,19 +21,17 @@ documentsRouter.get('/employees/:employeeId/documents/:docId/download', requireP
   const doc = await prisma.employeeDocument.findUnique({ where: { id: docId } });
   if (!doc) return c.json({ error: 'Document not found' }, 404);
 
-  try {
-    const file = await readFile(doc.filePath);
-    return new Response(file, {
-      status: 200,
-      headers: {
-        'Content-Type': doc.mimeType,
-        'Content-Disposition': `attachment; filename="${doc.fileName}"`,
-        'Content-Length': String(doc.fileSize),
-      },
-    });
-  } catch {
-    return c.json({ error: 'File not found on disk' }, 404);
-  }
+  const file = await documentStorage().get(doc.filePath);
+  if (!file) return c.json({ error: 'File not found in storage' }, 404);
+
+  return new Response(file, {
+    status: 200,
+    headers: {
+      'Content-Type': doc.mimeType,
+      'Content-Disposition': `attachment; filename="${doc.fileName}"`,
+      'Content-Length': String(doc.fileSize),
+    },
+  });
 });
 
 documentsRouter.post('/employees/:employeeId/documents', requirePermission('documents.upload'), async (c) => {
@@ -50,15 +48,11 @@ documentsRouter.post('/employees/:employeeId/documents', requirePermission('docu
 
   if (!file) return c.json({ error: 'No file provided' }, 400);
 
-  const uploadsDir = `uploads/documents/${employeeId}`;
-  await mkdir(uploadsDir, { recursive: true });
+  // Strip path separators and other odd characters so the name can't escape the folder
+  const safeFileName = `${Date.now()}_${file.name.replace(/[^\w.\-]+/g, '_')}`;
+  const filePath = `uploads/documents/${employeeId}/${safeFileName}`;
 
-  const timestamp = Date.now();
-  const safeFileName = `${timestamp}_${file.name}`;
-  const filePath = `${uploadsDir}/${safeFileName}`;
-
-  const buffer = await file.arrayBuffer();
-  await writeFile(filePath, new Uint8Array(buffer));
+  await documentStorage().put(filePath, await file.arrayBuffer(), file.type || 'application/octet-stream');
 
   const document = await prisma.employeeDocument.create({
     data: {
@@ -88,7 +82,7 @@ documentsRouter.delete('/employees/:employeeId/documents/:docId', requirePermiss
   const doc = await prisma.employeeDocument.findUnique({ where: { id: docId } });
   if (!doc) return c.json({ error: 'Document not found' }, 404);
 
-  try { await rm(doc.filePath); } catch { /* file may already be gone */ }
+  try { await documentStorage().delete(doc.filePath); } catch { /* file may already be gone */ }
   await prisma.employeeDocument.delete({ where: { id: docId } });
 
   await auditLog(c.user!.userId, 'DELETE', 'employee_document', docId, doc, null);

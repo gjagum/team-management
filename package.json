@@ -17,5 +17,8 @@
     "@prisma/engines",
     "prisma",
     "esbuild"
-  ]
+  ],
+  "devDependencies": {
+    "wrangler": "^4.160.1"
+  }
 }

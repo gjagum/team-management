@@ -1,6 +1,6 @@
 import { Context, Next } from 'hono';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../index.ts';
+import { prisma } from '../db.ts';
 
 export interface AuthContext extends Context {
   user?: {
