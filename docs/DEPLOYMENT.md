@@ -4,17 +4,25 @@
 
 | Method | Best For | Guide |
 |---|---|---|
-| **Deno Deploy** | Production (serverless, zero-config) | [DENO_DEPLOY.md](./DENO_DEPLOY.md) |
 | **Docker** | Self-hosted / on-premise | [DOCKER.md](./DOCKER.md) |
 
 ## Local Development
 
 ```bash
-# Backend (hot reload on port 3001)
-cd backend && deno task dev
+# Install all workspace dependencies (run once, from repo root)
+bun install
 
-# Frontend (hot reload on port 5173)
-cd frontend && deno task dev
+# Backend (hot reload on port 3001)
+bun run dev:backend
+
+# Frontend (hot reload on port 3000, proxies /api to 3001)
+bun run dev:frontend
+
+# Production build: frontend bundle -> backend/static, Prisma client
+bun run build && bun run start
+
+# Tests
+bun run test
 ```
 
 ## Environment Variables

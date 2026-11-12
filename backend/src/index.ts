@@ -2,7 +2,7 @@ import pkg from '@prisma/client';
 const { PrismaClient } = pkg;
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { serveStatic } from 'hono/deno';
+import { serveStatic } from 'hono/bun';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
@@ -40,7 +40,7 @@ app.get('/api/auth/me', async (c) => {
   if (!token) return c.json({ error: 'No token provided' }, 401);
 
   try {
-    const decoded = jwt.verify(token, Deno.env.get('JWT_SECRET') || 'your-secret-key') as JWTPayload;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as JWTPayload;
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       include: { employee: true },
@@ -74,7 +74,7 @@ app.post('/api/auth/login', async (c) => {
 
   const token = jwt.sign(
     { userId: user.id, email: user.email, role: user.role },
-    Deno.env.get('JWT_SECRET') || 'your-secret-key',
+    process.env.JWT_SECRET || 'your-secret-key',
     { expiresIn: '24h' }
   );
 
@@ -120,11 +120,11 @@ app.route('/api', onboardingRouter);
 app.route('/api/teams', teamsRouter);
 
 
-// --- Serve Built Frontend (for production / Deno Deploy) ---
+// --- Serve Built Frontend (production) ---
 app.use('/assets/*', serveStatic({ root: './static' }));
 app.get('*', serveStatic({ root: './static', path: 'index.html' }));
 
-const port = parseInt(Deno.env.get('PORT') || '3001');
+const port = parseInt(process.env.PORT || '3001');
 console.log(`🚀 Server running on http://localhost:${port}`);
-Deno.serve({ port }, app.fetch);
+Bun.serve({ port, fetch: app.fetch });
 

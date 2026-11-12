@@ -30,3 +30,9 @@ Thumbs.db
 
 # Bun
 bun.lockb
+
+# Generated frontend build served by backend
+static/
+
+# Uploaded documents
+uploads/

@@ -283,7 +283,7 @@ All endpoints (except auth and the public settings endpoint) require a `Bearer` 
 - `docs/API.md` — API endpoints documentation
 - `docs/RBAC.md` — RBAC and permissions
 - `docs/DEPLOYMENT.md` — Production deployment
-- `docs/DENO_DEPLOY.md` — Deno Deploy notes
+- `wrangler.jsonc` — Cloudflare Workers config (work in progress)
 - `docs/DOCKER.md` — Docker details
 - `docs/PROJECT_SUMMARY.md` — Complete project overview
 

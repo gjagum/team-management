@@ -18,7 +18,7 @@ export async function authMiddleware(c: AuthContext, next: Next) {
   }
 
   try {
-    const decoded = jwt.verify(token, Deno.env.get('JWT_SECRET') || 'your-secret-key') as any;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
     
     const session = await prisma.session.findFirst({
       where: {

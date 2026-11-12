@@ -1,4 +1,4 @@
 {
-  "deno.enablePaths": ["backend/"],
-  "deno.config": "./backend/deno.json"
+  "deno.enable": false,
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
