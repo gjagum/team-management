@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { prisma } from '../index.ts';
+import { prisma } from '../db.ts';
 
 const webhooksRouter = new Hono();
 

@@ -4,7 +4,7 @@ import {
   requirePermission,
   auditLog,
 } from "../middleware/auth.ts";
-import { prisma } from "../index.ts";
+import { prisma } from "../db.ts";
 
 const overtimeRouter = new Hono();
 

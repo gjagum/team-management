@@ -1,11 +1,10 @@
 // Cloudflare Workers config: one Worker serves both the API and the built frontend.
 // Docs: https://developers.cloudflare.com/workers/wrangler/configuration/
 //
-// NOTE: not deployable yet. Remaining work before `wrangler deploy`:
-//   1. backend/src/worker.ts  – Worker entry that exports the Hono app (split app from Bun.serve in index.ts)
-//   2. Prisma driver adapter  – @prisma/adapter-pg over the HYPERDRIVE binding (no TCP engine on Workers)
-//   3. Uploads → R2           – documents.ts uses the local filesystem; switch to the DOCUMENTS binding
-//   4. jsonwebtoken → hono/jwt (Web Crypto)
+// One-time setup before the first deploy:
+//   wrangler r2 bucket create team-management-documents
+//   wrangler secret put DATABASE_URL     # Postgres (Neon) connection string
+//   wrangler secret put JWT_SECRET
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "team-management",
@@ -13,31 +12,19 @@
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat"],
 
-  // Build the Vite frontend before each deploy / dev session
+  // Build the Vite frontend and generate the Prisma client (WASM engine for Workers)
   "build": {
-    "command": "bun run --filter @team-management/frontend build"
+    "command": "bun run --filter @team-management/frontend build && bun run --filter @team-management/backend prisma:generate"
   },
 
-  // Frontend served from Cloudflare's CDN; Worker only runs for API routes
+  // Frontend served from Cloudflare's CDN; the Worker only runs for API routes
   "assets": {
     "directory": "frontend/dist",
-    "binding": "ASSETS",
     "not_found_handling": "single-page-application",
     "run_worker_first": ["/api/*", "/health"]
   },
 
-  // Postgres via Hyperdrive. Create with:
-  //   wrangler hyperdrive create team-db --connection-string="postgres://user:pass@host:5432/teammanagement"
-  "hyperdrive": [
-    {
-      "binding": "HYPERDRIVE",
-      "id": "<HYPERDRIVE_ID>",
-      // Used by `wrangler dev` instead of the remote Hyperdrive config
-      "localConnectionString": "postgres://teamuser:teampass@localhost:5432/teammanagement"
-    }
-  ],
-
-  // Employee document uploads. Create with: wrangler r2 bucket create team-management-documents
+  // Employee document uploads
   "r2_buckets": [
     {
       "binding": "DOCUMENTS",
@@ -45,7 +32,13 @@
     }
   ],
 
-  // Non-secret config. Set secrets with: wrangler secret put JWT_SECRET
+  // Optional, recommended for latency: pool Postgres connections with Hyperdrive.
+  //   wrangler hyperdrive create team-db --connection-string="<non-pooler Neon URL>"
+  // then uncomment and paste the id. worker.ts prefers it over DATABASE_URL.
+  // "hyperdrive": [
+  //   { "binding": "HYPERDRIVE", "id": "<HYPERDRIVE_ID>" }
+  // ],
+
   "vars": {
     "NODE_ENV": "production"
   },

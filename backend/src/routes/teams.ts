@@ -4,7 +4,7 @@ import {
   requirePermission,
   auditLog,
 } from "../middleware/auth.ts";
-import { prisma } from "../index.ts";
+import { prisma } from "../db.ts";
 import type { Prisma } from "@prisma/client";
 
 const teamsRouter = new Hono();
