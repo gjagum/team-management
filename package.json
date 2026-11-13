@@ -1,6 +1,7 @@
 {
   "name": "team-management",
   "private": true,
+  "packageManager": "bun@1.4.2",
   "workspaces": [
     "backend",
     "frontend"
