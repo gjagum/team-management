@@ -29,6 +29,7 @@
 | 2026-07-11 | Rewrote 5 session-* opencode commands from Cursor (md-file) format to opencode-native frontmatter + $ARGUMENTS wired to aitivity-ledger MCP | Governance | ✅ |
 | 2026-07-11 | Refreshed README — features (all 12 modules), 4-role RBAC, full project structure tree, complete API endpoint tables (13 route groups) | Docs | ✅ |
 | 2026-11-12 | Migrated runtime Deno → Bun (workspaces, bun:test, hono/bun static, node:fs uploads); fixed Dockerfile + uploads volume; added wrangler.jsonc for Cloudflare Workers | DevOps | ✅ |
+| 2026-11-12 | Added docs/ARCHITECTURE.md — Mermaid diagrams for topology, request pipeline, auth, ERD, leave/overtime/Slack/timesheet flows | Docs | ✅ |
 
 ## Active Task
 
