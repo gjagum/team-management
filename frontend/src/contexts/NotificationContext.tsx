@@ -111,7 +111,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             </div>
             
             <div className="flex-1 pt-0.5">
-              <h4 className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-1">
+              <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] mb-1">
                 {n.type === 'success' && 'Operation Successful'}
                 {n.type === 'error' && 'System Error'}
                 {n.type === 'warning' && 'Warning'}
@@ -125,7 +125,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             <button
               type="button"
               onClick={() => setNotifications((prev) => prev.filter((notif) => notif.id !== n.id))}
-              className="p-1 hover:bg-stone-100 rounded transition-colors text-stone-300 hover:text-stone-500"
+              className="p-1 hover:bg-zinc-100 rounded transition-colors text-zinc-300 hover:text-zinc-500"
             >
               <span className="material-symbols-outlined text-lg">close</span>
             </button>
@@ -135,13 +135,13 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
       {/* Confirm/Alert Global Dialog Overlay */}
       {(confirmState || alertState) && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in shadow-2xl">
-          <div className="bg-surface-container-lowest rounded-2xl editorial-shadow-lg w-full max-w-sm overflow-hidden animate-modal-in border border-stone-100">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in shadow-2xl">
+          <div className="bg-surface-container-lowest rounded-2xl editorial-shadow-lg w-full max-w-sm overflow-hidden animate-modal-in border border-zinc-100">
             <div className="p-10">
               <h3 className="text-2xl font-black text-on-surface tracking-tighter mb-3">
                 {confirmState?.options.title || alertState?.title || 'Notification'}
               </h3>
-              <p className="text-stone-500 text-sm leading-relaxed mb-10 font-medium">
+              <p className="text-zinc-500 text-sm leading-relaxed mb-10 font-medium">
                 {confirmState?.options.message || alertState?.message}
               </p>
               
@@ -151,7 +151,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
                     <button 
                       type="button"
                       onClick={() => handleConfirmClose(false)}
-                      className="flex-1 px-6 py-3.5 rounded-xl bg-stone-100 text-stone-600 font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-stone-200 transition-all border border-stone-200"
+                      className="flex-1 px-6 py-3.5 rounded-xl bg-zinc-100 text-zinc-600 font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-zinc-200 transition-all border border-zinc-200"
                     >
                       {confirmState.options.cancelLabel || 'No, Cancel'}
                     </button>

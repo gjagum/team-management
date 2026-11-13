@@ -100,7 +100,7 @@ export default function Overtime() {
           <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
             Overtime Ledger
           </h1>
-          <p className="text-stone-500 mt-2 max-w-md">
+          <p className="text-zinc-500 mt-2 max-w-md">
             Track, authorize, and analyze extended work hours across all personnel.
           </p>
         </div>
@@ -116,24 +116,24 @@ export default function Overtime() {
       {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-40 border-b-4 border-primary/20">
-          <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">Approved Hours</span>
+          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Approved Hours</span>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-on-surface tracking-tighter">{totalApprovedHours.toFixed(1)}</h3>
             <span className="text-green-600 text-xs font-bold mb-2">Validated</span>
           </div>
         </div>
         <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-40 border-b-4 border-amber-200">
-          <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">Pending Review</span>
+          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Pending Review</span>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-on-surface tracking-tighter">{pendingCount}</h3>
             <span className="text-amber-600 text-xs font-bold mb-2">Awaiting</span>
           </div>
         </div>
-        <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-40 border-b-4 border-stone-300">
-          <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">Total Records</span>
+        <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-40 border-b-4 border-zinc-300">
+          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Total Records</span>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-primary tracking-tighter">{overtimeRecords.length}</h3>
-            <span className="text-stone-500 text-xs font-bold mb-2">Logged</span>
+            <span className="text-zinc-500 text-xs font-bold mb-2">Logged</span>
           </div>
         </div>
       </div>
@@ -143,22 +143,22 @@ export default function Overtime() {
         <div className="bg-surface-container-lowest editorial-shadow rounded-lg overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-stone-50">
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Personnel</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Date</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Time Block</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Hours</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Description</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Status</th>
+              <tr className="bg-zinc-50">
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Personnel</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Date</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Time Block</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Hours</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Description</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Status</th>
                 <th className="px-8 py-6 text-right"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-100">
+            <tbody className="divide-y divide-zinc-100">
               {overtimeRecords.map((record) => (
-                <tr key={record.id} className="hover:bg-stone-50 transition-colors duration-200 group">
+                <tr key={record.id} className="hover:bg-zinc-50 transition-colors duration-200 group">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center text-stone-600 font-bold text-sm group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                      <div className="w-10 h-10 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-600 font-bold text-sm group-hover:bg-primary group-hover:text-white transition-all duration-500">
                         {record.employee?.user.fullName?.charAt(0).toUpperCase() || '?'}
                       </div>
                       <p className="font-bold text-on-surface tracking-tight">
@@ -167,10 +167,10 @@ export default function Overtime() {
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    <p className="text-stone-700 font-medium text-sm">{formatDate(record.date)}</p>
+                    <p className="text-zinc-700 font-medium text-sm">{formatDate(record.date)}</p>
                   </td>
                   <td className="px-8 py-6">
-                    <p className="text-stone-500 text-sm font-medium">
+                    <p className="text-zinc-500 text-sm font-medium">
                       {formatDateTime(record.startTime).split(' ')[1]} - {formatDateTime(record.endTime).split(' ')[1]}
                     </p>
                   </td>
@@ -178,7 +178,7 @@ export default function Overtime() {
                     <p className="font-black text-on-surface text-lg tracking-tight">{record.hours}h</p>
                   </td>
                   <td className="px-8 py-6">
-                    <p className="text-stone-500 text-sm font-medium italic max-w-xs truncate">
+                    <p className="text-zinc-500 text-sm font-medium italic max-w-xs truncate">
                       {record.description || '—'}
                     </p>
                   </td>
@@ -210,7 +210,7 @@ export default function Overtime() {
                       {record.status === 'PENDING' && record.employeeId === user?.id && (
                         <button
                           onClick={() => handleCancel(record.id)}
-                          className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-500 hover:text-red-700 hover:bg-stone-100 rounded-lg transition-colors"
+                          className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500 hover:text-red-700 hover:bg-zinc-100 rounded-lg transition-colors"
                         >
                           Cancel
                         </button>
@@ -226,7 +226,7 @@ export default function Overtime() {
 
       {/* Footer */}
       <div className="flex items-center justify-between">
-        <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">
+        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
           Displaying {overtimeRecords.length} Record{overtimeRecords.length !== 1 ? 's' : ''}
         </p>
       </div>
@@ -245,7 +245,7 @@ export default function Overtime() {
             </div>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                   Date
                 </label>
                 <input
@@ -258,7 +258,7 @@ export default function Overtime() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                     Start Time
                   </label>
                   <input
@@ -270,7 +270,7 @@ export default function Overtime() {
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                     End Time
                   </label>
                   <input
@@ -283,7 +283,7 @@ export default function Overtime() {
                 </div>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                   Description
                 </label>
                 <textarea
@@ -297,7 +297,7 @@ export default function Overtime() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-6 py-2.5 bg-surface-container-low text-stone-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all"
+                  className="px-6 py-2.5 bg-surface-container-low text-zinc-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all"
                 >
                   Cancel
                 </button>

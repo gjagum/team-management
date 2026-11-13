@@ -4,23 +4,23 @@
 
 @layer base {
   :root {
-    --background: 30 33% 98%;
-    --foreground: 0 3% 11%;
+    --background: 260 44% 98%;
+    --foreground: 258 18% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 0 3% 11%;
-    --primary: 0 100% 37%;
+    --card-foreground: 258 18% 12%;
+    --primary: 262 83% 58%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 1% 37%;
+    --secondary: 258 8% 37%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 20 8% 95%;
-    --muted-foreground: 20 3% 40%;
-    --accent: 20 8% 95%;
-    --accent-foreground: 0 3% 11%;
+    --muted: 260 20% 96%;
+    --muted-foreground: 258 8% 42%;
+    --accent: 260 20% 96%;
+    --accent-foreground: 258 18% 12%;
     --destructive: 0 79% 41%;
     --destructive-foreground: 0 0% 100%;
-    --border: 20 12% 90%;
-    --input: 20 12% 90%;
-    --ring: 0 100% 37%;
+    --border: 260 18% 91%;
+    --input: 260 18% 91%;
+    --ring: 262 83% 58%;
     --radius: 0.5rem;
   }
 }
@@ -32,7 +32,7 @@
   body {
     @apply bg-surface text-on-surface font-sans antialiased;
     font-family: 'Inter', system-ui, sans-serif;
-    background-color: #fcf9f8;
+    background-color: #faf9fd;
   }
 
   /* Custom scrollbar */
@@ -43,30 +43,30 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #d6d3d1;
+    background: #d5d1e0;
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #a8a29e;
+    background: #a9a3b8;
   }
 
   ::selection {
-    background-color: rgba(188, 0, 2, 0.15);
+    background-color: rgba(124, 58, 237, 0.16);
   }
 }
 
 @layer utilities {
   .editorial-shadow {
-    box-shadow: 0 12px 32px rgba(28, 27, 27, 0.06);
+    box-shadow: 0 12px 32px rgba(30, 22, 52, 0.06);
   }
   .editorial-shadow-lg {
-    box-shadow: 0 20px 48px rgba(28, 27, 27, 0.08);
+    box-shadow: 0 20px 48px rgba(30, 22, 52, 0.08);
   }
   .editorial-shadow-sm {
-    box-shadow: 0 4px 12px rgba(28, 27, 27, 0.04);
+    box-shadow: 0 4px 12px rgba(30, 22, 52, 0.04);
   }
   .primary-gradient {
-    background: linear-gradient(135deg, #bc0002 0%, #eb0003 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
   }
   .tracking-editorial {
     letter-spacing: 0.2em;
@@ -76,7 +76,7 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: #a8a29e;
+    color: #a1a1aa;
   }
 }
 

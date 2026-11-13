@@ -32,10 +32,10 @@ export default function Login() {
       <div className="w-full max-w-md">
         {/* Logo area */}
         <div className="text-center mb-12">
-          <h1 className="text-2xl font-bold tracking-tighter text-red-700 uppercase mb-2">
+          <h1 className="text-2xl font-bold tracking-tighter text-violet-700 uppercase mb-2">
             {getSetting('company.name') || 'TEAM MANAGEMENT'}
           </h1>
-          <p className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">
+          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">
             Corporate Management Platform
           </p>
         </div>
@@ -49,7 +49,7 @@ export default function Login() {
             <h2 className="text-3xl font-black text-on-surface tracking-tighter">
               Welcome Back
             </h2>
-            <p className="text-stone-500 mt-2 text-sm">
+            <p className="text-zinc-500 mt-2 text-sm">
               Sign in to access your corporate intelligence dashboard.
             </p>
           </div>
@@ -65,7 +65,7 @@ export default function Login() {
             <div>
               <label
                 htmlFor="email"
-                className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2"
+                className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2"
               >
                 Email Address
               </label>
@@ -75,7 +75,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-on-surface text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none transition-all placeholder:text-stone-400"
+                className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-on-surface text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none transition-all placeholder:text-zinc-400"
                 placeholder="admin@team.com"
               />
             </div>
@@ -83,7 +83,7 @@ export default function Login() {
             <div>
               <label
                 htmlFor="password"
-                className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2"
+                className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2"
               >
                 Password
               </label>
@@ -93,7 +93,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-on-surface text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none transition-all placeholder:text-stone-400"
+                className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-on-surface text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none transition-all placeholder:text-zinc-400"
                 placeholder="••••••••"
               />
             </div>
@@ -114,8 +114,8 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="mt-10 pt-6 border-t border-stone-100">
-            <p className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-3">
+          <div className="mt-10 pt-6 border-t border-zinc-100">
+            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] mb-3">
               Demo Credentials
             </p>
             <div className="space-y-2">
@@ -131,9 +131,9 @@ export default function Login() {
                 >
                   <div>
                     <span className="text-xs font-bold text-on-surface">{demo.label}</span>
-                    <span className="text-xs text-stone-400 ml-2">{demo.email}</span>
+                    <span className="text-xs text-zinc-400 ml-2">{demo.email}</span>
                   </div>
-                  <span className="material-symbols-outlined text-stone-400 group-hover:text-primary text-sm transition-colors">arrow_forward</span>
+                  <span className="material-symbols-outlined text-zinc-400 group-hover:text-primary text-sm transition-colors">arrow_forward</span>
                 </button>
               ))}
             </div>
@@ -142,7 +142,7 @@ export default function Login() {
 
         {/* Footer */}
         <div className="text-center mt-8">
-          <p className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">
+          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">
             Secured Platform · 2026
           </p>
         </div>

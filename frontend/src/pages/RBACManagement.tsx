@@ -110,7 +110,7 @@ export default function RBACManagement() {
           <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
             Roles & Permissions
           </h1>
-          <p className="text-stone-500 mt-2 max-w-md">
+          <p className="text-zinc-500 mt-2 max-w-md">
             Configure role-based access control, manage permissions, and define resource-level authorization rules.
           </p>
         </div>
@@ -127,13 +127,13 @@ export default function RBACManagement() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-stone-100 rounded-lg p-1 w-fit">
+      <div className="flex gap-1 bg-zinc-100 rounded-lg p-1 w-fit">
         <button
           onClick={() => setActiveTab('matrix')}
           className={`px-6 py-2 rounded-md text-sm font-bold uppercase tracking-wider transition-all ${
             activeTab === 'matrix'
-              ? 'bg-white text-red-700 shadow-sm'
-              : 'text-stone-500 hover:text-stone-700'
+              ? 'bg-white text-violet-700 shadow-sm'
+              : 'text-zinc-500 hover:text-zinc-700'
           }`}
         >
           Matrix View
@@ -142,8 +142,8 @@ export default function RBACManagement() {
           onClick={() => setActiveTab('permissions')}
           className={`px-6 py-2 rounded-md text-sm font-bold uppercase tracking-wider transition-all ${
             activeTab === 'permissions'
-              ? 'bg-white text-red-700 shadow-sm'
-              : 'text-stone-500 hover:text-stone-700'
+              ? 'bg-white text-violet-700 shadow-sm'
+              : 'text-zinc-500 hover:text-zinc-700'
           }`}
         >
           All Permissions
@@ -155,16 +155,16 @@ export default function RBACManagement() {
         <div className="space-y-8">
           {summary.roles.map(({ role, permissions: rolePerms }: { role: Role; permissions: { id: number; permissionId: number; name: string; resource: string; action: string }[] }) => (
             <div key={role} className="bg-surface-container-lowest editorial-shadow rounded-xl overflow-hidden">
-              <div className="px-8 py-5 bg-stone-50 border-b border-stone-100 flex items-center justify-between">
+              <div className="px-8 py-5 bg-zinc-50 border-b border-zinc-100 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className={`inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded ${
                     role === 'ADMIN' ? 'bg-primary/10 text-primary' :
                     role === 'MANAGER' ? 'bg-amber-50 text-amber-700' :
-                    'bg-stone-100 text-stone-600'
+                    'bg-zinc-100 text-zinc-600'
                   }`}>
                     {role}
                   </span>
-                  <span className="text-xs text-stone-400 font-medium">
+                  <span className="text-xs text-zinc-400 font-medium">
                     {rolePerms.length} permission{rolePerms.length !== 1 ? 's' : ''}
                   </span>
                 </div>
@@ -172,7 +172,7 @@ export default function RBACManagement() {
               <div className="p-8">
                 {Object.entries(groupedPermissions).map(([resource, perms]) => (
                   <div key={resource} className="mb-6 last:mb-0">
-                    <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-3">
+                    <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-3">
                       {resource}
                     </h3>
                     <div className="flex flex-wrap gap-2">
@@ -184,7 +184,7 @@ export default function RBACManagement() {
                             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                               entry
                                 ? 'bg-green-50 text-green-700 border border-green-200'
-                                : 'bg-stone-50 text-stone-400 border border-stone-100'
+                                : 'bg-zinc-50 text-zinc-400 border border-zinc-100'
                             }`}
                           >
                             <span className="material-symbols-outlined text-sm">
@@ -207,9 +207,9 @@ export default function RBACManagement() {
                   </div>
                 ))}
                 {/* Assign new permission to role */}
-                <div className="mt-4 pt-4 border-t border-stone-100">
+                <div className="mt-4 pt-4 border-t border-zinc-100">
                   <select
-                    className="px-3 py-2 bg-stone-50 rounded-lg text-xs font-medium text-stone-600 border border-stone-200 focus:ring-1 focus:ring-primary focus:outline-none"
+                    className="px-3 py-2 bg-zinc-50 rounded-lg text-xs font-medium text-zinc-600 border border-zinc-200 focus:ring-1 focus:ring-primary focus:outline-none"
                     defaultValue=""
                     onChange={(e) => {
                       const permId = parseInt(e.target.value);
@@ -237,35 +237,35 @@ export default function RBACManagement() {
           <div className="bg-surface-container-lowest editorial-shadow rounded-lg overflow-hidden">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-stone-50">
-                  <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Name</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Resource</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Action</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Description</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Roles</th>
+                <tr className="bg-zinc-50">
+                  <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Name</th>
+                  <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Resource</th>
+                  <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Action</th>
+                  <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Description</th>
+                  <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Roles</th>
                   <th className="px-8 py-6 text-right"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-zinc-100">
                 {permissions.map((perm) => {
                   const assignedRoles = ROLES.filter(role => hasPermission(role, perm.id));
                   return (
-                    <tr key={perm.id} className="hover:bg-stone-50 transition-colors duration-200 group">
+                    <tr key={perm.id} className="hover:bg-zinc-50 transition-colors duration-200 group">
                       <td className="px-8 py-6">
                         <p className="font-bold text-on-surface text-sm tracking-tight">{perm.name}</p>
                       </td>
                       <td className="px-8 py-6">
-                        <span className="inline-block px-2 py-1 bg-stone-100 text-stone-600 text-[10px] font-bold uppercase tracking-wider rounded">
+                        <span className="inline-block px-2 py-1 bg-zinc-100 text-zinc-600 text-[10px] font-bold uppercase tracking-wider rounded">
                           {perm.resource}
                         </span>
                       </td>
                       <td className="px-8 py-6">
-                        <span className="inline-block px-2 py-1 bg-stone-100 text-stone-600 text-[10px] font-bold uppercase tracking-wider rounded">
+                        <span className="inline-block px-2 py-1 bg-zinc-100 text-zinc-600 text-[10px] font-bold uppercase tracking-wider rounded">
                           {perm.action}
                         </span>
                       </td>
                       <td className="px-8 py-6">
-                        <p className="text-xs text-stone-400">{perm.description || '—'}</p>
+                        <p className="text-xs text-zinc-400">{perm.description || '—'}</p>
                       </td>
                       <td className="px-8 py-6">
                         <div className="flex gap-1">
@@ -273,20 +273,20 @@ export default function RBACManagement() {
                             <span key={role} className={`inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded ${
                               role === 'ADMIN' ? 'bg-primary/10 text-primary' :
                               role === 'MANAGER' ? 'bg-amber-50 text-amber-700' :
-                              'bg-stone-100 text-stone-600'
+                              'bg-zinc-100 text-zinc-600'
                             }`}>
                               {role}
                             </span>
                           ))}
                           {assignedRoles.length === 0 && (
-                            <span className="text-xs text-stone-300">Unassigned</span>
+                            <span className="text-xs text-zinc-300">Unassigned</span>
                           )}
                         </div>
                       </td>
                       <td className="px-8 py-6 text-right">
                         <button
                           onClick={() => handleDeletePermission(perm.id)}
-                          className="p-2 hover:bg-red-50 rounded-lg text-stone-400 hover:text-red-600 transition-colors"
+                          className="p-2 hover:bg-red-50 rounded-lg text-zinc-400 hover:text-red-600 transition-colors"
                           title="Delete"
                         >
                           <span className="material-symbols-outlined text-lg">delete</span>
@@ -303,7 +303,7 @@ export default function RBACManagement() {
 
       {/* Footer */}
       <div className="flex items-center justify-between">
-        <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">
+        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
           {permissions.length} permission{permissions.length !== 1 ? 's' : ''} defined
         </p>
       </div>
@@ -322,7 +322,7 @@ export default function RBACManagement() {
             </div>
             <form onSubmit={handleCreatePermission} className="space-y-5">
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                   Name
                 </label>
                 <input
@@ -336,7 +336,7 @@ export default function RBACManagement() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                     Resource
                   </label>
                   <input
@@ -349,7 +349,7 @@ export default function RBACManagement() {
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                     Action
                   </label>
                   <select
@@ -368,7 +368,7 @@ export default function RBACManagement() {
                 </div>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                   Description
                 </label>
                 <input
@@ -383,7 +383,7 @@ export default function RBACManagement() {
                 <button
                   type="button"
                   onClick={() => setShowPermModal(false)}
-                  className="px-6 py-2.5 bg-surface-container-low text-stone-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all"
+                  className="px-6 py-2.5 bg-surface-container-low text-zinc-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all"
                 >
                   Cancel
                 </button>

@@ -73,22 +73,22 @@ export default function Layout() {
             {/* Mobile menu toggle */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 hover:bg-stone-100 rounded-full transition-colors"
+              className="lg:hidden p-2 hover:bg-zinc-100 rounded-full transition-colors"
             >
-              <span className="material-symbols-outlined text-stone-600">
+              <span className="material-symbols-outlined text-zinc-600">
                 menu
               </span>
             </button>
-            <span className="text-xl font-bold tracking-tighter text-red-700 uppercase">
+            <span className="text-xl font-bold tracking-tighter text-violet-700 uppercase">
               {getSetting("company.name") || "TEAM MANAGEMENT"}
             </span>
             {/* Search bar */}
-            <div className="hidden md:flex items-center bg-stone-100 rounded-full px-4 py-1.5 gap-2">
-              <span className="material-symbols-outlined text-stone-500 text-sm">
+            <div className="hidden md:flex items-center bg-zinc-100 rounded-full px-4 py-1.5 gap-2">
+              <span className="material-symbols-outlined text-zinc-500 text-sm">
                 search
               </span>
               <input
-                className="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-64 placeholder:text-stone-400"
+                className="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-64 placeholder:text-zinc-400"
                 placeholder="Search..."
                 type="text"
               />
@@ -107,8 +107,8 @@ export default function Layout() {
                   to={item.href}
                   className={`font-medium transition-colors duration-200 ${
                     isActive
-                      ? "text-red-700 font-semibold border-b-2 border-red-700"
-                      : "text-stone-500 hover:text-stone-900"
+                      ? "text-violet-700 font-semibold border-b-2 border-violet-700"
+                      : "text-zinc-500 hover:text-zinc-900"
                   }`}
                 >
                   {item.name}
@@ -119,16 +119,16 @@ export default function Layout() {
 
           {/* Right side controls */}
           <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-stone-100 transition-colors duration-200 rounded-full">
-              <span className="material-symbols-outlined text-stone-600">
+            <button className="p-2 hover:bg-zinc-100 transition-colors duration-200 rounded-full">
+              <span className="material-symbols-outlined text-zinc-600">
                 notifications
               </span>
             </button>
             <Link
               to="/settings"
-              className="p-2 hover:bg-stone-100 transition-colors duration-200 rounded-full"
+              className="p-2 hover:bg-zinc-100 transition-colors duration-200 rounded-full"
             >
-              <span className="material-symbols-outlined text-stone-600">
+              <span className="material-symbols-outlined text-zinc-600">
                 settings
               </span>
             </Link>
@@ -137,7 +137,7 @@ export default function Layout() {
             </div>
           </div>
         </div>
-        <div className="bg-stone-100 h-[1px] w-full"></div>
+        <div className="bg-zinc-100 h-[1px] w-full"></div>
       </header>
 
       {/* Mobile overlay */}
@@ -150,17 +150,17 @@ export default function Layout() {
 
       {/* Side Navigation */}
       <aside
-        className={`fixed left-0 top-0 h-full w-64 bg-stone-50 flex-col py-8 px-4 gap-6 pt-24 z-40 transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 h-full w-64 bg-zinc-50 flex-col py-8 px-4 gap-6 pt-24 z-40 transform transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen
             ? "translate-x-0 flex"
             : "-translate-x-full lg:flex hidden lg:block"
         }`}
       >
         <div className="px-4 mb-4">
-          <h2 className="text-lg font-black text-red-700 uppercase tracking-widest">
+          <h2 className="text-lg font-black text-violet-700 uppercase tracking-widest">
             Management
           </h2>
-          <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
+          <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
             Admin Console
           </p>
         </div>
@@ -177,8 +177,8 @@ export default function Layout() {
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm tracking-wide uppercase transition-all duration-300 ${
                   isActive
-                    ? "text-red-700 bg-stone-200/50 border-r-4 border-red-700"
-                    : "text-stone-600 hover:text-red-700 hover:translate-x-1"
+                    ? "text-violet-700 bg-zinc-200/50 border-r-4 border-violet-700"
+                    : "text-zinc-600 hover:text-violet-700 hover:translate-x-1"
                 }`}
               >
                 <span className="material-symbols-outlined">{item.icon}</span>
@@ -188,7 +188,7 @@ export default function Layout() {
           })}
         </nav>
 
-        <div className="mt-auto flex flex-col gap-1 border-t border-stone-200 pt-6">
+        <div className="mt-auto flex flex-col gap-1 border-t border-zinc-200 pt-6">
           <div className="flex items-center gap-3 px-4 py-3 mb-2">
             <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
               {user?.fullName?.charAt(0).toUpperCase() || "U"}
@@ -197,14 +197,14 @@ export default function Layout() {
               <p className="text-sm font-bold text-on-surface truncate">
                 {user?.fullName}
               </p>
-              <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
+              <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
                 {user?.role}
               </p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-stone-600 hover:text-red-700 hover:translate-x-1 transition-all duration-300 font-medium text-sm tracking-wide uppercase"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-600 hover:text-violet-700 hover:translate-x-1 transition-all duration-300 font-medium text-sm tracking-wide uppercase"
           >
             <span className="material-symbols-outlined">logout</span>
             <span>Logout</span>
@@ -220,7 +220,7 @@ export default function Layout() {
       </div>
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-stone-100 flex justify-around items-center h-16 px-4 z-50">
+      <nav className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-zinc-100 flex justify-around items-center h-16 px-4 z-50">
         {filteredNavigation.slice(0, 4).map((item) => {
           const isActive = location.pathname === item.href;
           return (
@@ -228,7 +228,7 @@ export default function Layout() {
               key={item.name}
               to={item.href}
               className={`flex flex-col items-center gap-1 ${
-                isActive ? "text-red-700" : "text-stone-400"
+                isActive ? "text-violet-700" : "text-zinc-400"
               }`}
             >
               <span className="material-symbols-outlined">{item.icon}</span>

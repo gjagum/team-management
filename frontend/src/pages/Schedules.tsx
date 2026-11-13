@@ -309,7 +309,7 @@ export default function Schedules() {
             Operations Grid
           </span>
           <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">Schedules</h1>
-          <p className="text-stone-500 mt-2 max-w-md">Manage shifts and workforce allocation across the organization.</p>
+          <p className="text-zinc-500 mt-2 max-w-md">Manage shifts and workforce allocation across the organization.</p>
         </div>
         {isAdmin && (
           <button
@@ -326,33 +326,33 @@ export default function Schedules() {
       {/* Nav bar */}
       <div className="bg-surface-container-lowest editorial-shadow rounded-xl p-4">
         <div className="flex items-center justify-between">
-          <button type="button" onClick={() => navigate(-1)} className="p-2 hover:bg-stone-100 rounded-lg transition-colors">
-            <span className="material-symbols-outlined text-stone-600">chevron_left</span>
+          <button type="button" onClick={() => navigate(-1)} className="p-2 hover:bg-zinc-100 rounded-lg transition-colors">
+            <span className="material-symbols-outlined text-zinc-600">chevron_left</span>
           </button>
           <div className="text-center flex items-center gap-4">
             <h2 className="text-lg font-black text-on-surface tracking-tight">{headerLabel}</h2>
             <button type="button" onClick={() => setCurrentDate(new Date())} className="text-xs font-bold text-primary uppercase tracking-wider hover:underline">
               Today
             </button>
-            <div className="flex bg-stone-100 rounded-lg p-0.5">
+            <div className="flex bg-zinc-100 rounded-lg p-0.5">
               <button
                 type="button"
                 onClick={() => setViewMode('week')}
-                className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-colors ${viewMode === 'week' ? 'bg-white shadow-sm text-on-surface' : 'text-stone-500 hover:text-stone-700'}`}
+                className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-colors ${viewMode === 'week' ? 'bg-white shadow-sm text-on-surface' : 'text-zinc-500 hover:text-zinc-700'}`}
               >
                 Week
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('month')}
-                className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-colors ${viewMode === 'month' ? 'bg-white shadow-sm text-on-surface' : 'text-stone-500 hover:text-stone-700'}`}
+                className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-colors ${viewMode === 'month' ? 'bg-white shadow-sm text-on-surface' : 'text-zinc-500 hover:text-zinc-700'}`}
               >
                 Month
               </button>
             </div>
           </div>
-          <button type="button" onClick={() => navigate(1)} className="p-2 hover:bg-stone-100 rounded-lg transition-colors">
-            <span className="material-symbols-outlined text-stone-600">chevron_right</span>
+          <button type="button" onClick={() => navigate(1)} className="p-2 hover:bg-zinc-100 rounded-lg transition-colors">
+            <span className="material-symbols-outlined text-zinc-600">chevron_right</span>
           </button>
         </div>
       </div>
@@ -362,32 +362,32 @@ export default function Schedules() {
        <div className="bg-surface-container-lowest editorial-shadow rounded-lg overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-stone-50">
-              <th className="px-4 py-3 text-left text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] sticky left-0 bg-stone-50 min-w-[160px] z-10">
+            <tr className="bg-zinc-50">
+              <th className="px-4 py-3 text-left text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] sticky left-0 bg-zinc-50 min-w-[160px] z-10">
                 Contractor
               </th>
               {displayDates.map(d => {
                 const isToday = formatDateKey(d) === formatDateKey(new Date());
                 return (
-                  <th key={formatDateKey(d)} className={`px-1 py-3 text-center text-[10px] font-black uppercase tracking-[0.2em] ${viewMode === 'month' ? 'min-w-[80px]' : 'min-w-[130px]'} ${isToday ? 'text-primary bg-primary/5' : 'text-stone-400'}`}>
+                  <th key={formatDateKey(d)} className={`px-1 py-3 text-center text-[10px] font-black uppercase tracking-[0.2em] ${viewMode === 'month' ? 'min-w-[80px]' : 'min-w-[130px]'} ${isToday ? 'text-primary bg-primary/5' : 'text-zinc-400'}`}>
                     <div>{DAY_NAMES[d.getDay()]}</div>
                     <div className="text-sm">{d.getDate()}</div>
                   </th>
                 );
               })}
               {isAdmin && (
-                <th className="px-2 py-3 text-center text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] sticky right-0 bg-stone-50 min-w-[80px] z-10">
+                <th className="px-2 py-3 text-center text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] sticky right-0 bg-zinc-50 min-w-[80px] z-10">
                   Actions
                 </th>
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-stone-100">
+          <tbody className="divide-y divide-zinc-100">
             {displayEmployees.map((emp) => (
-              <tr key={emp.id} className="hover:bg-stone-50/50">
-                <td className="px-4 py-2 whitespace-nowrap sticky left-0 bg-white border-r border-stone-100 z-10">
+              <tr key={emp.id} className="hover:bg-zinc-50/50">
+                <td className="px-4 py-2 whitespace-nowrap sticky left-0 bg-white border-r border-zinc-100 z-10">
                   <div className="text-sm font-bold text-on-surface tracking-tight">{emp.user?.fullName}</div>
-                  {emp.department && <div className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">{emp.department}</div>}
+                  {emp.department && <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">{emp.department}</div>}
                 </td>
                 {displayDates.map(d => {
                   const dateKey = formatDateKey(d);
@@ -420,26 +420,26 @@ export default function Schedules() {
                         <button
                           type="button"
                           onClick={() => openAddModal(emp.id, dateKey)}
-                          className={`w-full rounded-md border-2 border-dashed border-stone-200 hover:border-primary hover:bg-primary/5 transition-colors flex items-center justify-center ${isCompact ? 'h-[28px]' : 'min-h-[48px]'}`}
+                          className={`w-full rounded-md border-2 border-dashed border-zinc-200 hover:border-primary hover:bg-primary/5 transition-colors flex items-center justify-center ${isCompact ? 'h-[28px]' : 'min-h-[48px]'}`}
                         >
-                          <span className={`material-symbols-outlined text-stone-400 ${isCompact ? 'text-xs' : 'text-sm'}`}>add</span>
+                          <span className={`material-symbols-outlined text-zinc-400 ${isCompact ? 'text-xs' : 'text-sm'}`}>add</span>
                         </button>
                       ) : (
-                        <div className={`flex items-center justify-center text-stone-300 text-xs ${isCompact ? 'h-[28px]' : 'min-h-[48px]'}`}>—</div>
+                        <div className={`flex items-center justify-center text-zinc-300 text-xs ${isCompact ? 'h-[28px]' : 'min-h-[48px]'}`}>—</div>
                       )}
                     </td>
                   );
                 })}
                 {isAdmin && (
-                  <td className="px-2 py-2 text-center sticky right-0 bg-white border-l border-stone-100 z-10">
+                  <td className="px-2 py-2 text-center sticky right-0 bg-white border-l border-zinc-100 z-10">
                     <div className="flex flex-col gap-1">
                       <button
                         type="button"
                         onClick={() => openDefaultsModal(emp.id)}
                         title="Set default schedule"
-                        className="p-1.5 hover:bg-stone-100 rounded-md transition-colors mx-auto"
+                        className="p-1.5 hover:bg-zinc-100 rounded-md transition-colors mx-auto"
                       >
-                        <span className="material-symbols-outlined text-stone-500 text-lg">settings</span>
+                        <span className="material-symbols-outlined text-zinc-500 text-lg">settings</span>
                       </button>
                       <button
                         type="button"
@@ -456,8 +456,8 @@ export default function Schedules() {
             ))}
             {displayEmployees.length === 0 && (
               <tr>
-                <td colSpan={displayDates.length + 2} className="px-6 py-12 text-center text-stone-400">
-                  <span className="material-symbols-outlined text-stone-300 text-4xl block mb-2">event_busy</span>
+                <td colSpan={displayDates.length + 2} className="px-6 py-12 text-center text-zinc-400">
+                  <span className="material-symbols-outlined text-zinc-300 text-4xl block mb-2">event_busy</span>
                   No contractors found
                 </td>
               </tr>
@@ -472,7 +472,7 @@ export default function Schedules() {
         {Object.entries(SHIFT_PRESETS).map(([key, preset]) => (
           <div key={key} className="flex items-center gap-1.5">
             <span className={`w-3 h-3 rounded-full ${preset.badge}`} />
-            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{preset.label}</span>
+            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{preset.label}</span>
           </div>
         ))}
       </div>
@@ -487,7 +487,7 @@ export default function Schedules() {
             </div>
             <form onSubmit={handleAddSubmit} className="space-y-4">
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">Shift Type</label>
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">Shift Type</label>
                 <div className="grid grid-cols-4 gap-2">
                   {Object.entries(SHIFT_PRESETS).map(([key, preset]) => (
                     <button
@@ -503,24 +503,24 @@ export default function Schedules() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">Start Time</label>
+                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">Start Time</label>
                   <input type="time" value={formData.startTime} onChange={e => setFormData({ ...formData, startTime: e.target.value })} required className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none" />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">End Time</label>
+                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">End Time</label>
                   <input type="time" value={formData.endTime} onChange={e => setFormData({ ...formData, endTime: e.target.value })} required className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none" />
                 </div>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">Break (minutes)</label>
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">Break (minutes)</label>
                 <input type="number" value={formData.breakMinutes} onChange={e => setFormData({ ...formData, breakMinutes: parseInt(e.target.value) || 0 })} className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none" />
               </div>
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">Notes</label>
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">Notes</label>
                 <textarea value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} rows={2} className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none resize-none" />
               </div>
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setShowAddModal(false)} className="px-6 py-2.5 bg-surface-container-low text-stone-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all">Cancel</button>
+                <button type="button" onClick={() => setShowAddModal(false)} className="px-6 py-2.5 bg-surface-container-low text-zinc-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all">Cancel</button>
                 <button type="submit" className="primary-gradient text-white px-6 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-primary/20">Add Shift</button>
               </div>
             </form>
@@ -539,26 +539,26 @@ export default function Schedules() {
                   Default Schedule — {employees.find(e => e.id === selectedEmployeeId)?.user.fullName}
                 </h2>
               </div>
-              <button type="button" onClick={() => setShowDefaultsModal(false)} className="p-2 hover:bg-stone-100 rounded-lg">
-                <span className="material-symbols-outlined text-stone-500">close</span>
+              <button type="button" onClick={() => setShowDefaultsModal(false)} className="p-2 hover:bg-zinc-100 rounded-lg">
+                <span className="material-symbols-outlined text-zinc-500">close</span>
               </button>
             </div>
-            <p className="text-sm text-stone-500 mb-6">
+            <p className="text-sm text-zinc-500 mb-6">
               Set the default weekly pattern. Use "Auto-fill Month" to populate schedules from these defaults.
             </p>
 
             <div className="space-y-3">
               {defaultDays.map(day => (
-                <div key={day.dayOfWeek} className={`flex items-center gap-3 p-3 rounded-lg border ${day.isOff ? 'bg-stone-50 border-stone-200 opacity-60' : 'border-stone-200'}`}>
+                <div key={day.dayOfWeek} className={`flex items-center gap-3 p-3 rounded-lg border ${day.isOff ? 'bg-zinc-50 border-zinc-200 opacity-60' : 'border-zinc-200'}`}>
                   <div className="w-20 text-sm font-bold text-on-surface tracking-tight">{DAY_NAMES_FULL[day.dayOfWeek]}</div>
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={day.isOff}
                       onChange={e => updateDefaultDay(day.dayOfWeek, 'isOff', e.target.checked)}
-                      className="rounded border-stone-300"
+                      className="rounded border-zinc-300"
                     />
-                    <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">Off</span>
+                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Off</span>
                   </label>
                   {!day.isOff && (
                     <>
@@ -572,7 +572,7 @@ export default function Schedules() {
                         ))}
                       </select>
                       <input type="time" value={day.startTime} onChange={e => updateDefaultDay(day.dayOfWeek, 'startTime', e.target.value)} className="px-2 py-1.5 text-sm bg-surface-container-low border-none rounded-lg focus:ring-1 focus:ring-primary outline-none" />
-                      <span className="text-stone-400">–</span>
+                      <span className="text-zinc-400">–</span>
                       <input type="time" value={day.endTime} onChange={e => updateDefaultDay(day.dayOfWeek, 'endTime', e.target.value)} className="px-2 py-1.5 text-sm bg-surface-container-low border-none rounded-lg focus:ring-1 focus:ring-primary outline-none" />
                     </>
                   )}
@@ -581,11 +581,11 @@ export default function Schedules() {
             </div>
 
             <div className="flex justify-between gap-3 mt-6">
-              <button type="button" onClick={() => setShowDefaultsModal(false)} className="px-6 py-2.5 bg-surface-container-low text-stone-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all">
+              <button type="button" onClick={() => setShowDefaultsModal(false)} className="px-6 py-2.5 bg-surface-container-low text-zinc-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all">
                 Cancel
               </button>
               <div className="flex gap-2">
-                <button type="button" onClick={() => handleSaveDefaults(false)} className="px-6 py-2.5 bg-surface-container-low text-stone-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all">
+                <button type="button" onClick={() => handleSaveDefaults(false)} className="px-6 py-2.5 bg-surface-container-low text-zinc-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all">
                   Save Defaults
                 </button>
                 <button type="button" onClick={() => handleSaveDefaults(true)} className="primary-gradient text-white px-6 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center gap-2">
