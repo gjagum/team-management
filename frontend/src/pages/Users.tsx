@@ -103,9 +103,9 @@ export default function Users() {
     const styles: Record<string, string> = {
       ADMIN: 'bg-primary/10 text-primary',
       MANAGER: 'bg-amber-50 text-amber-700',
-      EMPLOYEE: 'bg-stone-100 text-stone-600',
+      EMPLOYEE: 'bg-zinc-100 text-zinc-600',
     };
-    return styles[role] || 'bg-stone-100 text-stone-600';
+    return styles[role] || 'bg-zinc-100 text-zinc-600';
   };
 
   return (
@@ -119,7 +119,7 @@ export default function Users() {
           <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
             User Registry
           </h1>
-          <p className="text-stone-500 mt-2 max-w-md">
+          <p className="text-zinc-500 mt-2 max-w-md">
             Manage system access credentials, roles, and operational permissions.
           </p>
         </div>
@@ -141,29 +141,29 @@ export default function Users() {
         <div className="bg-surface-container-lowest editorial-shadow rounded-lg overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-stone-50">
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Identity</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Email</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Access Level</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Contractor Profile</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Slack ID</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Status</th>
+              <tr className="bg-zinc-50">
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Identity</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Email</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Access Level</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Contractor Profile</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Slack ID</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Status</th>
                 <th className="px-8 py-6 text-right"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-100">
+            <tbody className="divide-y divide-zinc-100">
               {users.map((user) => (
-                <tr key={user.id} className="hover:bg-stone-50 transition-colors duration-200 group">
+                <tr key={user.id} className="hover:bg-zinc-50 transition-colors duration-200 group">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-stone-200 flex items-center justify-center text-stone-600 font-bold text-lg group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                      <div className="w-12 h-12 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-600 font-bold text-lg group-hover:bg-primary group-hover:text-white transition-all duration-500">
                         {user.fullName.charAt(0).toUpperCase()}
                       </div>
                       <p className="font-bold text-on-surface text-lg tracking-tight">{user.fullName}</p>
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    <p className="text-xs text-stone-400 font-medium">{user.email}</p>
+                    <p className="text-xs text-zinc-400 font-medium">{user.email}</p>
                   </td>
                   <td className="px-8 py-6">
                     <span className={`inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded ${getRoleBadge(user.role)}`}>
@@ -178,7 +178,7 @@ export default function Users() {
                           {user.employee.employeeCode}
                         </span>
                         {user.employee.department && (
-                          <span className="text-xs text-stone-400 ml-1">• {user.employee.department}</span>
+                          <span className="text-xs text-zinc-400 ml-1">• {user.employee.department}</span>
                         )}
                       </div>
                     ) : (
@@ -196,12 +196,12 @@ export default function Users() {
                     )}
                   </td>
                   <td className="px-8 py-6">
-                    <p className="text-xs text-stone-600 font-mono">{user.employee?.slackId || '—'}</p>
+                    <p className="text-xs text-zinc-600 font-mono">{user.employee?.slackId || '—'}</p>
                   </td>
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${user.isActive ? 'bg-green-500' : 'bg-stone-300'}`}></span>
-                      <span className={`text-xs font-bold uppercase ${user.isActive ? 'text-green-700' : 'text-stone-500'}`}>
+                      <span className={`w-2 h-2 rounded-full ${user.isActive ? 'bg-green-500' : 'bg-zinc-300'}`}></span>
+                      <span className={`text-xs font-bold uppercase ${user.isActive ? 'text-green-700' : 'text-zinc-500'}`}>
                         {user.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
@@ -210,14 +210,14 @@ export default function Users() {
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => handleEdit(user)}
-                        className="p-2 hover:bg-stone-100 rounded-lg text-stone-400 hover:text-primary transition-colors"
+                        className="p-2 hover:bg-zinc-100 rounded-lg text-zinc-400 hover:text-primary transition-colors"
                         title="Edit"
                       >
                         <span className="material-symbols-outlined text-lg">edit</span>
                       </button>
                       <button
                         onClick={() => handleDelete(user.id)}
-                        className="p-2 hover:bg-red-50 rounded-lg text-stone-400 hover:text-red-600 transition-colors"
+                        className="p-2 hover:bg-red-50 rounded-lg text-zinc-400 hover:text-red-600 transition-colors"
                         title="Delete"
                       >
                         <span className="material-symbols-outlined text-lg">delete</span>
@@ -233,7 +233,7 @@ export default function Users() {
 
       {/* Footer */}
       <div className="flex items-center justify-between">
-        <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">
+        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
           Displaying {users.length} User{users.length !== 1 ? 's' : ''}
         </p>
       </div>
@@ -252,7 +252,7 @@ export default function Users() {
             </div>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                   Full Name
                 </label>
                 <input
@@ -264,7 +264,7 @@ export default function Users() {
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                   Email
                 </label>
                 <input
@@ -276,7 +276,7 @@ export default function Users() {
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                   Access Level
                 </label>
                 <select
@@ -290,7 +290,7 @@ export default function Users() {
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                   Slack User ID
                 </label>
                 <input
@@ -303,7 +303,7 @@ export default function Users() {
               </div>
               {!editingUser && (
                 <div>
-                  <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                     Password
                   </label>
                   <input
@@ -319,7 +319,7 @@ export default function Users() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-6 py-2.5 bg-surface-container-low text-stone-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all"
+                  className="px-6 py-2.5 bg-surface-container-low text-zinc-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all"
                 >
                   Cancel
                 </button>
@@ -346,13 +346,13 @@ export default function Users() {
               <h2 className="text-2xl font-black text-on-surface tracking-tighter">
                 Activate {activatingUser.fullName}
               </h2>
-              <p className="text-stone-500 text-sm mt-1">
+              <p className="text-zinc-500 text-sm mt-1">
                 Create a contractor profile to enable scheduling, leave management, and payroll.
               </p>
             </div>
             <form onSubmit={handleActivateEmployee} className="space-y-5">
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                   Department
                 </label>
                 <input
@@ -364,7 +364,7 @@ export default function Users() {
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                   Position
                 </label>
                 <input
@@ -376,7 +376,7 @@ export default function Users() {
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                   Hire Date
                 </label>
                 <input
@@ -388,7 +388,7 @@ export default function Users() {
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] block mb-2">
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                   Slack User ID
                 </label>
                 <input
@@ -403,7 +403,7 @@ export default function Users() {
                 <button
                   type="button"
                   onClick={() => { setShowActivateModal(false); setActivatingUser(null); }}
-                  className="px-6 py-2.5 bg-surface-container-low text-stone-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all"
+                  className="px-6 py-2.5 bg-surface-container-low text-zinc-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all"
                 >
                   Cancel
                 </button>

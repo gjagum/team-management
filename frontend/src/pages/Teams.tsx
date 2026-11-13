@@ -127,8 +127,8 @@ export default function Teams() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-stone-900">Teams</h1>
-          <p className="text-stone-500 text-sm">Manage teams, assign leaders and members</p>
+          <h1 className="text-2xl font-bold text-zinc-900">Teams</h1>
+          <p className="text-zinc-500 text-sm">Manage teams, assign leaders and members</p>
         </div>
         <button
           onClick={() => {
@@ -136,7 +136,7 @@ export default function Teams() {
             setFormData({ name: '', description: '', teamLeaderId: '', alternateApproverId: '' });
             setShowModal(true);
           }}
-          className="flex items-center gap-2 bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-red-800 transition-colors text-sm font-medium"
+          className="flex items-center gap-2 bg-violet-700 text-white px-4 py-2 rounded-lg hover:bg-violet-800 transition-colors text-sm font-medium"
         >
           <span className="material-symbols-outlined text-sm">add</span>
           Create Team
@@ -145,35 +145,35 @@ export default function Teams() {
 
       {/* Teams Grid */}
       {teams.length === 0 ? (
-        <div className="bg-white rounded-xl border border-stone-200 p-12 text-center">
-          <span className="material-symbols-outlined text-5xl text-stone-300 mb-4 block">group_work</span>
-          <h3 className="text-lg font-semibold text-stone-700 mb-2">No teams yet</h3>
-          <p className="text-stone-500">Create your first team to organize employees and manage approvals.</p>
+        <div className="bg-white rounded-xl border border-zinc-200 p-12 text-center">
+          <span className="material-symbols-outlined text-5xl text-zinc-300 mb-4 block">group_work</span>
+          <h3 className="text-lg font-semibold text-zinc-700 mb-2">No teams yet</h3>
+          <p className="text-zinc-500">Create your first team to organize employees and manage approvals.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {teams.map((team) => (
-            <div key={team.id} className="bg-white rounded-xl border border-stone-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div key={team.id} className="bg-white rounded-xl border border-zinc-200 overflow-hidden hover:shadow-md transition-shadow">
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-lg font-bold text-stone-900">{team.name}</h3>
-                    {team.description && <p className="text-stone-500 text-sm mt-1">{team.description}</p>}
+                    <h3 className="text-lg font-bold text-zinc-900">{team.name}</h3>
+                    {team.description && <p className="text-zinc-500 text-sm mt-1">{team.description}</p>}
                   </div>
                   <div className="flex gap-1">
                     <button
                       onClick={() => handleManageMembers(team)}
-                      className="p-1.5 hover:bg-stone-100 rounded-lg transition-colors"
+                      className="p-1.5 hover:bg-zinc-100 rounded-lg transition-colors"
                       title="Manage members"
                     >
-                      <span className="material-symbols-outlined text-stone-500 text-lg">group</span>
+                      <span className="material-symbols-outlined text-zinc-500 text-lg">group</span>
                     </button>
                     <button
                       onClick={() => handleEdit(team)}
-                      className="p-1.5 hover:bg-stone-100 rounded-lg transition-colors"
+                      className="p-1.5 hover:bg-zinc-100 rounded-lg transition-colors"
                       title="Edit team"
                     >
-                      <span className="material-symbols-outlined text-stone-500 text-lg">edit</span>
+                      <span className="material-symbols-outlined text-zinc-500 text-lg">edit</span>
                     </button>
                     <button
                       onClick={() => handleDelete(team.id)}
@@ -188,12 +188,12 @@ export default function Teams() {
                 {/* Team Leader & Alternate */}
                 <div className="space-y-3 mb-4">
                   {team.teamLeader && (
-                    <div className="flex items-center gap-3 bg-stone-50 rounded-lg p-3">
-                      <span className="material-symbols-outlined text-red-700">badge</span>
+                    <div className="flex items-center gap-3 bg-zinc-50 rounded-lg p-3">
+                      <span className="material-symbols-outlined text-violet-700">badge</span>
                       <div>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Team Leader</span>
-                        <p className="text-sm font-medium text-stone-800">{team.teamLeader.user.fullName}</p>
-                        <p className="text-xs text-stone-500">{team.teamLeader.user.email}</p>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Team Leader</span>
+                        <p className="text-sm font-medium text-zinc-800">{team.teamLeader.user.fullName}</p>
+                        <p className="text-xs text-zinc-500">{team.teamLeader.user.email}</p>
                       </div>
                     </div>
                   )}
@@ -201,9 +201,9 @@ export default function Teams() {
                     <div className="flex items-center gap-3 bg-blue-50 rounded-lg p-3">
                       <span className="material-symbols-outlined text-blue-600">person_alt</span>
                       <div>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Alternate Approver</span>
-                        <p className="text-sm font-medium text-stone-800">{team.alternateApprover.user.fullName}</p>
-                        <p className="text-xs text-stone-500">{team.alternateApprover.user.email}</p>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Alternate Approver</span>
+                        <p className="text-sm font-medium text-zinc-800">{team.alternateApprover.user.fullName}</p>
+                        <p className="text-xs text-zinc-500">{team.alternateApprover.user.email}</p>
                       </div>
                     </div>
                   )}
@@ -212,25 +212,25 @@ export default function Teams() {
                 {/* Members */}
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="material-symbols-outlined text-stone-500 text-sm">people</span>
-                    <span className="text-xs font-bold uppercase tracking-widest text-stone-500">
+                    <span className="material-symbols-outlined text-zinc-500 text-sm">people</span>
+                    <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">
                       Members ({team.members.length})
                     </span>
                   </div>
                   {team.members.length === 0 ? (
-                    <p className="text-sm text-stone-400 italic">No members assigned</p>
+                    <p className="text-sm text-zinc-400 italic">No members assigned</p>
                   ) : (
                     <div className="flex flex-wrap gap-2">
                       {team.members.slice(0, 5).map((member) => (
                         <span
                           key={member.id}
-                          className="inline-flex items-center gap-1 bg-stone-100 text-stone-700 text-xs font-medium px-2.5 py-1 rounded-full"
+                          className="inline-flex items-center gap-1 bg-zinc-100 text-zinc-700 text-xs font-medium px-2.5 py-1 rounded-full"
                         >
                           {member.user.fullName}
                         </span>
                       ))}
                       {team.members.length > 5 && (
-                        <span className="text-xs text-stone-400 py-1">+{team.members.length - 5} more</span>
+                        <span className="text-xs text-zinc-400 py-1">+{team.members.length - 5} more</span>
                       )}
                     </div>
                   )}
@@ -245,37 +245,37 @@ export default function Teams() {
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4">
-            <div className="p-6 border-b border-stone-200">
-              <h2 className="text-lg font-bold text-stone-900">{editingTeam ? 'Edit Team' : 'Create Team'}</h2>
+            <div className="p-6 border-b border-zinc-200">
+              <h2 className="text-lg font-bold text-zinc-900">{editingTeam ? 'Edit Team' : 'Create Team'}</h2>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">Team Name *</label>
+                <label className="block text-sm font-medium text-zinc-700 mb-1">Team Name *</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-700 focus:border-red-700 outline-none"
+                  className="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-violet-700 focus:border-violet-700 outline-none"
                   placeholder="e.g., Engineering, Marketing"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-zinc-700 mb-1">Description</label>
                 <textarea
                   rows={2}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-700 focus:border-red-700 outline-none resize-none"
+                  className="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-violet-700 focus:border-violet-700 outline-none resize-none"
                   placeholder="Optional team description"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">Team Leader</label>
+                <label className="block text-sm font-medium text-zinc-700 mb-1">Team Leader</label>
                 <select
                   value={formData.teamLeaderId}
                   onChange={(e) => setFormData({ ...formData, teamLeaderId: e.target.value })}
-                  className="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-700 focus:border-red-700 outline-none"
+                  className="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-violet-700 focus:border-violet-700 outline-none"
                 >
                   <option value="">None</option>
                   {employees.map((emp) => (
@@ -286,11 +286,11 @@ export default function Teams() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">Alternate Approver</label>
+                <label className="block text-sm font-medium text-zinc-700 mb-1">Alternate Approver</label>
                 <select
                   value={formData.alternateApproverId}
                   onChange={(e) => setFormData({ ...formData, alternateApproverId: e.target.value })}
-                  className="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-700 focus:border-red-700 outline-none"
+                  className="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-violet-700 focus:border-violet-700 outline-none"
                 >
                   <option value="">None</option>
                   {employees.map((emp) => (
@@ -307,13 +307,13 @@ export default function Teams() {
                     setShowModal(false);
                     setEditingTeam(null);
                   }}
-                  className="px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-red-700 hover:bg-red-800 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-white bg-violet-700 hover:bg-violet-800 rounded-lg transition-colors"
                 >
                   {editingTeam ? 'Update' : 'Create'}
                 </button>
@@ -327,35 +327,35 @@ export default function Teams() {
       {showMembersModal && memberTeam && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4">
-            <div className="p-6 border-b border-stone-200">
-              <h2 className="text-lg font-bold text-stone-900">Manage Members - {memberTeam.name}</h2>
-              <p className="text-sm text-stone-500">Select employees to assign to this team</p>
+            <div className="p-6 border-b border-zinc-200">
+              <h2 className="text-lg font-bold text-zinc-900">Manage Members - {memberTeam.name}</h2>
+              <p className="text-sm text-zinc-500">Select employees to assign to this team</p>
             </div>
             <div className="p-6 max-h-80 overflow-y-auto space-y-2">
               {employees.length === 0 ? (
-                <p className="text-sm text-stone-400 text-center py-4">No employees available</p>
+                <p className="text-sm text-zinc-400 text-center py-4">No employees available</p>
               ) : (
                 employees.map((emp) => (
                   <label
                     key={emp.id}
                     className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                      selectedMemberIds.includes(emp.id) ? 'bg-red-50 border border-red-200' : 'hover:bg-stone-50 border border-transparent'
+                      selectedMemberIds.includes(emp.id) ? 'bg-violet-50 border border-violet-200' : 'hover:bg-zinc-50 border border-transparent'
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={selectedMemberIds.includes(emp.id)}
                       onChange={() => toggleMember(emp.id)}
-                      className="rounded border-stone-300 text-red-700 focus:ring-red-700"
+                      className="rounded border-zinc-300 text-violet-700 focus:ring-violet-700"
                     />
                     <div>
-                      <p className="text-sm font-medium text-stone-800">{emp.user.fullName}</p>
-                      <p className="text-xs text-stone-500">
+                      <p className="text-sm font-medium text-zinc-800">{emp.user.fullName}</p>
+                      <p className="text-xs text-zinc-500">
                         {emp.employeeCode} · {emp.department || 'No dept'} · {emp.position || 'No position'}
                       </p>
                     </div>
                     {memberTeam.teamLeaderId === emp.id && (
-                      <span className="ml-auto text-[10px] font-bold uppercase tracking-widest text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
+                      <span className="ml-auto text-[10px] font-bold uppercase tracking-widest text-violet-700 bg-violet-100 px-2 py-0.5 rounded-full">
                         Leader
                       </span>
                     )}
@@ -363,8 +363,8 @@ export default function Teams() {
                 ))
               )}
             </div>
-            <div className="p-6 border-t border-stone-200 flex justify-between items-center">
-              <span className="text-sm text-stone-500">{selectedMemberIds.length} member(s) selected</span>
+            <div className="p-6 border-t border-zinc-200 flex justify-between items-center">
+              <span className="text-sm text-zinc-500">{selectedMemberIds.length} member(s) selected</span>
               <div className="flex gap-3">
                 <button
                   type="button"
@@ -372,13 +372,13 @@ export default function Teams() {
                     setShowMembersModal(false);
                     setMemberTeam(null);
                   }}
-                  className="px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveMembers}
-                  className="px-4 py-2 text-sm font-medium text-white bg-red-700 hover:bg-red-800 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-white bg-violet-700 hover:bg-violet-800 rounded-lg transition-colors"
                 >
                   Save Members
                 </button>

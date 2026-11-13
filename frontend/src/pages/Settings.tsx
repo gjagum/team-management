@@ -188,10 +188,10 @@ export default function Settings() {
             disabled={!isAdmin}
             className="sr-only peer"
           />
-          <div className={`w-12 h-6 rounded-full peer-focus:ring-4 peer-focus:ring-primary/20 transition-colors ${value === 'true' ? 'bg-primary' : 'bg-stone-300'}`}>
+          <div className={`w-12 h-6 rounded-full peer-focus:ring-4 peer-focus:ring-primary/20 transition-colors ${value === 'true' ? 'bg-primary' : 'bg-zinc-300'}`}>
             <div className={`h-5 w-5 bg-white rounded-full shadow-md transform transition-transform mt-0.5 ${value === 'true' ? 'translate-x-6.5 ml-0.5' : 'translate-x-0.5'}`} />
           </div>
-          <span className={`ml-3 text-xs font-bold uppercase tracking-wider ${value === 'true' ? 'text-primary' : 'text-stone-500'}`}>
+          <span className={`ml-3 text-xs font-bold uppercase tracking-wider ${value === 'true' ? 'text-primary' : 'text-zinc-500'}`}>
             {value === 'true' ? 'Enabled' : 'Disabled'}
           </span>
         </label>
@@ -258,7 +258,7 @@ export default function Settings() {
           <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
             Settings
           </h1>
-          <p className="text-stone-500 mt-2 max-w-md">
+          <p className="text-zinc-500 mt-2 max-w-md">
             Configure application-wide settings for employee management.
           </p>
         </div>
@@ -268,7 +268,7 @@ export default function Settings() {
               <button
                 type="button"
                 onClick={handleReset}
-                className="px-6 py-2.5 bg-surface-container-low text-stone-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all flex items-center gap-2"
+                className="px-6 py-2.5 bg-surface-container-low text-zinc-600 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-surface-container-high transition-all flex items-center gap-2"
               >
                 <span className="material-symbols-outlined text-lg">restart_alt</span>
                 Reset
@@ -283,7 +283,7 @@ export default function Settings() {
                   ? 'primary-gradient text-white shadow-lg shadow-primary/20 active:scale-95'
                   : saveSuccess
                     ? 'bg-green-600 text-white'
-                    : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                    : 'bg-zinc-200 text-zinc-400 cursor-not-allowed'
               }`}
             >
               {saving ? (
@@ -318,26 +318,26 @@ export default function Settings() {
           <div key={catKey} className="bg-surface-container-low p-1 rounded-xl">
             <div className="bg-surface-container-lowest editorial-shadow rounded-lg overflow-hidden">
               {/* Category header */}
-              <div className="px-8 py-6 border-b border-stone-100">
+              <div className="px-8 py-6 border-b border-zinc-100">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center">
                     <span className="material-symbols-outlined text-primary">{meta.icon}</span>
                   </div>
                   <div>
                     <h2 className="text-lg font-black text-on-surface tracking-tight">{meta.label}</h2>
-                    <p className="text-xs text-stone-400 font-medium">{meta.description}</p>
+                    <p className="text-xs text-zinc-400 font-medium">{meta.description}</p>
                   </div>
                 </div>
               </div>
 
               {/* Settings rows */}
-              <div className="divide-y divide-stone-100">
+              <div className="divide-y divide-zinc-100">
                 {catSettings.map((setting) => {
                   const isChanged = (editedValues[setting.key] ?? setting.value) !== originalValues[setting.key];
                   return (
                     <div
                       key={setting.key}
-                      className={`px-8 py-6 flex items-start gap-6 transition-colors ${isChanged ? 'bg-primary/[0.02]' : 'hover:bg-stone-50/50'}`}
+                      className={`px-8 py-6 flex items-start gap-6 transition-colors ${isChanged ? 'bg-primary/[0.02]' : 'hover:bg-zinc-50/50'}`}
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
@@ -349,7 +349,7 @@ export default function Settings() {
                           )}
                         </div>
                         {setting.description && (
-                          <p className="text-xs text-stone-400 mt-1 leading-relaxed">{setting.description}</p>
+                          <p className="text-xs text-zinc-400 mt-1 leading-relaxed">{setting.description}</p>
                         )}
                       </div>
                       <div className="w-72 shrink-0">
@@ -366,8 +366,8 @@ export default function Settings() {
 
       {!isAdmin && (
         <div className="bg-surface-container-low rounded-xl px-6 py-4 flex items-center gap-3">
-          <span className="material-symbols-outlined text-stone-400">lock</span>
-          <p className="text-sm text-stone-500 font-medium">
+          <span className="material-symbols-outlined text-zinc-400">lock</span>
+          <p className="text-sm text-zinc-500 font-medium">
             <strong className="text-on-surface">Read-only access.</strong> Only administrators can modify application settings.
           </p>
         </div>

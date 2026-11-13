@@ -148,7 +148,7 @@ function UIHost({
             <button 
               type="button"
               onClick={() => onRemoveToast(toast.id)}
-              className="text-stone-300 hover:text-stone-500 transition-colors"
+              className="text-zinc-300 hover:text-zinc-500 transition-colors"
             >
               <span className="material-symbols-outlined text-lg">close</span>
             </button>
@@ -158,13 +158,13 @@ function UIHost({
 
       {/* Confirm/Alert Overlay */}
       {(confirm || alert) && (
-        <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-2xl editorial-shadow-lg w-full max-w-sm overflow-hidden animate-modal-in">
             <div className="p-8">
               <h3 className="text-2xl font-black text-on-surface tracking-tighter mb-3">
                 {confirm?.options.title || alert?.title || 'Notification'}
               </h3>
-              <p className="text-stone-500 text-sm leading-relaxed mb-8">
+              <p className="text-zinc-500 text-sm leading-relaxed mb-8">
                 {confirm?.options.message || alert?.message}
               </p>
               
@@ -174,7 +174,7 @@ function UIHost({
                     <button 
                       type="button"
                       onClick={() => onConfirm(false)}
-                      className="flex-1 px-6 py-3 rounded-xl bg-stone-100 text-stone-600 font-bold text-xs uppercase tracking-widest hover:bg-stone-200 transition-all border border-stone-200"
+                      className="flex-1 px-6 py-3 rounded-xl bg-zinc-100 text-zinc-600 font-bold text-xs uppercase tracking-widest hover:bg-zinc-200 transition-all border border-zinc-200"
                     >
                       {confirm.options.cancelLabel || 'No, Cancel'}
                     </button>

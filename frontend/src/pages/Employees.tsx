@@ -42,13 +42,13 @@ export default function Employees() {
           <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
             Global Directory
           </h1>
-          <p className="text-stone-500 mt-2 max-w-md">
+          <p className="text-zinc-500 mt-2 max-w-md">
             Access and manage the centralized repository of talent across all departments.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Filter:</span>
+            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Filter:</span>
             <select className="bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary py-2 px-4 cursor-pointer">
               <option>All Departments</option>
             </select>
@@ -61,42 +61,42 @@ export default function Employees() {
         <div className="bg-surface-container-lowest editorial-shadow rounded-lg overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-stone-50">
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Contractor Identity</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Division</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Designation</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Hire Date</th>
-                <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Status</th>
+              <tr className="bg-zinc-50">
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Contractor Identity</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Division</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Designation</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Hire Date</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-100">
+            <tbody className="divide-y divide-zinc-100">
               {employees.map((employee) => (
                 <tr
                   key={employee.id}
                   onClick={() => navigate(`/employees/${employee.id}`)}
-                  className="hover:bg-stone-50 transition-colors duration-200 group cursor-pointer"
+                  className="hover:bg-zinc-50 transition-colors duration-200 group cursor-pointer"
                 >
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-stone-200 flex items-center justify-center text-stone-600 font-bold text-lg group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                      <div className="w-12 h-12 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-600 font-bold text-lg group-hover:bg-primary group-hover:text-white transition-all duration-500">
                         {employee.user.fullName.charAt(0).toUpperCase()}
                       </div>
                       <div>
                         <p className="font-bold text-on-surface text-lg tracking-tight">{employee.user.fullName}</p>
-                        <p className="text-xs text-stone-400 font-medium">{employee.user.email}</p>
+                        <p className="text-xs text-zinc-400 font-medium">{employee.user.email}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    <span className="inline-block px-3 py-1 bg-stone-100 text-stone-600 text-[10px] font-bold uppercase tracking-wider rounded">
+                    <span className="inline-block px-3 py-1 bg-zinc-100 text-zinc-600 text-[10px] font-bold uppercase tracking-wider rounded">
                       {employee.department || 'Unassigned'}
                     </span>
                   </td>
                   <td className="px-8 py-6">
-                    <p className="text-stone-700 font-medium italic">{employee.position || 'N/A'}</p>
+                    <p className="text-zinc-700 font-medium italic">{employee.position || 'N/A'}</p>
                   </td>
                   <td className="px-8 py-6">
-                    <p className="text-stone-500 text-sm font-medium">
+                    <p className="text-zinc-500 text-sm font-medium">
                       {new Date(employee.hireDate).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
@@ -106,8 +106,8 @@ export default function Employees() {
                   </td>
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${employee.user.isActive ? 'bg-green-500' : 'bg-stone-300'}`}></span>
-                      <span className={`text-xs font-bold uppercase ${employee.user.isActive ? 'text-green-700' : 'text-stone-500'}`}>
+                      <span className={`w-2 h-2 rounded-full ${employee.user.isActive ? 'bg-green-500' : 'bg-zinc-300'}`}></span>
+                      <span className={`text-xs font-bold uppercase ${employee.user.isActive ? 'text-green-700' : 'text-zinc-500'}`}>
                         {employee.user.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
@@ -121,7 +121,7 @@ export default function Employees() {
 
       {/* Table Footer */}
       <div className="flex items-center justify-between">
-        <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">
+        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
           Displaying {employees.length} Professional{employees.length !== 1 ? 's' : ''}
         </p>
       </div>
@@ -129,23 +129,23 @@ export default function Employees() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-primary/20">
-          <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">Total Workforce</span>
+          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Total Workforce</span>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-on-surface tracking-tighter">{employees.length}</h3>
             <span className="text-green-600 text-xs font-bold mb-2">Active</span>
           </div>
         </div>
-        <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-stone-300">
-          <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">Departments</span>
+        <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-zinc-300">
+          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Departments</span>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-on-surface tracking-tighter">
               {new Set(employees.map(e => e.department).filter(Boolean)).size}
             </h3>
-            <span className="text-stone-500 text-xs font-bold mb-2">Divisions</span>
+            <span className="text-zinc-500 text-xs font-bold mb-2">Divisions</span>
           </div>
         </div>
         <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-primary/20">
-          <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">Retention Rate</span>
+          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Retention Rate</span>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-primary tracking-tighter">
               {employees.length > 0 ? Math.round((employees.filter(e => e.user.isActive).length / employees.length) * 100) : 0}%

@@ -55,7 +55,7 @@ export default function Dashboard() {
         <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
           Corporate Intelligence
         </h1>
-        <p className="text-stone-500 mt-2 max-w-md">
+        <p className="text-zinc-500 mt-2 max-w-md">
           High-level synthesis of organizational dynamics and real-time personnel transitions.
         </p>
       </div>
@@ -64,14 +64,14 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-primary/20">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">Leave Balance</span>
-            <span className="material-symbols-outlined text-stone-300">calendar_today</span>
+            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Leave Balance</span>
+            <span className="material-symbols-outlined text-zinc-300">calendar_today</span>
           </div>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-on-surface tracking-tighter">
               {leaveBalance?.availableLeaves || 0}
             </h3>
-            <span className="text-stone-500 text-xs font-bold mb-2">
+            <span className="text-zinc-500 text-xs font-bold mb-2">
               of {leaveBalance?.totalLeaves || 0} days
             </span>
           </div>
@@ -79,8 +79,8 @@ export default function Dashboard() {
 
         <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-amber-200">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">Pending Leaves</span>
-            <span className="material-symbols-outlined text-stone-300">pending_actions</span>
+            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Pending Leaves</span>
+            <span className="material-symbols-outlined text-zinc-300">pending_actions</span>
           </div>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-on-surface tracking-tighter">
@@ -92,8 +92,8 @@ export default function Dashboard() {
 
         <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-primary/20">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">Overtime Hours</span>
-            <span className="material-symbols-outlined text-stone-300">schedule</span>
+            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Overtime Hours</span>
+            <span className="material-symbols-outlined text-zinc-300">schedule</span>
           </div>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-primary tracking-tighter">
@@ -116,22 +116,22 @@ export default function Dashboard() {
           <div className="bg-surface-container-lowest editorial-shadow rounded-xl overflow-hidden">
             {pendingLeaves.length === 0 && pendingOvertime.length === 0 ? (
               <div className="p-12 text-center">
-                <span className="material-symbols-outlined text-stone-300 text-5xl mb-4 block">inbox</span>
-                <p className="text-stone-400 font-medium">No pending activity</p>
+                <span className="material-symbols-outlined text-zinc-300 text-5xl mb-4 block">inbox</span>
+                <p className="text-zinc-400 font-medium">No pending activity</p>
               </div>
             ) : (
-              <div className="divide-y divide-stone-100">
+              <div className="divide-y divide-zinc-100">
                 {pendingLeaves.slice(0, 4).map((leave) => (
-                  <div key={`leave-${leave.id}`} className="flex items-center gap-4 px-8 py-5 hover:bg-stone-50 transition-colors duration-200">
+                  <div key={`leave-${leave.id}`} className="flex items-center gap-4 px-8 py-5 hover:bg-zinc-50 transition-colors duration-200">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <span className="material-symbols-outlined text-primary text-lg">event_busy</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-on-surface tracking-tight">
-                        <span className="italic text-stone-500">requested </span>
+                        <span className="italic text-zinc-500">requested </span>
                         {leave.leaveType}
                       </p>
-                      <p className="text-xs text-stone-400 font-medium mt-0.5">
+                      <p className="text-xs text-zinc-400 font-medium mt-0.5">
                         {formatDate(leave.startDate)} - {formatDate(leave.endDate)}
                       </p>
                     </div>
@@ -141,16 +141,16 @@ export default function Dashboard() {
                   </div>
                 ))}
                 {pendingOvertime.slice(0, 3).map((overtime) => (
-                  <div key={`ot-${overtime.id}`} className="flex items-center gap-4 px-8 py-5 hover:bg-stone-50 transition-colors duration-200">
+                  <div key={`ot-${overtime.id}`} className="flex items-center gap-4 px-8 py-5 hover:bg-zinc-50 transition-colors duration-200">
                     <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center flex-shrink-0">
                       <span className="material-symbols-outlined text-purple-600 text-lg">schedule</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-on-surface tracking-tight">
-                        <span className="italic text-stone-500">logged </span>
+                        <span className="italic text-zinc-500">logged </span>
                         {overtime.hours}h overtime
                       </p>
-                      <p className="text-xs text-stone-400 font-medium mt-0.5">
+                      <p className="text-xs text-zinc-400 font-medium mt-0.5">
                         {formatDate(overtime.date)} · {overtime.description || 'No description'}
                       </p>
                     </div>
@@ -185,10 +185,10 @@ export default function Dashboard() {
               href="/overtime"
               className="block bg-surface-container-lowest editorial-shadow rounded-xl p-6 hover:shadow-editorial-lg transition-all duration-300 group"
             >
-              <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">Record</span>
+              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Record</span>
               <div className="flex items-center justify-between mt-2">
                 <span className="text-xl font-black text-on-surface">Log Overtime</span>
-                <span className="material-symbols-outlined text-stone-400 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                <span className="material-symbols-outlined text-zinc-400 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
               </div>
             </a>
 
@@ -196,10 +196,10 @@ export default function Dashboard() {
               href="/schedules"
               className="block bg-surface-container-lowest editorial-shadow rounded-xl p-6 hover:shadow-editorial-lg transition-all duration-300 group"
             >
-              <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">View</span>
+              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">View</span>
               <div className="flex items-center justify-between mt-2">
                 <span className="text-xl font-black text-on-surface">Schedules</span>
-                <span className="material-symbols-outlined text-stone-400 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                <span className="material-symbols-outlined text-zinc-400 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
               </div>
             </a>
           </div>

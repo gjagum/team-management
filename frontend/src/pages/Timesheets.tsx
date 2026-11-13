@@ -142,7 +142,7 @@ export default function Timesheets() {
           <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
             Timesheet Generator
           </h1>
-          <p className="text-stone-500 mt-2 max-w-md">
+          <p className="text-zinc-500 mt-2 max-w-md">
             Generate professional reference timesheets for contractors based on verified time logs.
           </p>
         </div>
@@ -157,7 +157,7 @@ export default function Timesheets() {
               <select
                 value={selectedEmployeeId}
                 onChange={(e) => setSelectedEmployeeId(e.target.value)}
-                className="w-full bg-stone-50 border-none rounded-lg text-sm font-bold py-3 px-4 focus:ring-1 focus:ring-primary cursor-pointer"
+                className="w-full bg-zinc-50 border-none rounded-lg text-sm font-bold py-3 px-4 focus:ring-1 focus:ring-primary cursor-pointer"
               >
                 {employees.map(emp => (
                   <option key={emp.id} value={emp.id}>{emp.user.fullName} ({emp.employeeCode})</option>
@@ -168,7 +168,7 @@ export default function Timesheets() {
           {isEmployee && (
             <div className="space-y-2">
               <label className="text-label block">Contractor</label>
-              <div className="w-full bg-stone-100 border-none rounded-lg text-sm font-bold py-3 px-4 text-stone-600">
+              <div className="w-full bg-zinc-100 border-none rounded-lg text-sm font-bold py-3 px-4 text-zinc-600">
                 {user?.fullName} ({user?.employee?.employeeCode})
               </div>
             </div>
@@ -179,7 +179,7 @@ export default function Timesheets() {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full bg-stone-50 border-none rounded-lg text-sm font-bold py-3 px-4 focus:ring-1 focus:ring-primary"
+              className="w-full bg-zinc-50 border-none rounded-lg text-sm font-bold py-3 px-4 focus:ring-1 focus:ring-primary"
             />
           </div>
           <div className="space-y-2">
@@ -188,7 +188,7 @@ export default function Timesheets() {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full bg-stone-50 border-none rounded-lg text-sm font-bold py-3 px-4 focus:ring-1 focus:ring-primary"
+              className="w-full bg-zinc-50 border-none rounded-lg text-sm font-bold py-3 px-4 focus:ring-1 focus:ring-primary"
             />
           </div>
         </div>
@@ -202,13 +202,13 @@ export default function Timesheets() {
         <>
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-surface-container-low p-6 rounded-xl border-b-4 border-stone-200">
+            <div className="bg-surface-container-low p-6 rounded-xl border-b-4 border-zinc-200">
               <span className="text-label">Regular Time</span>
-              <h3 className="text-3xl font-black text-on-surface tracking-tighter mt-2">{preview.summary.totalRegularHours.toFixed(2)} <span className="text-sm font-bold text-stone-400">HRS</span></h3>
+              <h3 className="text-3xl font-black text-on-surface tracking-tighter mt-2">{preview.summary.totalRegularHours.toFixed(2)} <span className="text-sm font-bold text-zinc-400">HRS</span></h3>
             </div>
-            <div className="bg-surface-container-low p-6 rounded-xl border-b-4 border-stone-200">
+            <div className="bg-surface-container-low p-6 rounded-xl border-b-4 border-zinc-200">
               <span className="text-label">Overtime</span>
-              <h3 className="text-3xl font-black text-on-surface tracking-tighter mt-2">{preview.summary.totalOvertimeHours.toFixed(2)} <span className="text-sm font-bold text-stone-400">HRS</span></h3>
+              <h3 className="text-3xl font-black text-on-surface tracking-tighter mt-2">{preview.summary.totalOvertimeHours.toFixed(2)} <span className="text-sm font-bold text-zinc-400">HRS</span></h3>
             </div>
             <div className="bg-surface-container-low p-6 rounded-xl border-b-4 border-primary/20">
               <span className="text-label">Hourly Rate</span>
@@ -236,7 +236,7 @@ export default function Timesheets() {
             <div className="bg-surface-container-lowest editorial-shadow rounded-lg overflow-hidden">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-stone-50">
+                  <tr className="bg-zinc-50">
                     <th className="px-8 py-5 text-label">Date</th>
                     <th className="px-8 py-5 text-label text-center">Clock In</th>
                     <th className="px-8 py-5 text-label text-center">Clock Out</th>
@@ -245,36 +245,36 @@ export default function Timesheets() {
                     <th className="px-8 py-5 text-label">Notes</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100">
+                <tbody className="divide-y divide-zinc-100">
                   {preview.logs.map((log) => (
-                    <tr key={log.date} className="hover:bg-stone-50/50 transition-colors duration-200">
+                    <tr key={log.date} className="hover:bg-zinc-50/50 transition-colors duration-200">
                       <td className="px-8 py-4">
                         <span className="font-bold text-on-surface">{new Date(log.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
                       </td>
                       <td className="px-8 py-4 text-center">
-                        <span className={`text-xs font-bold ${log.clockIn ? 'text-green-600' : 'text-stone-300'}`}>
+                        <span className={`text-xs font-bold ${log.clockIn ? 'text-green-600' : 'text-zinc-300'}`}>
                           {formatTime(log.clockIn)}
                         </span>
                       </td>
                       <td className="px-8 py-4 text-center">
-                        <span className={`text-xs font-bold ${log.clockOut ? 'text-amber-600' : 'text-stone-300'}`}>
+                        <span className={`text-xs font-bold ${log.clockOut ? 'text-amber-600' : 'text-zinc-300'}`}>
                           {formatTime(log.clockOut)}
                         </span>
                       </td>
                       <td className="px-8 py-4 text-center">
-                        <span className="text-sm font-medium text-stone-600">{log.regular.toFixed(2)}</span>
+                        <span className="text-sm font-medium text-zinc-600">{log.regular.toFixed(2)}</span>
                       </td>
                       <td className="px-8 py-4 text-center">
-                        <span className={`text-sm font-bold ${log.overtime > 0 ? 'text-primary' : 'text-stone-400'}`}>{log.overtime.toFixed(2)}</span>
+                        <span className={`text-sm font-bold ${log.overtime > 0 ? 'text-primary' : 'text-zinc-400'}`}>{log.overtime.toFixed(2)}</span>
                       </td>
                       <td className="px-8 py-4">
-                        <p className="text-xs text-stone-400 truncate max-w-xs">{log.notes || '—'}</p>
+                        <p className="text-xs text-zinc-400 truncate max-w-xs">{log.notes || '—'}</p>
                       </td>
                     </tr>
                   ))}
                   {preview.logs.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="px-8 py-12 text-center text-stone-400 text-sm font-medium italic">
+                      <td colSpan={4} className="px-8 py-12 text-center text-zinc-400 text-sm font-medium italic">
                         No time records found for this period.
                       </td>
                     </tr>
@@ -285,7 +285,7 @@ export default function Timesheets() {
           </div>
           
           <div className="flex items-center justify-between px-2">
-            <p className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">
+            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">
               Draft Reference Preview Only
             </p>
             <button
@@ -300,8 +300,8 @@ export default function Timesheets() {
           </div>
         </>
       ) : (
-        <div className="bg-stone-100/50 rounded-xl border-2 border-dashed border-stone-200 h-64 flex items-center justify-center">
-          <p className="text-stone-400 font-medium italic">
+        <div className="bg-zinc-100/50 rounded-xl border-2 border-dashed border-zinc-200 h-64 flex items-center justify-center">
+          <p className="text-zinc-400 font-medium italic">
             {isEmployee ? 'Select a date range to preview your timesheet data.' : 'Select a contractor and date range to preview timesheet data.'}
           </p>
         </div>
