@@ -34,6 +34,7 @@
 | 2026-11-20 | Implemented Slack Socket Mode base integration (apps.connections.open + WebSocket envelopes, ack, reconnect) reusing shared event handler; validated bot token via auth.test | Integration | ✅ |
 | 2026-11-20 | Added Slack slash commands /checkin and /checkout over Socket Mode with ephemeral replies | Integration | ✅ |
 | 2026-11-20 | Improved Slack slash command error handling/logging (response_url status, fallback replies) | Integration | ✅ |
+| 2026-11-20 | Fixed /checkin on Cloudflare: Workers cannot run Socket Mode, added signed HTTP slash-command endpoint /api/webhooks/slack/commands (SLACK_SIGNING_SECRET) | Integration | ✅ |
 
 ## Active Task
 
