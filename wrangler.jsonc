@@ -5,6 +5,7 @@
 //   wrangler r2 bucket create team-management-documents
 //   wrangler secret put DATABASE_URL     # Postgres (Neon) connection string
 //   wrangler secret put JWT_SECRET
+//   wrangler secret put SLACK_SIGNING_SECRET   # Slack slash commands -> /api/webhooks/slack/commands
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "team-management",
