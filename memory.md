@@ -33,6 +33,7 @@
 | 2026-11-12 | Rebranded UI to the OMNITASK violet palette — primary #7c3aed, cool zinc neutrals replacing warm stone, violet gradients/shadows/focus rings; red reserved for destructive + error states | UI | ✅ |
 | 2026-11-20 | Implemented Slack Socket Mode base integration (apps.connections.open + WebSocket envelopes, ack, reconnect) reusing shared event handler; validated bot token via auth.test | Integration | ✅ |
 | 2026-11-20 | Added Slack slash commands /checkin and /checkout over Socket Mode with ephemeral replies | Integration | ✅ |
+| 2026-11-20 | Improved Slack slash command error handling/logging (response_url status, fallback replies) | Integration | ✅ |
 
 ## Active Task
 
