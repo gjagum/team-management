@@ -39,9 +39,7 @@
   //   { "binding": "HYPERDRIVE", "id": "<HYPERDRIVE_ID>" }
   // ],
 
-  "vars": {
-    "NODE_ENV": "production"
-  },
+  "vars": {},
 
   "observability": {
     "enabled": true
