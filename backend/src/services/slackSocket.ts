@@ -78,17 +78,31 @@ async function connect(): Promise<void> {
         console.error('[SLACK] event handling error:', err);
       }
     } else if (envelope?.type === 'slash_commands' && payload) {
+      console.log('[SLACK] slash command received:', payload.command, 'from', payload.user_id);
+      let reply = 'Something went wrong. Please try again.';
       try {
-        const reply = await handleSlackSlashCommand(payload);
-        if (payload.response_url) {
-          await fetch(payload.response_url, {
+        reply = await handleSlackSlashCommand(payload);
+      } catch (err) {
+        console.error('[SLACK] slash command handling error:', err);
+      }
+      if (payload.response_url) {
+        try {
+          const resp = await fetch(payload.response_url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: reply, response_type: 'ephemeral' }),
           });
+          console.log('[SLACK] response_url status:', resp.status);
+        } catch (err) {
+          console.error('[SLACK] response_url post error:', err);
         }
-      } catch (err) {
-        console.error('[SLACK] slash command handling error:', err);
+      } else {
+        console.warn('[SLACK] no response_url in slash command payload');
+      }
+    } else {
+      // Log unhandled envelope types to aid debugging
+      if (envelope?.type && envelope.type !== 'hello') {
+        console.log('[SLACK] unhandled envelope type:', envelope.type);
       }
     }
   };
