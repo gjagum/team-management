@@ -9,6 +9,7 @@
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "seed": "bun prisma/seed.ts",
+    "permissions:sync": "bun scripts/sync-permissions.ts",
     "test": "bun test src/",
     "typecheck": "tsc --noEmit",
     "copy-static": "bun -e \"const fs = require('node:fs'); fs.rmSync('static', { recursive: true, force: true }); fs.cpSync('../frontend/dist', 'static', { recursive: true })\""
