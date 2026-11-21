@@ -21,6 +21,7 @@ usersRouter.get('/', requirePermission('users.read'), async (c) => {
           employeeCode: true,
           department: true,
           position: true,
+          slackId: true,
         },
       },
     },
@@ -80,8 +81,22 @@ usersRouter.put('/:id', requirePermission('users.update'), async (c) => {
   const id = parseInt(c.req.param('id'));
   const data = await c.req.json();
 
-  const oldUser = await prisma.user.findUnique({ where: { id } });
+  const oldUser = await prisma.user.findUnique({ where: { id }, include: { employee: true } });
   if (!oldUser) return c.json({ error: 'User not found' }, 404);
+
+  // Slack ID lives on the employee profile
+  if (data.slackId !== undefined) {
+    const slackId = String(data.slackId || '').trim() || null;
+    if (!oldUser.employee) {
+      if (slackId) return c.json({ error: 'Activate an employee profile before setting a Slack ID' }, 400);
+    } else if (slackId !== oldUser.employee.slackId) {
+      const taken = slackId && (await prisma.employee.findUnique({ where: { slackId } }));
+      if (taken && taken.id !== oldUser.employee.id) {
+        return c.json({ error: 'That Slack ID is already linked to another employee' }, 409);
+      }
+      await prisma.employee.update({ where: { id: oldUser.employee.id }, data: { slackId } });
+    }
+  }
 
   const updateData: any = {};
   if (data.fullName) updateData.fullName = data.fullName;
