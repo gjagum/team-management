@@ -1,4 +1,4 @@
-import { handleSlackEvent, handleSlackSlashCommand } from './slackEvents.ts';
+import { handleSlackEvent, handleSlackSlashCommand, type SlashReply } from './slackEvents.ts';
 
 const APP_TOKEN = process.env.SLACK_APP_TOKEN;
 const BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
@@ -79,7 +79,7 @@ async function connect(): Promise<void> {
       }
     } else if (envelope?.type === 'slash_commands' && payload) {
       console.log('[SLACK] slash command received:', payload.command, 'from', payload.user_id);
-      let reply = 'Something went wrong. Please try again.';
+      let reply: SlashReply = { text: 'Something went wrong. Please try again.', inChannel: false };
       try {
         reply = await handleSlackSlashCommand(payload);
       } catch (err) {
@@ -90,7 +90,7 @@ async function connect(): Promise<void> {
           const resp = await fetch(payload.response_url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: reply, response_type: 'ephemeral' }),
+            body: JSON.stringify({ text: reply.text, response_type: reply.inChannel ? 'in_channel' : 'ephemeral' }),
           });
           console.log('[SLACK] response_url status:', resp.status);
         } catch (err) {

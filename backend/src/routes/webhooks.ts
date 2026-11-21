@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { handleSlackEvent, handleSlackSlashCommand } from '../services/slackEvents.ts';
+import { handleSlackEvent, handleSlackSlashCommand, type SlashReply } from '../services/slackEvents.ts';
 import { verifySlackSignature } from '../services/slackVerify.ts';
 
 const webhooksRouter = new Hono();
@@ -57,14 +57,37 @@ webhooksRouter.post('/slack/commands', async (c) => {
   const payload = Object.fromEntries(new URLSearchParams(raw));
   console.log('[SLACK] slash command received:', payload.command, 'from', payload.user_id);
 
-  let text = 'Something went wrong. Please try again.';
+  // Slack times out after 3s, and a cold DB connection can exceed that. Ack now
+  // (empty 200 = no visible message) and post the result to response_url.
+  const work = (async () => {
+    let reply: SlashReply = { text: 'Something went wrong. Please try again.', inChannel: false };
+    try {
+      reply = await handleSlackSlashCommand(payload);
+    } catch (err) {
+      console.error('[SLACK] slash command handling error:', err);
+    }
+    if (!payload.response_url) {
+      console.warn('[SLACK] no response_url in slash command payload');
+      return;
+    }
+    try {
+      const resp = await fetch(payload.response_url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ response_type: reply.inChannel ? 'in_channel' : 'ephemeral', text: reply.text }),
+      });
+      console.log('[SLACK] reply sent:', resp.status, reply.inChannel ? '(in_channel)' : '(ephemeral)', '-', reply.text);
+    } catch (err) {
+      console.error('[SLACK] response_url post error:', err);
+    }
+  })();
+
   try {
-    text = await handleSlackSlashCommand(payload);
-  } catch (err) {
-    console.error('[SLACK] slash command handling error:', err);
+    c.executionCtx.waitUntil(work); // Cloudflare Workers
+  } catch {
+    // Bun has no ExecutionContext; the promise keeps running on its own.
   }
-  // Slack requires a reply within 3s; replying inline avoids needing response_url.
-  return c.json({ response_type: 'ephemeral', text });
+  return c.body(null, 200);
 });
 
 export default webhooksRouter;
