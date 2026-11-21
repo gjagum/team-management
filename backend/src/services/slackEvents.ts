@@ -71,13 +71,6 @@ function slackTime(d: Date): string {
   return `<!date^${Math.floor(d.getTime() / 1000)}^{time}|${d.toISOString().slice(11, 16)} UTC>`;
 }
 
-function formatDuration(ms: number): string {
-  const totalMin = Math.max(0, Math.round(ms / 60000));
-  const h = Math.floor(totalMin / 60);
-  const m = totalMin % 60;
-  return h ? `${h}h ${m}m` : `${m}m`;
-}
-
 /**
  * Handle Slack slash commands (/checkin, /checkout), over HTTP or Socket Mode.
  * Successful check-ins/outs are posted in the channel; errors are private.
@@ -119,14 +112,13 @@ export async function handleSlackSlashCommand(payload: any): Promise<SlashReply>
   }
 
   if (command === '/checkout') {
-    const log = await prisma.timeLog.upsert({
+    await prisma.timeLog.upsert({
       where: key,
       update: { clockOut: now },
       create: { employeeId: employee.id, date: today, clockOut: now, source: 'SLACK' },
     });
     console.log(`[SLACK] ${employee.user.fullName} checked out at ${now.toISOString()}`);
-    const worked = log.clockIn ? ` · worked ${formatDuration(now.getTime() - log.clockIn.getTime())}` : '';
-    return { text: `:house: <@${slackId}> checked out at ${slackTime(now)}${worked}`, inChannel: true };
+    return { text: `:house: <@${slackId}>, thank you for today.`, inChannel: true };
   }
 
   return privately(`Unknown command: ${command}`);
