@@ -60,13 +60,32 @@ export async function handleSlackEvent(event: any): Promise<void> {
   }
 }
 
+export interface SlashReply {
+  text: string;
+  /** true = post in the channel; false = only the invoking user sees it */
+  inChannel: boolean;
+}
+
+/** Slack date token: renders in each viewer's own timezone. */
+function slackTime(d: Date): string {
+  return `<!date^${Math.floor(d.getTime() / 1000)}^{time}|${d.toISOString().slice(11, 16)} UTC>`;
+}
+
+function formatDuration(ms: number): string {
+  const totalMin = Math.max(0, Math.round(ms / 60000));
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  return h ? `${h}h ${m}m` : `${m}m`;
+}
+
 /**
- * Handle Slack slash commands (/checkin, /checkout) delivered over Socket Mode.
- * Returns a human-readable reply sent back to the user.
+ * Handle Slack slash commands (/checkin, /checkout), over HTTP or Socket Mode.
+ * Successful check-ins/outs are posted in the channel; errors are private.
  */
-export async function handleSlackSlashCommand(payload: any): Promise<string> {
+export async function handleSlackSlashCommand(payload: any): Promise<SlashReply> {
   const slackId = payload?.user_id;
   const command = String(payload?.command || '').toLowerCase().trim();
+  const privately = (text: string): SlashReply => ({ text, inChannel: false });
 
   const employee = await prisma.employee.findUnique({
     where: { slackId },
@@ -74,50 +93,41 @@ export async function handleSlackSlashCommand(payload: any): Promise<string> {
   });
 
   if (!employee) {
-    return 'You are not registered in the team management system.';
+    return privately(
+      ":warning: Your Slack account isn't linked to an employee profile yet. Ask an admin to add your Slack ID in Team Management.",
+    );
   }
 
   const now = new Date();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const key = { employeeId_date: { employeeId: employee.id, date: today } };
 
   if (command === '/checkin') {
-    const existingLog = await prisma.timeLog.findUnique({
-      where: { employeeId_date: { employeeId: employee.id, date: today } },
-    });
-
+    const existingLog = await prisma.timeLog.findUnique({ where: key });
     if (existingLog?.clockIn) {
-      return `You already checked in at ${existingLog.clockIn.toLocaleTimeString()}.`;
+      return privately(`You already checked in today at ${slackTime(existingLog.clockIn)}.`);
     }
 
     await prisma.timeLog.upsert({
-      where: { employeeId_date: { employeeId: employee.id, date: today } },
+      where: key,
       update: { clockIn: now },
-      create: {
-        employeeId: employee.id,
-        date: today,
-        clockIn: now,
-        source: 'SLACK',
-      },
+      create: { employeeId: employee.id, date: today, clockIn: now, source: 'SLACK' },
     });
     console.log(`[SLACK] ${employee.user.fullName} checked in at ${now.toISOString()}`);
-    return `Checked in at ${now.toLocaleTimeString()}. Have a great day!`;
+    return { text: `:wave: <@${slackId}> checked in at ${slackTime(now)}`, inChannel: true };
   }
 
   if (command === '/checkout') {
-    await prisma.timeLog.upsert({
-      where: { employeeId_date: { employeeId: employee.id, date: today } },
+    const log = await prisma.timeLog.upsert({
+      where: key,
       update: { clockOut: now },
-      create: {
-        employeeId: employee.id,
-        date: today,
-        clockOut: now,
-        source: 'SLACK',
-      },
+      create: { employeeId: employee.id, date: today, clockOut: now, source: 'SLACK' },
     });
     console.log(`[SLACK] ${employee.user.fullName} checked out at ${now.toISOString()}`);
-    return `Checked out at ${now.toLocaleTimeString()}. See you tomorrow!`;
+    const worked = log.clockIn ? ` · worked ${formatDuration(now.getTime() - log.clockIn.getTime())}` : '';
+    return { text: `:house: <@${slackId}> checked out at ${slackTime(now)}${worked}`, inChannel: true };
   }
 
-  return `Unknown command: ${command}`;
+  return privately(`Unknown command: ${command}`);
 }

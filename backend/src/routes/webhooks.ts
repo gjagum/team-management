@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { handleSlackEvent, handleSlackSlashCommand } from '../services/slackEvents.ts';
+import { handleSlackEvent, handleSlackSlashCommand, type SlashReply } from '../services/slackEvents.ts';
 import { verifySlackSignature } from '../services/slackVerify.ts';
 
 const webhooksRouter = new Hono();
@@ -60,9 +60,9 @@ webhooksRouter.post('/slack/commands', async (c) => {
   // Slack times out after 3s, and a cold DB connection can exceed that. Ack now
   // (empty 200 = no visible message) and post the result to response_url.
   const work = (async () => {
-    let text = 'Something went wrong. Please try again.';
+    let reply: SlashReply = { text: 'Something went wrong. Please try again.', inChannel: false };
     try {
-      text = await handleSlackSlashCommand(payload);
+      reply = await handleSlackSlashCommand(payload);
     } catch (err) {
       console.error('[SLACK] slash command handling error:', err);
     }
@@ -74,9 +74,9 @@ webhooksRouter.post('/slack/commands', async (c) => {
       const resp = await fetch(payload.response_url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ response_type: 'ephemeral', text }),
+        body: JSON.stringify({ response_type: reply.inChannel ? 'in_channel' : 'ephemeral', text: reply.text }),
       });
-      console.log('[SLACK] reply sent:', resp.status, '-', text);
+      console.log('[SLACK] reply sent:', resp.status, reply.inChannel ? '(in_channel)' : '(ephemeral)', '-', reply.text);
     } catch (err) {
       console.error('[SLACK] response_url post error:', err);
     }
