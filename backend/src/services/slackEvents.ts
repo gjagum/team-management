@@ -115,7 +115,7 @@ export async function handleSlackSlashCommand(payload: any): Promise<SlashReply>
       create: { employeeId: employee.id, date: today, clockIn: now, source: 'SLACK' },
     });
     console.log(`[SLACK] ${employee.user.fullName} checked in at ${now.toISOString()}`);
-    return { text: `:wave: <@${slackId}> checked in at ${slackTime(now)}`, inChannel: true };
+    return { text: `Hi <@${slackId}>, have a great day!`, inChannel: true };
   }
 
   if (command === '/checkout') {
