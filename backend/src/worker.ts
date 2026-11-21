@@ -36,10 +36,22 @@ export default {
     const pool = new Pool({ connectionString, max: 1 });
     const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
+    // Track background work (ctx.waitUntil) started by routes so the pool stays
+    // open until it finishes, e.g. Slack slash commands that reply after acking.
+    const pending: Promise<unknown>[] = [];
+    const trackedCtx: ExecutionContext = {
+      waitUntil: (p: Promise<unknown>) => {
+        pending.push(p);
+        ctx.waitUntil(p);
+      },
+      passThroughOnException: () => ctx.passThroughOnException(),
+      props: (ctx as any).props,
+    } as ExecutionContext;
+
     try {
-      return await runWithPrisma(prisma, () => app.fetch(request, env, ctx));
+      return await runWithPrisma(prisma, () => app.fetch(request, env, trackedCtx));
     } finally {
-      ctx.waitUntil(pool.end());
+      ctx.waitUntil(Promise.allSettled(pending).then(() => pool.end()));
     }
   },
 };
