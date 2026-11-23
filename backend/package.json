@@ -8,6 +8,7 @@
     "build": "cd ../frontend && bun run build && cd ../backend && bun run copy-static && bun run prisma:generate",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
+    "db:studio": "node node_modules/prisma/build/index.js studio --port 5555",
     "seed": "bun prisma/seed.ts",
     "test": "bun test src/",
     "typecheck": "tsc --noEmit",

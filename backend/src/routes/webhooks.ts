@@ -6,6 +6,11 @@ const webhooksRouter = new Hono();
 webhooksRouter.post('/slack', async (c) => {
   const body = await c.req.json();
 
+  console.log(
+    `[SLACK] received type=${body.type} event=${body.event?.type ?? '-'} user=${body.event?.user ?? '-'} ` +
+      `channel=${body.event?.channel ?? '-'} text=${JSON.stringify(body.event?.text ?? '')}`,
+  );
+
   // 1. Slack URL verification challenge
   if (body.type === 'url_verification') {
     return c.json({ challenge: body.challenge });
@@ -28,6 +33,7 @@ webhooksRouter.post('/slack', async (c) => {
 
       if (!employee) {
         // Silence failure if user not found (don't want to leak info or cause errors for non-registered users)
+        console.log(`[SLACK] no employee linked to slackId=${slackId} — ignoring message`);
         return c.json({ ok: true });
       }
 
@@ -36,10 +42,10 @@ webhooksRouter.post('/slack', async (c) => {
       today.setHours(0, 0, 0, 0);
 
       // Simple keyword matching
-      const isMorning = text.includes('good morning');
-      const isEvening = text.includes('good evening');
+      const isCheckIn = text.includes('checkin');
+      const isCheckOut = text.includes('checkout');
 
-      if (isMorning) {
+      if (isCheckIn) {
         // Clock In: Only set if not already set for today, or if we want the earliest
         const existingLog = await prisma.timeLog.findUnique({
           where: { employeeId_date: { employeeId: employee.id, date: today } }
@@ -58,8 +64,8 @@ webhooksRouter.post('/slack', async (c) => {
           });
           console.log(`[SLACK] ${employee.user.fullName} clocked in at ${now.toISOString()}`);
         }
-      } else if (isEvening) {
-        // Clock Out: Always update to the latest "good evening"
+      } else if (isCheckOut) {
+        // Clock Out: Always update to the latest "checkout"
         await prisma.timeLog.upsert({
           where: { employeeId_date: { employeeId: employee.id, date: today } },
           update: { clockOut: now },

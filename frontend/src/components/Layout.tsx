@@ -1,11 +1,9 @@
 import React from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.tsx";
-import { useSettings } from "../contexts/SettingsContext.tsx";
 
 export default function Layout() {
   const { user, logout } = useAuth();
-  const { getSetting } = useSettings();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -79,9 +77,11 @@ export default function Layout() {
                 menu
               </span>
             </button>
-            <span className="text-xl font-bold tracking-tighter text-violet-700 uppercase">
-              {getSetting("company.name") || "TEAM MANAGEMENT"}
-            </span>
+            <img
+              src="/omnitask-logo.png"
+              alt="OMNITASK"
+              className="h-8 w-auto"
+            />
             {/* Search bar */}
             <div className="hidden md:flex items-center bg-zinc-100 rounded-full px-4 py-1.5 gap-2">
               <span className="material-symbols-outlined text-zinc-500 text-sm">

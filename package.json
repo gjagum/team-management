@@ -7,11 +7,14 @@
     "frontend"
   ],
   "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "dev:stack": "bun scripts/dev-stack.ts",
     "dev:backend": "bun run --filter @team-management/backend dev",
     "dev:frontend": "bun run --filter @team-management/frontend dev",
     "build": "bun run --filter @team-management/backend build",
     "start": "bun run --filter @team-management/backend start",
-    "test": "bun run --filter @team-management/backend test"
+    "test": "bun run --filter @team-management/backend test",
+    "db:studio": "cd backend && node node_modules/prisma/build/index.js studio --port 5555"
   },
   "trustedDependencies": [
     "@prisma/client",

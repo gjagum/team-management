@@ -219,9 +219,9 @@ sequenceDiagram
   W->>DB: findUnique(employee) by slackId
   alt employee not linked
     W-->>Slack: { ok: true } (silent)
-  else "good morning"
+  else "checkin"
     W->>DB: upsert TimeLog(today).clockIn = now if empty
-  else "good evening"
+  else "checkout"
     W->>DB: upsert TimeLog(today).clockOut = now (latest wins)
   end
   W-->>Slack: { ok: true }

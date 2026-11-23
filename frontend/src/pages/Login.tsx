@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.tsx';
-import { useSettings } from '../contexts/SettingsContext.tsx';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -9,7 +8,6 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
    const { login } = useAuth();
-  const { getSetting } = useSettings();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,9 +30,11 @@ export default function Login() {
       <div className="w-full max-w-md">
         {/* Logo area */}
         <div className="text-center mb-12">
-          <h1 className="text-2xl font-bold tracking-tighter text-violet-700 uppercase mb-2">
-            {getSetting('company.name') || 'TEAM MANAGEMENT'}
-          </h1>
+          <img
+            src="/omnitask-logo.png"
+            alt="OMNITASK"
+            className="h-14 w-auto mx-auto mb-3"
+          />
           <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">
             Corporate Management Platform
           </p>
@@ -47,10 +47,10 @@ export default function Login() {
               Authentication
             </span>
             <h2 className="text-3xl font-black text-on-surface tracking-tighter">
-              Welcome Back
+              Welcome Back!
             </h2>
             <p className="text-zinc-500 mt-2 text-sm">
-              Sign in to access your corporate intelligence dashboard.
+              Sign in to access.
             </p>
           </div>
 
