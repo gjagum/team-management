@@ -84,14 +84,18 @@ usersRouter.put('/:id', requirePermission('users.update'), async (c) => {
   const oldUser = await prisma.user.findUnique({ where: { id }, include: { employee: true } });
   if (!oldUser) return c.json({ error: 'User not found' }, 404);
 
-  // The Slack link lives on the employee profile, but the Users modal edits both at once.
-  const slackIdProvided = data.slackId !== undefined;
-  const slackId = slackIdProvided ? (String(data.slackId).trim() || null) : undefined;
-  if (slackIdProvided && !oldUser.employee) {
-    return c.json(
-      { error: 'This user has no employee profile yet — activate the employee record before linking Slack' },
-      400,
-    );
+  // Slack ID lives on the employee profile
+  if (data.slackId !== undefined) {
+    const slackId = String(data.slackId || '').trim() || null;
+    if (!oldUser.employee) {
+      if (slackId) return c.json({ error: 'Activate an employee profile before setting a Slack ID' }, 400);
+    } else if (slackId !== oldUser.employee.slackId) {
+      const taken = slackId && (await prisma.employee.findUnique({ where: { slackId } }));
+      if (taken && taken.id !== oldUser.employee.id) {
+        return c.json({ error: 'That Slack ID is already linked to another employee' }, 409);
+      }
+      await prisma.employee.update({ where: { id: oldUser.employee.id }, data: { slackId } });
+    }
   }
 
   const updateData: any = {};
@@ -100,30 +104,14 @@ usersRouter.put('/:id', requirePermission('users.update'), async (c) => {
   if (data.isActive !== undefined) updateData.isActive = data.isActive;
   if (data.password) updateData.passwordHash = await bcrypt.hash(data.password, 10);
 
-  try {
-    const user = await prisma.user.update({
-      where: { id },
-      data: updateData,
-    });
+  const user = await prisma.user.update({
+    where: { id },
+    data: updateData,
+  });
 
-    if (slackIdProvided) {
-      const employee = await prisma.employee.update({
-        where: { userId: id },
-        data: { slackId: slackId ?? null },
-      });
-      await auditLog(c.user!.userId, 'UPDATE', 'employee', employee.id, oldUser.employee, employee);
-    }
+  await auditLog(c.user!.userId, 'UPDATE', 'user', id, oldUser, user);
 
-    await auditLog(c.user!.userId, 'UPDATE', 'user', id, oldUser, user);
-
-    return c.json(user);
-  } catch (error: any) {
-    // Unique constraint on employees.slack_id
-    if (error?.code === 'P2002') {
-      return c.json({ error: 'That Slack ID is already linked to another employee' }, 409);
-    }
-    throw error;
-  }
+  return c.json(user);
 });
 
 usersRouter.delete('/:id', requirePermission('users.delete'), async (c) => {

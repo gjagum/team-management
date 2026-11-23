@@ -40,6 +40,11 @@
 | 2026-11-20 | Fixed Slack ID editing: `PUT /api/users/:id` now saves `slackId` onto the employee profile (409 on duplicates, 400 without an employee record) and `GET /api/users` returns `slackId` so the Users table/modal reflect it | Backend | ✅ |
 | 2026-11-20 | Slack clock keywords changed from "good morning"/"good evening" to `checkin`/`checkout`; webhook now logs every inbound event (type/user/channel/text) and unlinked slackIds; ARCHITECTURE + explainer docs updated | Backend | ✅ |
 | 2026-11-20 | Added `bun run dev:stack` (`scripts/dev-stack.ts`): runs backend + frontend + cloudflared quick tunnel in one terminal, prints the Slack webhook Request URL, task-kills the whole tree on Ctrl+C | DevOps | ✅ |
+| 2026-11-20 | Implemented Slack Socket Mode base integration (apps.connections.open + WebSocket envelopes, ack, reconnect) reusing shared event handler; validated bot token via auth.test | Integration | ✅ |
+| 2026-11-20 | Added Slack slash commands /checkin and /checkout over Socket Mode with ephemeral replies | Integration | ✅ |
+| 2026-11-20 | Improved Slack slash command error handling/logging (response_url status, fallback replies) | Integration | ✅ |
+| 2026-11-20 | Fixed /checkin on Cloudflare: Workers cannot run Socket Mode, added signed HTTP slash-command endpoint /api/webhooks/slack/commands (SLACK_SIGNING_SECRET) | Integration | ✅ |
+| 2026-11-23 | Merged origin/main (Slack Socket Mode + slash commands, signed webhook verification) into docs/omnitask-guide; moved message keywords to `checkin`/`checkout` in the shared slackEvents handler | Integration | ✅ |
 
 ## Active Task
 
