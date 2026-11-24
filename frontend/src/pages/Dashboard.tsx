@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { LeaveRequest, OvertimeRecord, LeaveBalance } from '../types';
 import { formatDate, getStatusColor } from '../utils/helpers';
@@ -7,6 +8,7 @@ import { useNotification } from '../contexts/NotificationContext';
 
 export default function Dashboard() {
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
   const [leaveBalance, setLeaveBalance] = useState<LeaveBalance | null>(null);
   const [pendingLeaves, setPendingLeaves] = useState<LeaveRequest[]>([]);
   const [pendingOvertime, setPendingOvertime] = useState<OvertimeRecord[]>([]);
@@ -49,14 +51,11 @@ export default function Dashboard() {
     <div className="space-y-12">
       {/* Page Header */}
       <div>
-        <span className="text-[10px] font-bold text-primary tracking-[0.2em] uppercase mb-2 block">
-          Perspective & Control
-        </span>
         <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
-          Corporate Intelligence
+          Welcome Back
         </h1>
         <p className="text-zinc-500 mt-2 max-w-md">
-          High-level synthesis of organizational dynamics and real-time personnel transitions.
+          Your leave, overtime and schedules at a glance
         </p>
       </div>
 
@@ -164,44 +163,47 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Action Center */}
+        {/* Quick Actions */}
         <div>
           <h2 className="text-2xl font-black text-on-surface tracking-tighter mb-6">
-            Action Center
+            Quick Actions
           </h2>
           <div className="space-y-4">
-            <a
-              href="/leaves"
-              className="block bg-primary primary-gradient rounded-xl p-6 text-white hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 group"
+            <button
+              type="button"
+              onClick={() => navigate('/leaves', { state: { openNew: true } })}
+              className="w-full text-left block bg-primary primary-gradient rounded-xl p-6 text-white hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 group"
             >
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">Request</span>
               <div className="flex items-center justify-between mt-2">
                 <span className="text-xl font-black">New Leave</span>
                 <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
               </div>
-            </a>
+            </button>
 
-            <a
-              href="/overtime"
-              className="block bg-surface-container-lowest editorial-shadow rounded-xl p-6 hover:shadow-editorial-lg transition-all duration-300 group"
+            <button
+              type="button"
+              onClick={() => navigate('/overtime', { state: { openNew: true } })}
+              className="w-full text-left block bg-surface-container-lowest editorial-shadow rounded-xl p-6 hover:shadow-editorial-lg transition-all duration-300 group"
             >
               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Record</span>
               <div className="flex items-center justify-between mt-2">
-                <span className="text-xl font-black text-on-surface">Log Overtime</span>
+                <span className="text-xl font-black text-on-surface">Record Overtime</span>
                 <span className="material-symbols-outlined text-zinc-400 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
               </div>
-            </a>
+            </button>
 
-            <a
-              href="/schedules"
-              className="block bg-surface-container-lowest editorial-shadow rounded-xl p-6 hover:shadow-editorial-lg transition-all duration-300 group"
+            <button
+              type="button"
+              onClick={() => navigate('/schedules')}
+              className="w-full text-left block bg-surface-container-lowest editorial-shadow rounded-xl p-6 hover:shadow-editorial-lg transition-all duration-300 group"
             >
               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">View</span>
               <div className="flex items-center justify-between mt-2">
                 <span className="text-xl font-black text-on-surface">Schedules</span>
                 <span className="material-symbols-outlined text-zinc-400 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
               </div>
-            </a>
+            </button>
           </div>
         </div>
       </div>

@@ -1,16 +1,29 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.tsx';
-import { useSettings } from '../contexts/SettingsContext.tsx';
+
+const demoAccounts = {
+  EMPLOYEE: { email: 'employee@team.com', pass: 'employee123' },
+  MANAGER: { email: 'manager@team.com', pass: 'manager123' },
+  ADMIN: { email: 'admin@team.com', pass: 'admin123' },
+} as const;
+
+type AccessLevel = keyof typeof demoAccounts;
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [accessLevel, setAccessLevel] = useState<AccessLevel>('EMPLOYEE');
    const { login } = useAuth();
-  const { getSetting } = useSettings();
   const navigate = useNavigate();
+
+  const chooseAccessLevel = (level: AccessLevel) => {
+    setAccessLevel(level);
+    setEmail(demoAccounts[level].email);
+    setPassword(demoAccounts[level].pass);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,9 +45,11 @@ export default function Login() {
       <div className="w-full max-w-md">
         {/* Logo area */}
         <div className="text-center mb-12">
-          <h1 className="text-2xl font-bold tracking-tighter text-violet-700 uppercase mb-2">
-            {getSetting('company.name') || 'TEAM MANAGEMENT'}
-          </h1>
+          <img
+            src="/omnitask-logo.png"
+            alt="OMNITASK"
+            className="h-14 w-auto mx-auto mb-3"
+          />
           <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">
             Corporate Management Platform
           </p>
@@ -47,10 +62,10 @@ export default function Login() {
               Authentication
             </span>
             <h2 className="text-3xl font-black text-on-surface tracking-tighter">
-              Welcome Back
+              Welcome Back!
             </h2>
             <p className="text-zinc-500 mt-2 text-sm">
-              Sign in to access your corporate intelligence dashboard.
+              Sign in to access.
             </p>
           </div>
 
@@ -116,27 +131,28 @@ export default function Login() {
 
           <div className="mt-10 pt-6 border-t border-zinc-100">
             <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] mb-3">
-              Demo Credentials
+              Access Level
             </p>
-            <div className="space-y-2">
-              {[
-                { label: 'Admin', email: 'admin@team.com', pass: 'admin123' },
-                { label: 'Manager', email: 'manager@team.com', pass: 'manager123' },
-                { label: 'Contractor', email: 'employee@team.com', pass: 'employee123' },
-              ].map((demo) => (
+            <div className="grid grid-cols-3 gap-1 bg-surface-container-low p-1 rounded-lg">
+              {(Object.keys(demoAccounts) as AccessLevel[]).map((level) => (
                 <button
-                  key={demo.label}
-                  onClick={() => { setEmail(demo.email); setPassword(demo.pass); }}
-                  className="w-full text-left px-4 py-2.5 rounded-lg bg-surface-container-low hover:bg-surface-container-high transition-all group flex items-center justify-between"
+                  key={level}
+                  type="button"
+                  onClick={() => chooseAccessLevel(level)}
+                  className={`py-2 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${
+                    accessLevel === level
+                      ? 'bg-white text-primary shadow-sm'
+                      : 'text-zinc-400 hover:text-zinc-600'
+                  }`}
                 >
-                  <div>
-                    <span className="text-xs font-bold text-on-surface">{demo.label}</span>
-                    <span className="text-xs text-zinc-400 ml-2">{demo.email}</span>
-                  </div>
-                  <span className="material-symbols-outlined text-zinc-400 group-hover:text-primary text-sm transition-colors">arrow_forward</span>
+                  {level}
                 </button>
               ))}
             </div>
+            <p className="text-[10px] text-zinc-400 mt-3 leading-relaxed">
+              Select a level to fill in its demo login. Managers and admins also hold employee
+              self-service access for leave and overtime.
+            </p>
           </div>
         </div>
 

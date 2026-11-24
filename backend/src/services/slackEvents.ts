@@ -17,6 +17,7 @@ export async function handleSlackEvent(event: any): Promise<void> {
 
   if (!employee) {
     // Silence failure if user not found
+    console.log(`[SLACK] no employee linked to slackId=${slackId} — ignoring message`);
     return;
   }
 
@@ -24,10 +25,10 @@ export async function handleSlackEvent(event: any): Promise<void> {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const isMorning = text.includes('good morning');
-  const isEvening = text.includes('good evening');
+  const isCheckIn = text.includes('checkin');
+  const isCheckOut = text.includes('checkout');
 
-  if (isMorning) {
+  if (isCheckIn) {
     const existingLog = await prisma.timeLog.findUnique({
       where: { employeeId_date: { employeeId: employee.id, date: today } },
     });
@@ -45,7 +46,7 @@ export async function handleSlackEvent(event: any): Promise<void> {
       });
       console.log(`[SLACK] ${employee.user.fullName} clocked in at ${now.toISOString()}`);
     }
-  } else if (isEvening) {
+  } else if (isCheckOut) {
     await prisma.timeLog.upsert({
       where: { employeeId_date: { employeeId: employee.id, date: today } },
       update: { clockOut: now },

@@ -21,7 +21,15 @@ usersRouter.get('/', requirePermission('users.read'), async (c) => {
           employeeCode: true,
           department: true,
           position: true,
+          hireDate: true,
           slackId: true,
+          team: {
+            select: {
+              id: true,
+              name: true,
+              teamLeader: { select: { user: { select: { fullName: true } } } },
+            },
+          },
         },
       },
     },
@@ -96,6 +104,18 @@ usersRouter.put('/:id', requirePermission('users.update'), async (c) => {
       }
       await prisma.employee.update({ where: { id: oldUser.employee.id }, data: { slackId } });
     }
+  }
+
+  // Other employee-profile fields edited from the merged People & Access page
+  const employeePatch: any = {};
+  if (data.position !== undefined) employeePatch.position = data.position || null;
+  if (data.hireDate !== undefined && data.hireDate) employeePatch.hireDate = new Date(data.hireDate);
+  if (data.teamId !== undefined) employeePatch.teamId = data.teamId ? Number(data.teamId) : null;
+  if (Object.keys(employeePatch).length > 0) {
+    if (!oldUser.employee) {
+      return c.json({ error: 'Activate an employee profile before editing employee details' }, 400);
+    }
+    await prisma.employee.update({ where: { id: oldUser.employee.id }, data: employeePatch });
   }
 
   const updateData: any = {};

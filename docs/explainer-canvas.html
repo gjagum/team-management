@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Team Management — Explainer Canvas</title>
+<style>
+  :root {
+    --violet-50:#f5f3ff; --violet-100:#ede9fe; --violet-200:#ddd6fe;
+    --violet-300:#c4b5fd; --violet-400:#a78bfa; --violet-500:#8b5cf6;
+    --violet-600:#7c3aed; --violet-700:#6d28d9;
+    --zinc-50:#fafafa; --zinc-100:#f4f4f5; --zinc-200:#e4e4e7;
+    --zinc-300:#d4d4d8; --zinc-400:#a1a1aa; --zinc-500:#71717a;
+    --zinc-600:#52525b; --zinc-700:#3f3f46; --zinc-800:#27272a; --zinc-900:#18181b;
+    --red:#dc2626; --red-bg:#fef2f2; --green:#059669; --green-bg:#ecfdf5;
+    --amber:#d97706; --amber-bg:#fffbeb;
+    --radius:14px;
+    --shadow-sm:0 1px 2px rgba(24,24,27,.06), 0 1px 3px rgba(24,24,27,.05);
+    --shadow-md:0 4px 16px -4px rgba(24,24,27,.12), 0 2px 6px -2px rgba(24,24,27,.06);
+    --mono:ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --sans:ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; scroll-padding-top:76px; }
+  body {
+    margin:0; font-family:var(--sans); color:var(--zinc-800);
+    background:
+      radial-gradient(900px 420px at 12% -8%, var(--violet-100), transparent 70%),
+      radial-gradient(700px 360px at 100% 0%, #eef2ff, transparent 65%),
+      var(--zinc-50);
+    line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  a { color:var(--violet-700); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    position:sticky; top:0; z-index:50; backdrop-filter:blur(12px);
+    background:rgba(250,250,250,.82); border-bottom:1px solid var(--zinc-200);
+  }
+  .topbar-in { max-width:1120px; margin:0 auto; padding:12px 24px;
+    display:flex; align-items:center; gap:20px; }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:650; letter-spacing:-.02em; }
+  .dot { width:26px; height:26px; border-radius:8px;
+    background:linear-gradient(140deg,var(--violet-500),var(--violet-700));
+    box-shadow:0 4px 12px -4px rgba(124,58,237,.55); }
+  .nav { display:flex; gap:4px; margin-left:auto; flex-wrap:wrap; }
+  .nav a { font-size:12.5px; color:var(--zinc-600); padding:6px 10px; border-radius:8px; }
+  .nav a:hover { background:var(--violet-50); color:var(--violet-700); text-decoration:none; }
+
+  /* ---------- layout ---------- */
+  main { max-width:1120px; margin:0 auto; padding:40px 24px 100px; }
+  section { margin-top:64px; }
+  .eyebrow { font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--violet-600); font-weight:600; }
+  h1 { font-size:clamp(30px,4.2vw,46px); line-height:1.08; letter-spacing:-.035em;
+    margin:10px 0 14px; color:var(--zinc-900); font-weight:700; }
+  h2 { font-size:22px; letter-spacing:-.02em; margin:0 0 6px; color:var(--zinc-900); font-weight:650; }
+  h3 { font-size:14px; margin:0 0 10px; color:var(--zinc-900); font-weight:650; }
+  p.lead { font-size:17px; color:var(--zinc-600); max-width:70ch; margin:0; }
+  .sub { font-size:14px; color:var(--zinc-500); margin:0 0 22px; max-width:75ch; }
+
+  .hero-facts { display:flex; gap:10px; flex-wrap:wrap; margin-top:24px; }
+  .fact { background:#fff; border:1px solid var(--zinc-200); border-radius:var(--radius);
+    padding:10px 14px; box-shadow:var(--shadow-sm); min-width:130px; }
+  .fact b { display:block; font-size:17px; color:var(--zinc-900); letter-spacing:-.02em; }
+  .fact span { font-size:11.5px; color:var(--zinc-500); font-family:var(--mono); }
+
+  /* ---------- stack diagram ---------- */
+  .stack { display:grid; gap:12px; margin-top:8px; }
+  .layer { display:grid; grid-template-columns:1.15fr 2fr; gap:16px; align-items:center;
+    background:#fff; border:1px solid var(--zinc-200); border-radius:var(--radius);
+    padding:16px 18px; box-shadow:var(--shadow-sm); }
+  .layer .name { font-weight:650; color:var(--zinc-900); font-size:14.5px; }
+  .layer .name small { display:block; font-family:var(--mono); font-size:11px;
+    color:var(--zinc-500); font-weight:400; margin-top:3px; }
+  .chips { display:flex; gap:8px; flex-wrap:wrap; }
+  .chip { font-family:var(--mono); font-size:11.5px; padding:4px 9px; border-radius:7px;
+    background:var(--zinc-100); color:var(--zinc-700); border:1px solid var(--zinc-200); }
+  .chip.v { background:var(--violet-50); color:var(--violet-700); border-color:var(--violet-200); }
+  .chip.g { background:var(--green-bg); color:var(--green); border-color:#a7f3d0; }
+  .chip.r { background:var(--amber-bg); color:var(--amber); border-color:#fde68a; }
+  .arrow { text-align:center; color:var(--zinc-400); font-size:18px; line-height:1; margin:-4px 0; }
+
+  /* ---------- pipeline ---------- */
+  .pipeline { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-top:18px; }
+  .step { position:relative; background:#fff; border:1px solid var(--zinc-200);
+    border-radius:12px; padding:14px 12px; box-shadow:var(--shadow-sm); }
+  .step .n { font-family:var(--mono); font-size:10.5px; color:var(--violet-600);
+    font-weight:600; letter-spacing:.08em; }
+  .step b { display:block; font-size:12.5px; margin:4px 0 4px; color:var(--zinc-900); }
+  .step span { font-size:11.5px; color:var(--zinc-500); display:block; }
+  .step::after { content:"→"; position:absolute; right:-9px; top:50%; transform:translateY(-50%);
+    color:var(--zinc-300); font-size:13px; z-index:2; }
+  .step:last-child::after { content:""; }
+  .step.fail { border-color:#fecaca; background:var(--red-bg); }
+  .step.fail .n { color:var(--red); }
+
+  /* ---------- cards ---------- */
+  .grid { display:grid; gap:14px; }
+  .g3 { grid-template-columns:repeat(3,1fr); }
+  .g2 { grid-template-columns:repeat(2,1fr); }
+  .card { background:#fff; border:1px solid var(--zinc-200); border-radius:var(--radius);
+    padding:16px 18px; box-shadow:var(--shadow-sm); }
+  .card h3 { display:flex; align-items:center; gap:8px; }
+  .card ul { margin:8px 0 0; padding-left:18px; font-size:13px; color:var(--zinc-600); }
+  .card li { margin:3px 0; }
+  .card li code { font-family:var(--mono); font-size:11.5px; color:var(--violet-700); }
+  .tag { font-family:var(--mono); font-size:10px; padding:2px 7px; border-radius:999px;
+    background:var(--violet-100); color:var(--violet-700); font-weight:600; letter-spacing:.04em; }
+
+  /* ---------- roles ---------- */
+  .roles { display:flex; gap:8px; flex-wrap:wrap; margin:18px 0 14px; }
+  .role-btn { border:1px solid var(--zinc-200); background:#fff; border-radius:10px;
+    padding:9px 16px; font-size:13px; font-weight:600; color:var(--zinc-600);
+    cursor:pointer; transition:.15s; font-family:var(--sans); }
+  .role-btn:hover { border-color:var(--violet-300); color:var(--violet-700); }
+  .role-btn[aria-selected="true"] { background:var(--violet-600); border-color:var(--violet-600);
+    color:#fff; box-shadow:0 6px 16px -8px rgba(124,58,237,.8); }
+  .role-panel { display:none; }
+  .role-panel.on { display:block; }
+  .role-panel .head { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+  .role-panel .head b { font-size:16px; color:var(--zinc-900); }
+  .role-panel .head span { font-family:var(--mono); font-size:11.5px; color:var(--zinc-500); }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .box { border:1px solid var(--zinc-200); border-radius:12px; padding:14px 16px; background:var(--zinc-50); }
+  .box h4 { margin:0 0 8px; font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--zinc-500); font-family:var(--mono); font-weight:600; }
+  .box ul { margin:0; padding-left:16px; font-size:13px; color:var(--zinc-700); }
+  .box li { margin:4px 0; }
+  .box.deny { background:var(--red-bg); border-color:#fecaca; }
+  .box.deny h4 { color:var(--red); }
+
+  /* ---------- flow timeline ---------- */
+  .flow { display:grid; gap:0; margin-top:16px; }
+  .fstep { display:grid; grid-template-columns:26px 1fr; gap:14px; }
+  .rail { display:flex; flex-direction:column; align-items:center; }
+  .rail .b { width:9px; height:9px; border-radius:50%; background:var(--violet-600);
+    margin-top:7px; box-shadow:0 0 0 3px var(--violet-100); flex:none; }
+  .rail .line { width:2px; flex:1; background:var(--zinc-200); margin:4px 0; }
+  .fstep:last-child .rail .line { display:none; }
+  .fbody { padding-bottom:16px; }
+  .fbody b { font-size:13.5px; color:var(--zinc-900); display:block; }
+  .fbody p { margin:3px 0 0; font-size:12.5px; color:var(--zinc-600); }
+  .fbody code { font-family:var(--mono); font-size:11.5px; background:var(--zinc-100);
+    padding:1px 5px; border-radius:5px; color:var(--violet-700); }
+
+  /* ---------- table ---------- */
+  table { width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;
+    background:#fff; border-radius:12px; overflow:hidden; box-shadow:var(--shadow-sm); }
+  th, td { text-align:left; padding:10px 14px; border-bottom:1px solid var(--zinc-100); }
+  th { background:var(--zinc-50); font-family:var(--mono); font-size:10.5px;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--zinc-500); }
+  tr:last-child td { border-bottom:none; }
+  td code { font-family:var(--mono); font-size:11.5px; color:var(--violet-700); }
+
+  /* ---------- notes ---------- */
+  .note { display:grid; grid-template-columns:24px 1fr; gap:12px; padding:12px 0;
+    border-bottom:1px dashed var(--zinc-200); }
+  .note:last-child { border-bottom:none; }
+  .note .ic { font-size:15px; line-height:1.5; }
+  .note b { font-size:13.5px; color:var(--zinc-900); }
+  .note p { margin:3px 0 0; font-size:12.5px; color:var(--zinc-600); }
+  .note code { font-family:var(--mono); font-size:11.5px; background:var(--zinc-100);
+    padding:1px 5px; border-radius:5px; color:var(--zinc-700); }
+
+  .callout { display:flex; gap:12px; align-items:flex-start; background:var(--violet-50);
+    border:1px solid var(--violet-200); border-radius:var(--radius); padding:14px 16px;
+    font-size:13px; color:var(--violet-700); }
+  .callout code { font-family:var(--mono); background:#fff; padding:1px 6px; border-radius:5px; }
+
+  footer { margin-top:72px; padding-top:20px; border-top:1px solid var(--zinc-200);
+    font-size:12px; color:var(--zinc-500); display:flex; justify-content:space-between;
+    gap:16px; flex-wrap:wrap; }
+
+  @media (max-width:900px) {
+    .pipeline { grid-template-columns:repeat(2,1fr); }
+    .step::after { display:none; }
+    .g3, .g2, .cols { grid-template-columns:1fr; }
+    .layer { grid-template-columns:1fr; }
+    .nav { display:none; }
+  }
+  @media print {
+    .topbar { display:none; } body { background:#fff; } .card, .step, .layer { box-shadow:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brand"><div class="dot"></div>Team Management</div>
+    <nav class="nav">
+      <a href="#shape">Shape</a>
+      <a href="#pipeline">Request path</a>
+      <a href="#data">Data</a>
+      <a href="#roles">Roles</a>
+      <a href="#flows">Flows</a>
+      <a href="#edges">Sharp edges</a>
+    </nav>
+  </div>
+</div>
+
+<main>
+
+  <!-- ============ HERO ============ -->
+  <header>
+    <div class="eyebrow">Explainer canvas</div>
+    <h1>One app for people,<br>time off, and hours logged.</h1>
+    <p class="lead">
+      A React single-page app talking to a Hono API on Bun, backed by PostgreSQL through Prisma.
+      Employees request leave and overtime; managers and team leaders approve them; admins own the
+      permission matrix. Everything else — teams, schedules, timesheets, documents, onboarding —
+      hangs off the same employee record.
+    </p>
+    <div class="hero-facts">
+      <div class="fact"><b>16</b><span>Prisma models</span></div>
+      <div class="fact"><b>7</b><span>enums</span></div>
+      <div class="fact"><b>13</b><span>route groups</span></div>
+      <div class="fact"><b>4</b><span>roles</span></div>
+      <div class="fact"><b>2</b><span>runtimes</span></div>
+    </div>
+  </header>
+
+  <!-- ============ SHAPE ============ -->
+  <section id="shape">
+    <div class="eyebrow">01 — The shape of it</div>
+    <h2>Two runtimes, one Hono app</h2>
+    <p class="sub">
+      <code style="font-family:var(--mono);font-size:12px">app.ts</code> exports the whole API and knows nothing about the host.
+      Bun serves it locally and in Docker; a Cloudflare Worker entry reuses it unchanged.
+      In production the API also serves the built SPA, so there is a single origin.
+    </p>
+
+    <div class="stack">
+      <div class="layer">
+        <div class="name">Frontend<small>React 18 · Vite · Tailwind · :3000 dev</small></div>
+        <div class="chips">
+          <span class="chip">pages/*</span><span class="chip">AuthContext</span>
+          <span class="chip">SettingsContext</span><span class="chip">NotificationContext</span>
+          <span class="chip">services/api.ts</span><span class="chip">types/index.ts</span>
+        </div>
+      </div>
+      <div class="arrow">↓ axios · JWT in <code style="font-family:var(--mono)">Authorization: Bearer</code> · /api/*</div>
+      <div class="layer">
+        <div class="name">API<small>Bun · Hono 4 · :3001</small></div>
+        <div class="chips">
+          <span class="chip v">authMiddleware</span><span class="chip v">requirePermission</span>
+          <span class="chip">users</span><span class="chip">employees</span><span class="chip">teams</span>
+          <span class="chip">leaves</span><span class="chip">overtime</span><span class="chip">schedules</span>
+          <span class="chip">timesheets</span><span class="chip">documents</span><span class="chip">onboarding</span>
+          <span class="chip">rbac</span><span class="chip">settings</span><span class="chip">webhooks</span>
+        </div>
+      </div>
+      <div class="arrow">↓ Prisma 7 client</div>
+      <div class="layer">
+        <div class="name">PostgreSQL 16<small>docker-compose service</small></div>
+        <div class="chips">
+          <span class="chip g">users</span><span class="chip g">employees</span><span class="chip g">teams</span>
+          <span class="chip g">leave_*</span><span class="chip g">overtime_records</span><span class="chip g">schedules</span>
+          <span class="chip g">time_logs</span><span class="chip g">audit_log</span><span class="chip g">role_permissions</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:14px"></div>
+    <div class="callout">
+      <span>🧩</span>
+      <div>
+        Document storage is abstracted behind <code>setDocumentStorage()</code> — <code>storage-fs.ts</code>
+        writes to disk today, but the routes never import the filesystem directly.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PIPELINE ============ -->
+  <section id="pipeline">
+    <div class="eyebrow">02 — One request, end to end</div>
+    <h2>Every mutating call takes the same six steps</h2>
+    <p class="sub">
+      Middleware runs in order, so an unauthenticated or unpermitted call never reaches a handler.
+      The permission check is a database lookup, not a hardcoded role list.
+    </p>
+
+    <div class="pipeline">
+      <div class="step"><div class="n">STEP 1</div><b>CORS + parse</b><span>hono/cors on /api/*</span></div>
+      <div class="step"><div class="n">STEP 2</div><b>Verify JWT</b><span>jsonwebtoken, 24h expiry</span></div>
+      <div class="step"><div class="n">STEP 3</div><b>Check session</b><span>row must exist &amp; be unexpired</span></div>
+      <div class="step"><div class="n">STEP 4</div><b>Permission</b><span>RolePermission lookup by name</span></div>
+      <div class="step"><div class="n">STEP 5</div><b>Handler</b><span>scope checks live here too</span></div>
+      <div class="step"><div class="n">STEP 6</div><b>Audit</b><span>old + new values as JSON</span></div>
+    </div>
+
+    <div style="height:16px"></div>
+    <div class="grid g3">
+      <div class="card">
+        <h3>Fails at 2 or 3 <span class="tag">401</span></h3>
+        <ul><li>No token in header</li><li>Signature invalid or expired</li><li>Session row deleted (logout)</li></ul>
+      </div>
+      <div class="card">
+        <h3>Fails at 4 <span class="tag">403</span></h3>
+        <ul><li>Role lacks the named permission</li><li>Grant revoked in <code>/rbac</code></li></ul>
+      </div>
+      <div class="card">
+        <h3>Fails inside handler <span class="tag">400 / 403 / 404</span></h3>
+        <ul><li>No employee profile yet</li><li>Requester outside the leader's team</li><li>Overlapping leave dates</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DATA ============ -->
+  <section id="data">
+    <div class="eyebrow">03 — The data model</div>
+    <h2>User is the account. Employee is the person.</h2>
+    <p class="sub">
+      They are deliberately split: a freshly created user has a role and a login but no employee profile
+      until an admin “activates” one. Every domain table below hangs off <code style="font-family:var(--mono);font-size:12px">Employee</code>, not <code style="font-family:var(--mono);font-size:12px">User</code>.
+    </p>
+
+    <div class="grid g3">
+      <div class="card">
+        <h3>👤 People</h3>
+        <ul>
+          <li><b>User</b> — email, bcrypt hash, role, isActive</li>
+          <li><b>Employee</b> — code, dept, position, hire date, salary, teamId, slackId</li>
+          <li><b>Team</b> — leaderId + alternateApproverId (both unique)</li>
+          <li><b>Session</b> — token row, expiresAt</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🌴 Leave &amp; overtime</h3>
+        <ul>
+          <li><b>LeaveRequest</b> — days, paid/unpaid split, status, reviewer</li>
+          <li><b>LeaveBalance</b> — per employee <i>per year</i>: total vs used</li>
+          <li><b>OvertimeRecord</b> — date, start/end, hours, status</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>⏱ Time</h3>
+        <ul>
+          <li><b>Schedule</b> — one row per employee+date, shift type</li>
+          <li><b>DefaultSchedule</b> — per employee+dayOfWeek, has <i>isOff</i></li>
+          <li><b>TimeLog</b> — one row per employee+date, clockIn/Out, source</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>📄 Paperwork</h3>
+        <ul>
+          <li><b>EmployeeDocument</b> — type, size, mime, expiry, status</li>
+          <li><b>OnboardingTask</b> — required flag, category, sortOrder, completedBy</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>⚙️ System</h3>
+        <ul>
+          <li><b>Permission</b> — resource + action + name</li>
+          <li><b>RolePermission</b> — role ↔ permission grant</li>
+          <li><b>AppSettings</b> — typed key/value, grouped by category</li>
+          <li><b>AuditLog</b> — action, entity, oldValues, newValues</li>
+        </ul>
+      </div>
+      <div class="card" style="background:var(--violet-50);border-color:var(--violet-200)">
+        <h3>🔗 The spine</h3>
+        <ul>
+          <li><code style="color:var(--violet-700)">User 1 ── 0..1 Employee</code></li>
+          <li><code style="color:var(--violet-700)">Employee * ── 1 Team</code></li>
+          <li><code style="color:var(--violet-700)">Employee 1 ── * everything else</code></li>
+          <li>Approvals point back at an <b>Employee</b>, not a User — so "who approved" is always a person on staff.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ROLES ============ -->
+  <section id="roles">
+    <div class="eyebrow">04 — Who can do what</div>
+    <h2>Four roles, one editable matrix</h2>
+    <p class="sub">
+      Capabilities are rows in <code style="font-family:var(--mono);font-size:12px">role_permissions</code>, not code.
+      An admin can hand a permission to a role at runtime and the next request honours it.
+      Role checks still exist alongside for hard boundaries — like team scoping.
+    </p>
+
+    <div class="roles" role="tablist" aria-label="Roles">
+      <button class="role-btn" role="tab" data-role="admin" aria-selected="true">Admin</button>
+      <button class="role-btn" role="tab" data-role="manager" aria-selected="false">Manager</button>
+      <button class="role-btn" role="tab" data-role="leader" aria-selected="false">Team Leader</button>
+      <button class="role-btn" role="tab" data-role="employee" aria-selected="false">Employee</button>
+    </div>
+
+    <div class="card">
+      <div class="role-panel on" data-panel="admin">
+        <div class="head"><b>Admin</b><span>ADMIN</span></div>
+        <div class="cols">
+          <div class="box"><h4>Can</h4><ul>
+            <li>Everything: users, employees, teams, schedules, documents, onboarding</li>
+            <li>Edit the permission matrix at <code>/rbac</code></li>
+            <li>Change global settings (company name, currency, overtime multiplier)</li>
+            <li>Approve anything — no team scoping applies</li>
+          </ul></div>
+          <div class="box"><h4>Still can't</h4><ul>
+            <li>Bypass the session table — logging out invalidates the token for real</li>
+            <li>Skip the audit log on a mutation</li>
+          </ul></div>
+        </div>
+      </div>
+
+      <div class="role-panel" data-panel="manager">
+        <div class="head"><b>Manager</b><span>MANAGER</span></div>
+        <div class="cols">
+          <div class="box"><h4>Can</h4><ul>
+            <li>See <i>all</i> leave and overtime requests, not just their own</li>
+            <li>Approve / reject with review notes</li>
+            <li>View reports and generate timesheet PDFs</li>
+          </ul></div>
+          <div class="box deny"><h4>Can't</h4><ul>
+            <li>Manage users or the permission matrix</li>
+            <li>Edit settings</li>
+            <li>Change team composition</li>
+          </ul></div>
+        </div>
+      </div>
+
+      <div class="role-panel" data-panel="leader">
+        <div class="head"><b>Team Leader</b><span>TEAM_LEADER</span></div>
+        <div class="cols">
+          <div class="box"><h4>Can</h4><ul>
+            <li>Approve leave/overtime <b>only</b> for members of a team they lead</li>
+            <li>Manage schedules for that team</li>
+            <li>Acts as alternate approver when assigned on the team</li>
+          </ul></div>
+          <div class="box deny"><h4>Can't</h4><ul>
+            <li>Approve across teams — handler returns 403</li>
+            <li>Reach admin surfaces, even with a stray permission</li>
+          </ul></div>
+        </div>
+      </div>
+
+      <div class="role-panel" data-panel="employee">
+        <div class="head"><b>Employee</b><span>EMPLOYEE</span></div>
+        <div class="cols">
+          <div class="box"><h4>Can</h4><ul>
+            <li>Create own leave and overtime requests</li>
+            <li>See own balance, own requests, own schedule</li>
+            <li>Cancel a still-pending request</li>
+            <li>Clock in/out by messaging the Slack bot</li>
+          </ul></div>
+          <div class="box deny"><h4>Can't</h4><ul>
+            <li>See anyone else's requests — list is filtered by employeeId</li>
+            <li>Approve anything</li>
+          </ul></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:14px"></div>
+    <table>
+      <thead><tr><th>Permission</th><th>Guards</th><th>Typical holder</th></tr></thead>
+      <tbody>
+        <tr><td><code>leaves.create</code></td><td>POST /api/leaves</td><td>Employee and up</td></tr>
+        <tr><td><code>leaves.approve</code></td><td>PATCH /api/leaves/:id/approve</td><td>Manager, Team Leader</td></tr>
+        <tr><td><code>overtime.approve</code></td><td>PATCH /api/overtime/:id/approve</td><td>Manager, Team Leader</td></tr>
+        <tr><td><code>schedules.update</code></td><td>PUT /api/schedules/:id</td><td>Admin, Team Leader</td></tr>
+        <tr><td><code>reports.export</code></td><td>POST /api/timesheets/generate</td><td>Manager, Admin</td></tr>
+        <tr><td><code>onboarding.manage</code></td><td>POST/PUT/DELETE onboarding tasks</td><td>Admin, Manager</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ FLOWS ============ -->
+  <section id="flows">
+    <div class="eyebrow">05 — Three flows worth knowing</div>
+    <h2>Leave, overtime, and the Slack clock</h2>
+
+    <div class="grid g3">
+      <div class="card">
+        <h3>🌴 Requesting leave <span class="tag">accrual</span></h3>
+        <div class="flow">
+          <div class="fstep"><div class="rail"><div class="b"></div><div class="line"></div></div>
+            <div class="fbody"><b>Balance is earned, not granted</b>
+              <p><code>computeAccruedLeaves()</code> prorates <code>leave.annual_allowance</code> (default 15) by days worked this year, from hire date.</p></div></div>
+          <div class="fstep"><div class="rail"><div class="b"></div><div class="line"></div></div>
+            <div class="fbody"><b>Paid / unpaid is split at creation</b>
+              <p>Paid days = min(requested, remaining balance). The rest lands in <code>unpaidDays</code>.</p></div></div>
+          <div class="fstep"><div class="rail"><div class="b"></div><div class="line"></div></div>
+            <div class="fbody"><b>Overlap is rejected</b>
+              <p>Any PENDING or APPROVED request touching those dates returns 400 before insert.</p></div></div>
+          <div class="fstep"><div class="rail"><div class="b"></div><div class="line"></div></div>
+            <div class="fbody"><b>Approval only moves paid days</b>
+              <p>On approve, <code>usedLeaves</code> increments by <code>paidDays</code> via upsert.</p></div></div>
+          <div class="fstep"><div class="rail"><div class="b"></div></div>
+            <div class="fbody"><b>Delete means cancel while pending</b>
+              <p>Only a PENDING request flips to CANCELLED; otherwise the call is a no-op.</p></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>⏱ Logging overtime <span class="tag">approval</span></h3>
+        <div class="flow">
+          <div class="fstep"><div class="rail"><div class="b"></div><div class="line"></div></div>
+            <div class="fbody"><b>Employee submits</b>
+              <p>Date, start, end, hours, description. Status starts PENDING. No balance maths — hours are recorded, not debited.</p></div></div>
+          <div class="fstep"><div class="rail"><div class="b"></div><div class="line"></div></div>
+            <div class="fbody"><b>Team Leader or Manager reviews</b>
+              <p>Same team-membership guard as leave: a leader may only touch their own team's rows.</p></div></div>
+          <div class="fstep"><div class="rail"><div class="b"></div></div>
+            <div class="fbody"><b>Timesheet consumes it</b>
+              <p><code>GET /timesheets/preview</code> and <code>POST /timesheets/generate</code> turn approved hours, plus time logs, into a PDF with per-type multipliers.</p></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>💬 The Slack clock <span class="tag">no auth</span></h3>
+        <div class="flow">
+          <div class="fstep"><div class="rail"><div class="b"></div><div class="line"></div></div>
+            <div class="fbody"><b>One public endpoint</b>
+              <p><code>POST /api/webhooks/slack</code> — outside the auth middleware entirely.</p></div></div>
+          <div class="fstep"><div class="rail"><div class="b"></div><div class="line"></div></div>
+            <div class="fbody"><b>Challenge, then events</b>
+              <p>Answers Slack's <code>url_verification</code>, then reads message events, ignoring bots.</p></div></div>
+          <div class="fstep"><div class="rail"><div class="b"></div><div class="line"></div></div>
+            <div class="fbody"><b>Keyword mapping</b>
+              <p>"checkin" → clock in (only if unset). "checkout" → clock out (always latest).</p></div></div>
+          <div class="fstep"><div class="rail"><div class="b"></div></div>
+            <div class="fbody"><b>Silent on unknown users</b>
+              <p>No matching <code>slackId</code> returns <code>{ok:true}</code> so Slack never retries or leaks membership.</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:14px"></div>
+    <div class="callout">
+      <span>🕐</span>
+      <div>
+        Clock-in is <b>first-wins</b> and clock-out is <b>last-wins</b> for a given day, because
+        <code>time_logs</code> has a unique <code>(employeeId, date)</code> pair.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EDGES ============ -->
+  <section id="edges">
+    <div class="eyebrow">06 — Sharp edges</div>
+    <h2>Where the seams show</h2>
+    <p class="sub">
+      Found while reading the code — not fixed, just surfaced so they don't surprise you.
+    </p>
+
+    <div class="card" style="padding:8px 18px">
+      <div class="note"><div class="ic">🐞</div><div>
+        <b>Wrong field name in the leave-creation fallback</b>
+        <p><code>leaves.ts</code> reads <code>employee.hiredDate</code>, but Prisma exposes <code>hireDate</code>. That branch feeds <code>undefined</code> into the accrual maths, producing NaN totals.</p>
+      </div></div>
+      <div class="note"><div class="ic">🔀</div><div>
+        <b>Two different allowance defaults</b>
+        <p><code>/balance</code> reads the <code>leave.annual_allowance</code> setting (default 15); the creation fallback hardcodes 20. A brand-new balance can start at either number.</p>
+      </div></div>
+      <div class="note"><div class="ic">📉</div><div>
+        <b>Accrual is frozen at first write</b>
+        <p><code>totalLeaves</code> is set once when the balance row is created and never re-accrued, so the "earn as you work" figure drifts as the year advances.</p>
+      </div></div>
+      <div class="note"><div class="ic">🔓</div><div>
+        <b>Deactivation doesn't revoke access</b>
+        <p>Setting <code>isActive = false</code> is not checked by <code>authMiddleware</code>, so an existing session keeps working until it expires.</p>
+      </div></div>
+      <div class="note"><div class="ic">🧪</div><div>
+        <b>A little untyped hiding</b>
+        <p><code>appSettings</code> is reached via <code>(prisma as any)</code> in the leaves route even though the model exists — a leftover from before it was generated.</p>
+      </div></div>
+      <div class="note"><div class="ic">📝</div><div>
+        <b>Docs say three roles, code has four</b>
+        <p><code>TEAM_LEADER</code> exists in the schema, middleware and UI, but README and memory.md describe a three-role model.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ RUN ============ -->
+  <section>
+    <div class="eyebrow">07 — Running it</div>
+    <h2>One command, three services</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Docker (recommended)</h3>
+        <ul>
+          <li><code>docker-compose up -d</code></li>
+          <li>Frontend on <b>:3000</b>, API on <b>:3001</b></li>
+          <li>Seed users are created on first boot</li>
+          <li><code>docker-compose down -v</code> resets the database</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Seeded accounts</h3>
+        <ul>
+          <li><code>admin@team.com</code> / <code>admin123</code></li>
+          <li><code>manager@team.com</code> / <code>manager123</code></li>
+          <li><code>employee@team.com</code> / <code>employee123</code></li>
+          <li>No Team Leader is seeded — promote an employee to test team approvals.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Team Management · explainer canvas · generated from the codebase</span>
+    <span>Source of truth: <code style="font-family:var(--mono)">backend/src</code> and <code style="font-family:var(--mono)">backend/prisma/schema.prisma</code></span>
+  </footer>
+
+</main>
+
+<script>
+  const buttons = document.querySelectorAll('.role-btn');
+  const panels = document.querySelectorAll('.role-panel');
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      buttons.forEach((b) => b.setAttribute('aria-selected', 'false'));
+      btn.setAttribute('aria-selected', 'true');
+      panels.forEach((p) => p.classList.toggle('on', p.dataset.panel === btn.dataset.role));
+    });
+  });
+</script>
+</body>
+</html>

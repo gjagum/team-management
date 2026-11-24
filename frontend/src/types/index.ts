@@ -11,6 +11,12 @@ export interface User {
     position: string;
     hireDate: string;
     salary: number;
+    slackId?: string | null;
+    team?: {
+      id: number;
+      name: string;
+      teamLeader?: { user: { fullName: string } } | null;
+    } | null;
   };
 }
 

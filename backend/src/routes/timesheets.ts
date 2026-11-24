@@ -108,7 +108,7 @@ timesheetsRouter.get('/preview', requirePermission('reports.view'), async (c: an
   
   const currency = settingsMap.get('company.currency') || 'PHP';
   const otMultiplier = parseFloat(settingsMap.get('overtime.rate_multiplier') || '1.5');
-  const hourlyRate = Number(employee.salary || 0); // Assuming hourly rate for contractors
+  const hourlyRate = Number(employee.salary || 0); // Assuming hourly rate for employees
 
   // Aggregate Data
   const dailyLogs: Record<string, any> = {};
@@ -197,20 +197,20 @@ timesheetsRouter.post('/generate', requirePermission('reports.export'), async (c
     // Header
     page.drawText(companyName.toUpperCase(), { x: 50, y, size: 20, font: fontBold, color: rgb(0, 0.2, 0.6) });
     y -= 25;
-    page.drawText('CONTRACTOR TIMESHEET', { x: width - 200, y: height - 50, size: 16, font: fontBold });
+    page.drawText('EMPLOYEE TIMESHEET', { x: width - 200, y: height - 50, size: 16, font: fontBold });
     y -= 10;
     page.drawLine({ start: { x: 50, y }, end: { x: width - 50, y }, thickness: 1, color: rgb(0.8, 0.8, 0.8) });
     y -= 30;
 
-    // Employee/Contractor Info
-    page.drawText('CONTRACTOR DETAILS', { x: 50, y, size: 10, font: fontBold, color: rgb(0.4, 0.4, 0.4) });
+    // Employee Info
+    page.drawText('EMPLOYEE DETAILS', { x: 50, y, size: 10, font: fontBold, color: rgb(0.4, 0.4, 0.4) });
     y -= 15;
     page.drawText(`Name: ${employee.user.fullName}`, { x: 50, y, size: 11, font });
     page.drawText(`ID: ${employee.employeeCode}`, { x: width - 150, y, size: 11, font });
     y -= 15;
     page.drawText(`Email: ${employee.user.email}`, { x: 50, y, size: 11, font });
     y -= 15;
-    page.drawText(`Position: ${employee.position || 'Contractor'}`, { x: 50, y, size: 11, font });
+    page.drawText(`Position: ${employee.position || 'Employee'}`, { x: 50, y, size: 11, font });
     y -= 40;
 
     // Table Header

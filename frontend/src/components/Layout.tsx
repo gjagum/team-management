@@ -1,11 +1,9 @@
 import React from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.tsx";
-import { useSettings } from "../contexts/SettingsContext.tsx";
 
 export default function Layout() {
   const { user, logout } = useAuth();
-  const { getSetting } = useSettings();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -21,7 +19,7 @@ export default function Layout() {
     { name: "Leave", href: "/leaves", icon: "event_busy" },
     { name: "Overtime", href: "/overtime", icon: "schedule" },
     {
-      name: "Users",
+      name: "People & Access",
       href: "/users",
       icon: "admin_panel_settings",
       roles: ["ADMIN"],
@@ -31,12 +29,6 @@ export default function Layout() {
       href: "/timesheets",
       icon: "receipt_long",
       roles: ["ADMIN", "MANAGER", "EMPLOYEE"],
-    },
-    {
-      name: "Contractors",
-      href: "/employees",
-      icon: "groups",
-      roles: ["ADMIN"],
     },
     {
       name: "Teams",
@@ -79,9 +71,11 @@ export default function Layout() {
                 menu
               </span>
             </button>
-            <span className="text-xl font-bold tracking-tighter text-violet-700 uppercase">
-              {getSetting("company.name") || "TEAM MANAGEMENT"}
-            </span>
+            <img
+              src="/omnitask-logo.png"
+              alt="OMNITASK"
+              className="h-8 w-auto"
+            />
             {/* Search bar */}
             <div className="hidden md:flex items-center bg-zinc-100 rounded-full px-4 py-1.5 gap-2">
               <span className="material-symbols-outlined text-zinc-500 text-sm">
@@ -94,28 +88,6 @@ export default function Layout() {
               />
             </div>
           </div>
-
-          {/* Top nav links */}
-          <nav className="hidden md:flex items-center gap-6">
-            {filteredNavigation.slice(0, 4).map((item) => {
-              const isActive =
-                location.pathname === item.href ||
-                (item.href !== "/" && location.pathname.startsWith(item.href));
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`font-medium transition-colors duration-200 ${
-                    isActive
-                      ? "text-violet-700 font-semibold border-b-2 border-violet-700"
-                      : "text-zinc-500 hover:text-zinc-900"
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              );
-            })}
-          </nav>
 
           {/* Right side controls */}
           <div className="flex items-center gap-4">
@@ -150,19 +122,21 @@ export default function Layout() {
 
       {/* Side Navigation */}
       <aside
-        className={`fixed left-0 top-0 h-full w-64 bg-zinc-50 flex-col py-8 px-4 gap-6 pt-24 z-40 transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 h-full w-64 bg-zinc-50 flex-col py-8 px-4 gap-6 pt-24 lg:pt-28 z-40 transform transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen
             ? "translate-x-0 flex"
             : "-translate-x-full lg:flex hidden lg:block"
         }`}
       >
         <div className="px-4 mb-4">
-          <h2 className="text-lg font-black text-violet-700 uppercase tracking-widest">
-            Management
-          </h2>
-          <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
-            Admin Console
-          </p>
+          <div className="inline-block max-w-full">
+            <h2 className="text-lg font-black text-violet-700 uppercase tracking-widest">
+              Workday Hub
+            </h2>
+            <p className="mt-1 w-full text-center text-[10px] text-zinc-500 font-bold uppercase tracking-[0.18em]">
+              Time, Leave &amp; Teams
+            </p>
+          </div>
         </div>
 
         <nav className="flex flex-col gap-1">
@@ -215,6 +189,12 @@ export default function Layout() {
       {/* Main Content */}
       <div className="lg:pl-64 pt-16 min-h-screen">
         <main className="max-w-[1200px] mx-auto p-8 lg:p-12">
+          {/* Reminder shown on every page */}
+          <div className="bg-primary/5 border border-primary/15 rounded-xl px-6 py-4 mb-10">
+            <p className="font-bold text-primary tracking-tight">
+              A small update today saves a big correction later.
+            </p>
+          </div>
           <Outlet />
         </main>
       </div>
