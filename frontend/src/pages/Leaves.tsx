@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api.ts';
 import { LeaveRequest, LeaveBalance } from '../types/index.ts';
 import { formatDate, getStatusColor } from '../utils/helpers.tsx';
@@ -7,6 +8,8 @@ import { useNotification } from '../contexts/NotificationContext.tsx';
 
 export default function Leaves() {
   const { showNotification } = useNotification();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [leaves, setLeaves] = useState<LeaveRequest[]>([]);
   const [balance, setBalance] = useState<LeaveBalance | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,6 +45,14 @@ export default function Leaves() {
     fetchData(controller.signal);
     return () => controller.abort();
   }, [fetchData]);
+
+  // Opened from the dashboard "New Leave" quick action.
+  useEffect(() => {
+    if ((location.state as { openNew?: boolean } | null)?.openNew) {
+      setShowModal(true);
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.state, location.pathname, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,7 +153,7 @@ export default function Leaves() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-zinc-50">
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Contractor</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Employee</th>
                 <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Category</th>
                 <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Period</th>
                 <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Duration</th>

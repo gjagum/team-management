@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { OvertimeRecord } from '../types';
 import { formatDate, formatDateTime, getStatusColor } from '../utils/helpers';
@@ -7,6 +8,8 @@ import { useNotification } from '../contexts/NotificationContext';
 
 export default function Overtime() {
   const { showNotification } = useNotification();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [overtimeRecords, setOvertimeRecords] = useState<OvertimeRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -21,6 +24,14 @@ export default function Overtime() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Opened from the dashboard "Record Overtime" quick action.
+  useEffect(() => {
+    if ((location.state as { openNew?: boolean } | null)?.openNew) {
+      setShowModal(true);
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.state, location.pathname, navigate]);
 
   const fetchData = async () => {
     try {

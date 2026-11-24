@@ -197,7 +197,7 @@ export default function EmployeeDetail() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
           <span className="text-[10px] font-bold text-primary tracking-[0.2em] uppercase mb-2 block">
-            Contractor Profile
+            Employee Profile
           </span>
           <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
             {employee.user?.fullName || employee.id}

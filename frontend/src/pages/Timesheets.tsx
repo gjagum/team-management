@@ -143,7 +143,7 @@ export default function Timesheets() {
             Timesheet Generator
           </h1>
           <p className="text-zinc-500 mt-2 max-w-md">
-            Generate professional reference timesheets for contractors based on verified time logs.
+            Generate professional reference timesheets for employees based on verified time logs.
           </p>
         </div>
       </div>
@@ -153,7 +153,7 @@ export default function Timesheets() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {!isEmployee && (
             <div className="space-y-2">
-              <label className="text-label block">Select Contractor</label>
+              <label className="text-label block">Select Employee</label>
               <select
                 value={selectedEmployeeId}
                 onChange={(e) => setSelectedEmployeeId(e.target.value)}
@@ -167,7 +167,7 @@ export default function Timesheets() {
           )}
           {isEmployee && (
             <div className="space-y-2">
-              <label className="text-label block">Contractor</label>
+              <label className="text-label block">Employee</label>
               <div className="w-full bg-zinc-100 border-none rounded-lg text-sm font-bold py-3 px-4 text-zinc-600">
                 {user?.fullName} ({user?.employee?.employeeCode})
               </div>
@@ -302,7 +302,7 @@ export default function Timesheets() {
       ) : (
         <div className="bg-zinc-100/50 rounded-xl border-2 border-dashed border-zinc-200 h-64 flex items-center justify-center">
           <p className="text-zinc-400 font-medium italic">
-            {isEmployee ? 'Select a date range to preview your timesheet data.' : 'Select a contractor and date range to preview timesheet data.'}
+            {isEmployee ? 'Select a date range to preview your timesheet data.' : 'Select a employee and date range to preview timesheet data.'}
           </p>
         </div>
       )}
