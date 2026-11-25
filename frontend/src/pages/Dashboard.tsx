@@ -47,15 +47,33 @@ export default function Dashboard() {
     );
   }
 
+  // Headline copy depends on the account's access level; team leaders share the manager view.
+  const dashboardCopy =
+    user?.role === 'ADMIN'
+      ? {
+          title: 'Admin Dashboard',
+          subtitle: 'Company-wide leave, overtime, and activity insights in one place',
+        }
+      : user?.role === 'MANAGER' || user?.role === 'TEAM_LEADER'
+        ? {
+            title: 'Manager Dashboard',
+            subtitle:
+              'Review pending leave, monitor team schedule & overtime, and track recent activity',
+          }
+        : {
+            title: 'Your Dashboard',
+            subtitle: 'Your leave balances, overtime, and pending requests at a glance',
+          };
+
   return (
     <div className="space-y-12">
       {/* Page Header */}
       <div>
         <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
-          Welcome Back
+          {dashboardCopy.title}
         </h1>
-        <p className="text-zinc-500 mt-2 max-w-md">
-          Your leave, overtime and schedules at a glance
+        <p className="text-zinc-500 mt-2 max-w-xl">
+          {dashboardCopy.subtitle}
         </p>
       </div>
 

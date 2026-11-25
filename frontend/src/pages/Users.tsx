@@ -186,7 +186,7 @@ export default function Users() {
           Workforce
         </span>
         <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
-          People &amp; Access
+          Employees
         </h1>
         <p className="text-zinc-500 mt-2 max-w-xl">
           Manage employee profiles, roles and system access in one place.
