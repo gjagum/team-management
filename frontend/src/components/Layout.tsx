@@ -19,7 +19,7 @@ export default function Layout() {
     { name: "Leave", href: "/leaves", icon: "event_busy" },
     { name: "Overtime", href: "/overtime", icon: "schedule" },
     {
-      name: "People & Access",
+      name: "Employees",
       href: "/users",
       icon: "admin_panel_settings",
       roles: ["ADMIN"],

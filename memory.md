@@ -49,6 +49,9 @@
 | 2026-11-24 | UI pass: "Contractor" → "Employee" everywhere incl. timesheet PDF; login EMPLOYEE/MANAGER/ADMIN access-level tabs (prefill demo logins); sidebar "Workday Hub / Time, Leave & Teams"; dashboard "Welcome Back" + reminder banner, header nav hidden on home; "Quick Actions" for all roles opening the Leave/Overtime modals | UI | ✅ |
 | 2026-11-24 | Header nav links removed on all pages; reminder quote moved into the Layout shell (shown on every page) and top-aligned with the sidebar title; sidebar subtitle justified to the title width | UI | ✅ |
 | 2026-11-24 | Merged Users + Employees into "People & Access" (/users; /employees redirects): columns Employee ID, Name, Date Hired, Team, Job Title, Supervisor, Email, Slack ID, Access Level, Status, Edit/Del; Team filter beside New User; `GET /api/users` now returns hireDate/team/leader, `PUT` accepts position/hireDate/teamId | UI | ✅ |
+| 2026-11-24 | Published the branch as PR #12 (gjagum/team-management ← noviesawangan:docs/omnitask-guide) via fork, since the local GitHub login has no write access to the upstream repo; `fork` remote added | DevOps | ✅ |
+| 2026-11-25 | Dashboard heading "Welcome Back" → "Your Dashboard"; "People & Access" renamed to "Employees" (sidebar + page title) | UI | ✅ |
+| 2026-11-25 | Role-based dashboard header: Employee/Manager/Admin (and Team Leader → Manager) title + subtitle copy, no eyebrow line | UI | ✅ |
 | 2026-11-23 | Prisma Studio now loads data: pinned the Neon pooler hostname to its IPv4 (`13.228.46.236`) in the Windows hosts file, since the engine's IPv6-first resolution caused P1001 (`13.228.46.236 ep-purple-river-a1xah0gz-pooler.ap-southeast-1.aws.neon.tech`) | DevOps | ✅ |
 
 ## Active Task
