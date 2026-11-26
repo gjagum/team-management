@@ -17,15 +17,22 @@ export default function Users() {
   const [activatingUser, setActivatingUser] = useState<UserType | null>(null);
   const [editingUser, setEditingUser] = useState<UserType | null>(null);
   const [teamFilter, setTeamFilter] = useState<string>('ALL');
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     fullName: '',
     role: 'EMPLOYEE',
     slackId: '',
+    slackChannel: '',
+    employeeCode: '',
     position: '',
+    department: '',
     hireDate: '',
+    salary: '',
     teamId: '',
+    isActive: true,
   });
   const [activateData, setActivateData] = useState({
     department: '',
@@ -65,9 +72,14 @@ export default function Users() {
     fullName: '',
     role: 'EMPLOYEE',
     slackId: '',
+    slackChannel: '',
+    employeeCode: '',
     position: '',
+    department: '',
     hireDate: '',
+    salary: '',
     teamId: '',
+    isActive: true,
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,9 +89,14 @@ export default function Users() {
         const payload: Record<string, unknown> = {
           fullName: formData.fullName,
           role: formData.role,
+          isActive: formData.isActive,
           slackId: formData.slackId,
+          slackChannel: formData.slackChannel,
+          employeeCode: formData.employeeCode || undefined,
           position: formData.position,
+          department: formData.department,
           hireDate: formData.hireDate || undefined,
+          salary: formData.salary === '' ? null : Number(formData.salary),
           teamId: formData.teamId ? Number(formData.teamId) : null,
         };
         if (formData.password) payload.password = formData.password;
@@ -91,12 +108,19 @@ export default function Users() {
           fullName: formData.fullName,
           role: formData.role,
           slackId: formData.slackId,
+          slackChannel: formData.slackChannel,
+          employeeCode: formData.employeeCode || undefined,
           position: formData.position,
+          department: formData.department,
           hireDate: formData.hireDate || undefined,
+          salary: formData.salary === '' ? null : Number(formData.salary),
         });
-        // Team membership is set on the employee record created above.
-        if (formData.teamId && created.data?.id) {
-          await api.put(`/users/${created.data.id}`, { teamId: Number(formData.teamId) });
+        // Team membership and status are set on the record created above.
+        if (created.data?.id) {
+          const patch: Record<string, unknown> = {};
+          if (formData.teamId) patch.teamId = Number(formData.teamId);
+          if (formData.isActive === false) patch.isActive = false;
+          if (Object.keys(patch).length > 0) await api.put(`/users/${created.data.id}`, patch);
         }
       }
       setShowModal(false);
@@ -130,9 +154,14 @@ export default function Users() {
       fullName: user.fullName,
       role: user.role,
       slackId: user.employee?.slackId || '',
+      slackChannel: user.employee?.slackChannel || '',
+      employeeCode: user.employee?.employeeCode || '',
       position: user.employee?.position || '',
+      department: user.employee?.department || '',
       hireDate: user.employee?.hireDate ? user.employee.hireDate.split('T')[0] : '',
+      salary: user.employee?.salary !== null && user.employee?.salary !== undefined ? String(user.employee.salary) : '',
       teamId: user.employee?.team?.id ? String(user.employee.team.id) : '',
+      isActive: user.isActive !== false,
     });
     setShowModal(true);
   };
@@ -157,6 +186,173 @@ export default function Users() {
     return users.filter((u) => u.employee?.team?.name === teamFilter);
   }, [users, teamFilter]);
 
+  const csvCell = (value: string) => (/[",\r\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value);
+
+  const handleExport = () => {
+    const header = [
+      'ID No.',
+      'Name',
+      'Date Hired',
+      'Job Title',
+      'Team',
+      'Approver',
+      'Email',
+      'Role',
+      'Slack Channel',
+      'Slack ID',
+      'Status',
+      'Department',
+      'Salary',
+    ];
+    const rows = visibleUsers.map((u) => [
+      u.employee?.employeeCode ?? '',
+      u.fullName,
+      u.employee?.hireDate ? u.employee.hireDate.slice(0, 10) : '',
+      u.employee?.position ?? '',
+      u.employee?.team?.name ?? '',
+      u.employee?.team?.teamLeader?.user?.fullName ?? '',
+      u.email,
+      u.role,
+      u.employee?.slackChannel ?? '',
+      u.employee?.slackId ?? '',
+      u.isActive === false ? 'INACTIVE' : 'ACTIVE',
+      u.employee?.department ?? '',
+      u.employee?.salary !== null && u.employee?.salary !== undefined ? String(u.employee.salary) : '',
+    ]);
+    const csv = [header, ...rows].map((row) => row.map((c) => csvCell(String(c))).join(',')).join('\r\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `employees-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const parseCsv = (text: string): string[][] => {
+    const rows: string[][] = [];
+    let row: string[] = [];
+    let field = '';
+    let quoted = false;
+    const src = text.replace(/^\uFEFF/, '');
+    for (let i = 0; i < src.length; i++) {
+      const ch = src[i];
+      if (quoted) {
+        if (ch === '"' && src[i + 1] === '"') {
+          field += '"';
+          i++;
+        } else if (ch === '"') {
+          quoted = false;
+        } else {
+          field += ch;
+        }
+      } else if (ch === '"') {
+        quoted = true;
+      } else if (ch === ',') {
+        row.push(field);
+        field = '';
+      } else if (ch === '\n' || ch === '\r') {
+        if (ch === '\r' && src[i + 1] === '\n') i++;
+        row.push(field);
+        rows.push(row);
+        row = [];
+        field = '';
+      } else {
+        field += ch;
+      }
+    }
+    if (field.length > 0 || row.length > 0) {
+      row.push(field);
+      rows.push(row);
+    }
+    return rows.filter((r) => r.some((c) => c.trim() !== ''));
+  };
+
+  const handleImportFile = async (file: File) => {
+    setImporting(true);
+    try {
+      const table = parseCsv(await file.text());
+      if (table.length < 2) {
+        alert('That CSV has no data rows.');
+        return;
+      }
+      const header = table[0].map((h) => h.trim().toLowerCase());
+      const col = (...names: string[]) => {
+        for (const n of names) {
+          const i = header.indexOf(n);
+          if (i >= 0) return i;
+        }
+        return -1;
+      };
+      const get = (row: string[], ...names: string[]) => {
+        const i = col(...names);
+        return i >= 0 ? (row[i] ?? '').trim() : '';
+      };
+      const teamByName = new Map(teams.map((t) => [t.name.toLowerCase(), t.id]));
+      const validRoles = ['ADMIN', 'MANAGER', 'TEAM_LEADER', 'EMPLOYEE'];
+
+      let created = 0;
+      let updated = 0;
+      const failures: string[] = [];
+
+      for (const row of table.slice(1)) {
+        const email = get(row, 'email', 'email address');
+        if (!email) continue;
+        const rawRole = (get(row, 'access level', 'role') || 'EMPLOYEE').toUpperCase().replace(/\s+/g, '_');
+        const teamName = get(row, 'team');
+        const status = (get(row, 'status') || 'ACTIVE').toUpperCase();
+        const salary = get(row, 'salary');
+        const payload: Record<string, unknown> = {
+          fullName: get(row, 'name', 'full name') || email.split('@')[0],
+          role: validRoles.includes(rawRole) ? rawRole : 'EMPLOYEE',
+          employeeCode: get(row, 'employee id', 'id no.', 'employeecode') || undefined,
+          position: get(row, 'job title', 'position'),
+          department: get(row, 'department'),
+          hireDate: get(row, 'date hired', 'hire date') || undefined,
+          salary: salary ? Number(salary) : null,
+          slackId: get(row, 'slack id', 'slackid'),
+          slackChannel: get(row, 'slack channel', 'slackchannel'),
+          teamId: teamName ? teamByName.get(teamName.toLowerCase()) ?? null : null,
+          isActive: status !== 'INACTIVE',
+        };
+
+        const existing = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+        try {
+          if (existing) {
+            await api.put(`/users/${existing.id}`, payload);
+            updated++;
+          } else {
+            const res = await api.post<UserType>('/users', {
+              ...payload,
+              email,
+              password: get(row, 'password') || 'employee123',
+            });
+            if (res.data?.id) {
+              await api.put(`/users/${res.data.id}`, {
+                teamId: payload.teamId,
+                isActive: payload.isActive,
+              });
+            }
+            created++;
+          }
+        } catch (err: any) {
+          failures.push(`${email}: ${err.response?.data?.error || err.message}`);
+        }
+      }
+
+      await fetchUsers();
+      alert(
+        `Import finished.\nCreated: ${created}\nUpdated: ${updated}\nFailed: ${failures.length}` +
+          (failures.length ? `\n\n${failures.slice(0, 5).join('\n')}` : ''),
+      );
+    } catch (err: any) {
+      alert(`Import failed: ${err.message}`);
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -175,17 +371,16 @@ export default function Users() {
     return styles[role] || 'bg-zinc-100 text-zinc-600';
   };
 
-  const th = 'px-6 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] whitespace-nowrap';
-  const td = 'px-6 py-5 text-xs text-zinc-600 align-middle';
+  const th = 'px-4 py-2.5 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] whitespace-nowrap';
+  const td = 'px-4 py-3 text-xs text-zinc-600 align-middle';
+  const toolbarButton =
+    'w-36 h-10 rounded-lg inline-flex items-center justify-center gap-2 font-bold text-xs uppercase tracking-wider transition-all active:scale-95';
 
   return (
     <div className="space-y-12">
       {/* Page Header */}
       <div>
-        <span className="text-[10px] font-bold text-primary tracking-[0.2em] uppercase mb-2 block">
-          Workforce
-        </span>
-        <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
+                <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
           Employees
         </h1>
         <p className="text-zinc-500 mt-2 max-w-xl">
@@ -195,12 +390,12 @@ export default function Users() {
 
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <label className="flex items-center gap-3">
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Team</span>
+        <label className="flex items-center gap-3 pl-5">
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em]">Team</span>
           <select
             value={teamFilter}
             onChange={(e) => setTeamFilter(e.target.value)}
-            className="px-4 py-2.5 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+            className="px-4 py-2 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
           >
             <option value="ALL">All teams</option>
             {teamNames.map((name) => (
@@ -211,17 +406,42 @@ export default function Users() {
           </select>
         </label>
 
-        <button
-          onClick={() => {
-            setEditingUser(null);
-            setFormData(emptyForm);
-            setShowModal(true);
-          }}
-          className="primary-gradient text-white px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 font-bold text-sm uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-primary/20"
-        >
-          <span className="material-symbols-outlined text-lg">person_add</span>
-          <span>New User</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,text/csv"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void handleImportFile(file);
+            }}
+          />
+          <button
+            onClick={() => {
+              setEditingUser(null);
+              setFormData(emptyForm);
+              setShowModal(true);
+            }}
+            className={`${toolbarButton} primary-gradient text-white shadow-lg shadow-primary/20`}
+          >
+            <span className="material-symbols-outlined text-base">person_add</span>
+            <span>New User</span>
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importing}
+            className={`${toolbarButton} bg-violet-500 hover:bg-violet-600 text-white shadow-lg shadow-violet-500/20 disabled:opacity-50`}
+          >
+            {importing ? 'Importing…' : 'Import CSV'}
+          </button>
+          <button
+            onClick={handleExport}
+            className={`${toolbarButton} bg-violet-800 hover:bg-violet-900 text-white shadow-lg shadow-violet-900/20`}
+          >
+            Export CSV
+          </button>
+        </div>
       </div>
 
       {/* People table */}
@@ -230,17 +450,18 @@ export default function Users() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-zinc-50">
-                <th className={th}>Employee ID</th>
+                <th className={th}>ID No.</th>
                 <th className={th}>Name</th>
                 <th className={th}>Date Hired</th>
-                <th className={th}>Team</th>
                 <th className={th}>Job Title</th>
-                <th className={th}>Supervisor</th>
+                <th className={th}>Team</th>
+                <th className={th}>Approver</th>
                 <th className={th}>Email</th>
+                <th className={th}>Role</th>
+                <th className={th}>Slack Channel</th>
                 <th className={th}>Slack ID</th>
-                <th className={th}>Access Level</th>
                 <th className={th}>Status</th>
-                <th className={`${th} text-right`}>Action</th>
+                <th className={`${th} text-center`}>Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
@@ -250,25 +471,19 @@ export default function Users() {
                     {user.employee?.employeeCode || '—'}
                   </td>
                   <td className={td}>
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-600 font-bold group-hover:bg-primary group-hover:text-white transition-all duration-500">
-                        {user.fullName.charAt(0).toUpperCase()}
-                      </div>
-                      <span className="font-bold text-on-surface tracking-tight whitespace-nowrap">
-                        {user.fullName}
-                      </span>
-                    </div>
+                    <span className="font-bold text-on-surface tracking-tight whitespace-nowrap">
+                      {user.fullName}
+                    </span>
                   </td>
                   <td className={`${td} whitespace-nowrap`}>
                     {user.employee?.hireDate ? formatDate(user.employee.hireDate) : '—'}
                   </td>
-                  <td className={`${td} whitespace-nowrap`}>{user.employee?.team?.name || '—'}</td>
                   <td className={`${td} whitespace-nowrap`}>{user.employee?.position || '—'}</td>
+                  <td className={`${td} whitespace-nowrap`}>{user.employee?.team?.name || '—'}</td>
                   <td className={`${td} whitespace-nowrap`}>
                     {user.employee?.team?.teamLeader?.user?.fullName || '—'}
                   </td>
                   <td className={`${td} whitespace-nowrap`}>{user.email}</td>
-                  <td className={`${td} font-mono whitespace-nowrap`}>{user.employee?.slackId || '—'}</td>
                   <td className={td}>
                     <span
                       className={`inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded whitespace-nowrap ${getRoleBadge(
@@ -278,6 +493,8 @@ export default function Users() {
                       {user.role}
                     </span>
                   </td>
+                  <td className={`${td} whitespace-nowrap`}>{user.employee?.slackChannel || '—'}</td>
+                  <td className={`${td} font-mono whitespace-nowrap`}>{user.employee?.slackId || '—'}</td>
                   <td className={td}>
                     <span
                       className={`inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded whitespace-nowrap ${
@@ -287,8 +504,8 @@ export default function Users() {
                       {user.isActive === false ? 'Inactive' : 'Active'}
                     </span>
                   </td>
-                  <td className={`${td} text-right whitespace-nowrap`}>
-                    <div className="flex items-center justify-end gap-2">
+                  <td className={`${td} text-center whitespace-nowrap`}>
+                    <div className="flex items-center justify-center gap-2">
                       <button
                         onClick={() => handleEdit(user)}
                         className="px-3 py-1.5 bg-zinc-100 text-zinc-700 hover:bg-zinc-200 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors"
@@ -360,6 +577,18 @@ export default function Users() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
+                    Employee ID
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.employeeCode}
+                    onChange={(e) => setFormData({ ...formData, employeeCode: e.target.value })}
+                    placeholder="e.g. EMP-00007"
+                    className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                     Access Level
                   </label>
                   <select
@@ -373,18 +602,19 @@ export default function Users() {
                     <option value="ADMIN">Admin</option>
                   </select>
                 </div>
-                <div>
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
-                    Job Title
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.position}
-                    onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                    placeholder="e.g. Software Engineer"
-                    className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
-                  />
-                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
+                  Job Title
+                </label>
+                <input
+                  type="text"
+                  value={formData.position}
+                  onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                  placeholder="e.g. Software Engineer"
+                  className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -418,6 +648,35 @@ export default function Users() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
+                    Department
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.department}
+                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                    placeholder="e.g. Engineering"
+                    className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
+                    Salary
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.salary}
+                    onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
+                    placeholder="e.g. 45000"
+                    className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
                   Slack User ID
@@ -427,6 +686,19 @@ export default function Users() {
                   value={formData.slackId}
                   onChange={(e) => setFormData({ ...formData, slackId: e.target.value })}
                   placeholder="e.g. U12345678"
+                  className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
+                  Slack Channel
+                </label>
+                <input
+                  type="text"
+                  value={formData.slackChannel}
+                  onChange={(e) => setFormData({ ...formData, slackChannel: e.target.value })}
+                  placeholder="e.g. #otp_timekeeping_test"
                   className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
                 />
               </div>
@@ -443,6 +715,18 @@ export default function Users() {
                   className="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
                 />
               </div>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  className="h-4 w-4 rounded border-zinc-300 text-primary focus:ring-primary"
+                />
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">
+                  Account active
+                </span>
+              </label>
 
               {editingUser && !editingUser.employee && (
                 <button

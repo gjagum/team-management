@@ -47,6 +47,45 @@ function computeAccruedLeaves(hireDate: Date, annualAllowance: number): number {
   return Math.round(accrued * 100) / 100;
 }
 
+// Leave categories the platform tracks with a paid allocation.
+const PAID_LEAVE_TYPES = ["VACATION", "SICK"] as const;
+type PaidLeaveType = (typeof PAID_LEAVE_TYPES)[number];
+
+const LEAVE_TYPE_LABELS: Record<string, string> = {
+  VACATION: "Paid Vacation Leave",
+  SICK: "Paid Sick Leave",
+  UNPAID: "Unpaid Leave",
+};
+
+// Both paid categories default to 5 days per year.
+function defaultAllowance(_type: PaidLeaveType): number {
+  return 5;
+}
+
+function normalizeLeaveType(value: unknown): string {
+  const raw = String(value ?? "").toUpperCase().replace(/\s+/g, "_");
+  if (["VACATION", "ANNUAL", "PAID_VACATION_LEAVE", "PAID_VACATION"].includes(raw)) return "VACATION";
+  if (["SICK", "PAID_SICK_LEAVE", "PAID_SICK"].includes(raw)) return "SICK";
+  if (["UNPAID", "UNPAID_LEAVE", "WITHOUT_PAY"].includes(raw)) return "UNPAID";
+  return raw || "VACATION";
+}
+
+async function ensureBalance(employeeId: number, year: number, leaveType: PaidLeaveType) {
+  const existing = await prisma.leaveBalance.findUnique({
+    where: { employeeId_year_leaveType: { employeeId, year, leaveType } },
+  });
+  if (existing) return existing;
+  return prisma.leaveBalance.create({
+    data: {
+      employeeId,
+      year,
+      leaveType,
+      totalLeaves: defaultAllowance(leaveType),
+      usedLeaves: 0,
+    },
+  });
+}
+
 leavesRouter.get("/", requirePermission("leaves.read"), async (c) => {
   const employee = await getEmployeeByUserId(c.user!.userId);
 
@@ -121,41 +160,86 @@ leavesRouter.get("/balance", requirePermission("leaves.read"), async (c) => {
     c.req.query("year") || new Date().getFullYear().toString(),
   );
 
-  // Get annual allowance from settings, default to 15
-  const setting = await (prisma as any).appSettings.findUnique({
-    where: { key: "leave.annual_allowance" },
+  const vacation = await ensureBalance(employee.id, year, "VACATION");
+  const sick = await ensureBalance(employee.id, year, "SICK");
+
+  const toSummary = (row: any) => ({
+    id: row.id,
+    leaveType: row.leaveType,
+    year: row.year,
+    totalLeaves: Number(row.totalLeaves),
+    usedLeaves: Number(row.usedLeaves),
+    availableLeaves: Number(row.totalLeaves) - Number(row.usedLeaves),
   });
-  const annualAllowance = setting ? parseInt(setting.value) : 15;
-
-  // Compute accrued leaves based on hire date
-  const accrued = computeAccruedLeaves(employee.hireDate, annualAllowance);
-
-  // Find or create the leave balance record
-  let balance = await prisma.leaveBalance.findUnique({
-    where: {
-      employeeId_year: {
-        employeeId: employee.id,
-        year,
-      },
-    },
-  });
-
-  if (!balance) {
-    balance = await prisma.leaveBalance.create({
-      data: {
-        employeeId: employee.id,
-        year,
-        totalLeaves: accrued,
-        usedLeaves: 0,
-      },
-    });
-  }
 
   return c.json({
-    ...balance,
-    totalLeaves: balance.totalLeaves,
-    availableLeaves: balance.totalLeaves - balance.usedLeaves,
+    // Legacy shape (used by the dashboard cards) reflects the vacation allocation.
+    ...toSummary(vacation),
+    types: {
+      VACATION: toSummary(vacation),
+      SICK: toSummary(sick),
+    },
   });
+});
+
+// Per-employee allocations for the Monitor Leaves matrix (managers/admins).
+leavesRouter.get("/overview", requirePermission("leaves.read"), async (c) => {
+  const year = parseInt(c.req.query("year") || new Date().getFullYear().toString());
+
+  const employees = await prisma.employee.findMany({
+    include: { user: { select: { fullName: true, email: true, role: true } } },
+    orderBy: { employeeCode: "asc" },
+  });
+
+  const rows = await Promise.all(
+    employees.map(async (employee) => {
+      const vacation = await ensureBalance(employee.id, year, "VACATION");
+      const sick = await ensureBalance(employee.id, year, "SICK");
+      const summary = (row: any) => ({
+        totalLeaves: Number(row.totalLeaves),
+        usedLeaves: Number(row.usedLeaves),
+        availableLeaves: Number(row.totalLeaves) - Number(row.usedLeaves),
+      });
+      return {
+        employeeId: employee.id,
+        employeeCode: employee.employeeCode,
+        name: employee.user.fullName,
+        email: employee.user.email,
+        year,
+        vacation: summary(vacation),
+        sick: summary(sick),
+      };
+    }),
+  );
+
+  return c.json(rows);
+});
+
+// Set an employee's allocation for one paid leave type (used by CSV import).
+leavesRouter.put("/allocations/:employeeId", requirePermission("leaves.manage_balances"), async (c) => {
+  const employeeId = parseInt(c.req.param("employeeId"));
+  const data = await c.req.json();
+  const leaveType = normalizeLeaveType(data.leaveType) as PaidLeaveType;
+  if (!PAID_LEAVE_TYPES.includes(leaveType)) {
+    return c.json({ error: "leaveType must be VACATION or SICK" }, 400);
+  }
+  const year = Number(data.year) || new Date().getFullYear();
+  const totalLeaves = Number(data.totalLeaves);
+  if (!Number.isFinite(totalLeaves) || totalLeaves < 0) {
+    return c.json({ error: "totalLeaves must be a non-negative number" }, 400);
+  }
+
+  const employee = await prisma.employee.findUnique({ where: { id: employeeId } });
+  if (!employee) return c.json({ error: "Employee not found" }, 404);
+
+  const balance = await prisma.leaveBalance.upsert({
+    where: { employeeId_year_leaveType: { employeeId, year, leaveType } },
+    update: { totalLeaves },
+    create: { employeeId, year, leaveType, totalLeaves, usedLeaves: 0 },
+  });
+
+  await auditLog(c.user!.userId, "UPDATE", "leave_balance", balance.id, null, balance);
+  return c.json(balance);
 });
 
 leavesRouter.post("/", requirePermission("leaves.create"), async (c) => {
@@ -194,29 +278,19 @@ leavesRouter.post("/", requirePermission("leaves.create"), async (c) => {
       (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
     ) + 1;
 
-  // Calculate Paid vs Unpaid based on current balance
+  // Paid vs unpaid depends on the requested leave type and its own allocation.
   const currentYear = new Date().getFullYear();
-  let balance = await prisma.leaveBalance.findFirst({
-    where: { employeeId: employee.id, year: currentYear },
-  });
+  const leaveType = normalizeLeaveType(data.leaveType);
+  const isPaidType = PAID_LEAVE_TYPES.includes(leaveType as PaidLeaveType);
 
-  // If no balance found, they might need one initialized (safety check)
-  if (!balance) {
-    const hiredDate = new Date(employee.hiredDate);
-    const accrued = computeAccruedLeaves(hiredDate, 20); // Default to 20 for initialization if missing
-    balance = await prisma.leaveBalance.create({
-      data: {
-        employeeId: employee.id,
-        year: currentYear,
-        totalLeaves: accrued,
-        usedLeaves: 0,
-      },
-    });
+  let paidDays = 0;
+  let unpaidDays = days;
+  if (isPaidType) {
+    const balance = await ensureBalance(employee.id, currentYear, leaveType as PaidLeaveType);
+    const available = Number(balance.totalLeaves) - Number(balance.usedLeaves);
+    paidDays = Math.max(0, Math.min(days, available));
+    unpaidDays = days - paidDays;
   }
-
-  const available = Number(balance.totalLeaves) - Number(balance.usedLeaves);
-  const paidDays = Math.max(0, Math.min(days, available));
-  const unpaidDays = days - paidDays;
 
   // Check for overlapping requests (PENDING or APPROVED)
   const overlappingRequest = await prisma.leaveRequest.findFirst({
@@ -246,7 +320,7 @@ leavesRouter.post("/", requirePermission("leaves.create"), async (c) => {
     const leaveRequest = await prisma.leaveRequest.create({
       data: {
         employeeId: employee.id,
-        leaveType: data.leaveType || "ANNUAL",
+        leaveType,
         startDate,
         endDate,
         days,
@@ -322,24 +396,15 @@ leavesRouter.patch(
 
     if (data.status === "approved") {
       const year = new Date(leave.startDate).getFullYear();
-      // Upsert: create the balance if it doesn't exist, then increment usedLeaves
-      await prisma.leaveBalance.upsert({
-        where: {
-          employeeId_year: {
-            employeeId: leave.employeeId,
-            year,
-          },
-        },
-        create: {
-          employeeId: leave.employeeId,
-          year,
-          totalLeaves: 15,
-          usedLeaves: leave.paidDays,
-        },
-        update: {
-          usedLeaves: { increment: leave.paidDays },
-        },
-      });
+      const type = normalizeLeaveType(leave.leaveType) as PaidLeaveType;
+      // Only paid categories consume an allocation.
+      if (PAID_LEAVE_TYPES.includes(type)) {
+        const balance = await ensureBalance(leave.employeeId, year, type);
+        await prisma.leaveBalance.update({
+          where: { id: balance.id },
+          data: { usedLeaves: { increment: leave.paidDays } },
+        });
+      }
     }
 
     await auditLog(

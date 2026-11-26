@@ -13,10 +13,32 @@ export default function Layout() {
     navigate("/login");
   };
 
-  const navigation = [
+  interface NavChild {
+    name: string;
+    href: string;
+    roles?: string[];
+  }
+
+  interface NavItem {
+    name: string;
+    href: string;
+    icon: string;
+    roles?: string[];
+    children?: NavChild[];
+  }
+
+  const navigation: NavItem[] = [
     { name: "Dashboard", href: "/dashboard", icon: "dashboard" },
     { name: "Schedules", href: "/schedules", icon: "calendar_month" },
-    { name: "Leave", href: "/leaves", icon: "event_busy" },
+    {
+      name: "Leave",
+      href: "/leaves",
+      icon: "event_busy",
+      children: [
+        { name: "My Leave", href: "/leaves" },
+        { name: "Company Leave", href: "/leaves/monitor", roles: ["ADMIN", "MANAGER", "TEAM_LEADER"] },
+      ],
+    },
     { name: "Overtime", href: "/overtime", icon: "schedule" },
     {
       name: "Employees",
@@ -45,10 +67,22 @@ export default function Layout() {
     { name: "Settings", href: "/settings", icon: "settings", roles: ["ADMIN"] },
   ];
 
-  const filteredNavigation = navigation.filter((item) => {
-    if (!item.roles) return true;
-    return user?.role && item.roles.includes(user.role);
-  });
+  const filteredNavigation = navigation
+    .map((item) =>
+      item.children
+        ? {
+            ...item,
+            children: item.children.filter(
+              (child) => !child.roles || (user?.role && child.roles.includes(user.role)),
+            ),
+          }
+        : item,
+    )
+    .filter((item) => {
+      if (item.roles && !(user?.role && item.roles.includes(user.role))) return false;
+      if (item.children && item.children.length === 0) return false;
+      return true;
+    });
 
   const currentPage = filteredNavigation.find(
     (item) =>
@@ -145,19 +179,37 @@ export default function Layout() {
               location.pathname === item.href ||
               (item.href !== "/" && location.pathname.startsWith(item.href));
             return (
-              <Link
-                key={item.name}
-                to={item.href}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm tracking-wide uppercase transition-all duration-300 ${
-                  isActive
-                    ? "text-violet-700 bg-zinc-200/50 border-r-4 border-violet-700"
-                    : "text-zinc-600 hover:text-violet-700 hover:translate-x-1"
-                }`}
-              >
-                <span className="material-symbols-outlined">{item.icon}</span>
-                <span>{item.name}</span>
-              </Link>
+              <React.Fragment key={item.name}>
+                <Link
+                  to={item.href}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm tracking-wide uppercase transition-all duration-300 ${
+                    isActive
+                      ? "text-violet-700 bg-zinc-200/50 border-r-4 border-violet-700"
+                      : "text-zinc-600 hover:text-violet-700 hover:translate-x-1"
+                  }`}
+                >
+                  <span className="material-symbols-outlined">{item.icon}</span>
+                  <span>{item.name}</span>
+                </Link>
+                {item.children?.map((child) => {
+                  const childActive = location.pathname === child.href;
+                  return (
+                    <Link
+                      key={child.name}
+                      to={child.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`flex items-center pl-12 pr-4 py-2 rounded-lg text-xs font-semibold tracking-wide uppercase transition-colors duration-200 ${
+                        childActive
+                          ? "text-violet-700 bg-zinc-200/40"
+                          : "text-zinc-500 hover:text-violet-700 hover:bg-zinc-100"
+                      }`}
+                    >
+                      {child.name}
+                    </Link>
+                  );
+                })}
+              </React.Fragment>
             );
           })}
         </nav>

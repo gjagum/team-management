@@ -49,6 +49,7 @@ function App() {
               <Route index element={<Dashboard />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="leaves" element={<Leaves />} />
+              <Route path="leaves/monitor" element={<Leaves />} />
               <Route path="overtime" element={<Overtime />} />
               <Route path="users" element={<Users />} />
               <Route path="employees" element={<Navigate to="/users" replace />} />

@@ -12,6 +12,7 @@ export interface User {
     hireDate: string;
     salary: number;
     slackId?: string | null;
+    slackChannel?: string | null;
     team?: {
       id: number;
       name: string;
@@ -133,6 +134,29 @@ export interface LeaveBalance {
   totalLeaves: number;
   usedLeaves: number;
   availableLeaves: number;
+  types?: {
+    VACATION: LeaveBalanceSummary;
+    SICK: LeaveBalanceSummary;
+  };
+}
+
+export interface LeaveBalanceSummary {
+  id: number;
+  leaveType: string;
+  year: number;
+  totalLeaves: number;
+  usedLeaves: number;
+  availableLeaves: number;
+}
+
+export interface LeaveOverviewRow {
+  employeeId: number;
+  employeeCode: string;
+  name: string;
+  email: string;
+  year: number;
+  vacation: { totalLeaves: number; usedLeaves: number; availableLeaves: number };
+  sick: { totalLeaves: number; usedLeaves: number; availableLeaves: number };
 }
 
 export interface Permission {
