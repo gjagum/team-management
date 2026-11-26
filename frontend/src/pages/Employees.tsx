@@ -36,10 +36,7 @@ export default function Employees() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
-          <span className="text-[10px] font-bold text-primary tracking-[0.2em] uppercase mb-2 block">
-            Enterprise Assets
-          </span>
-          <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
+                    <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
             Global Directory
           </h1>
           <p className="text-zinc-500 mt-2 max-w-md">

@@ -23,6 +23,7 @@ usersRouter.get('/', requirePermission('users.read'), async (c) => {
           position: true,
           hireDate: true,
           slackId: true,
+          slackChannel: true,
           team: {
             select: {
               id: true,
@@ -74,6 +75,7 @@ usersRouter.post('/', requirePermission('users.create'), async (c) => {
         hireDate: data.hireDate ? new Date(data.hireDate) : new Date(),
         salary: data.salary || null,
         slackId: data.slackId || null,
+        slackChannel: data.slackChannel || null,
       },
     });
 
@@ -106,16 +108,29 @@ usersRouter.put('/:id', requirePermission('users.update'), async (c) => {
     }
   }
 
-  // Other employee-profile fields edited from the merged People & Access page
+  // Other employee-profile fields edited from the Employees page
   const employeePatch: any = {};
+  if (data.employeeCode !== undefined && data.employeeCode) employeePatch.employeeCode = data.employeeCode;
   if (data.position !== undefined) employeePatch.position = data.position || null;
+  if (data.department !== undefined) employeePatch.department = data.department || null;
+  if (data.slackChannel !== undefined) employeePatch.slackChannel = data.slackChannel || null;
   if (data.hireDate !== undefined && data.hireDate) employeePatch.hireDate = new Date(data.hireDate);
+  if (data.salary !== undefined) {
+    employeePatch.salary = data.salary === null || data.salary === '' ? null : Number(data.salary);
+  }
   if (data.teamId !== undefined) employeePatch.teamId = data.teamId ? Number(data.teamId) : null;
   if (Object.keys(employeePatch).length > 0) {
     if (!oldUser.employee) {
       return c.json({ error: 'Activate an employee profile before editing employee details' }, 400);
     }
-    await prisma.employee.update({ where: { id: oldUser.employee.id }, data: employeePatch });
+    try {
+      await prisma.employee.update({ where: { id: oldUser.employee.id }, data: employeePatch });
+    } catch (error: any) {
+      if (error?.code === 'P2002') {
+        return c.json({ error: 'That employee ID is already in use' }, 409);
+      }
+      throw error;
+    }
   }
 
   const updateData: any = {};
@@ -137,10 +152,34 @@ usersRouter.put('/:id', requirePermission('users.update'), async (c) => {
 usersRouter.delete('/:id', requirePermission('users.delete'), async (c) => {
   const id = parseInt(c.req.param('id'));
 
-  const oldUser = await prisma.user.findUnique({ where: { id } });
+  const oldUser = await prisma.user.findUnique({ where: { id }, include: { employee: true } });
   if (!oldUser) return c.json({ error: 'User not found' }, 404);
 
-  await prisma.user.delete({ where: { id } });
+  // A user can't be deleted while an employee profile (and its records) reference it,
+  // so clear the dependants in one transaction.
+  await prisma.$transaction(async (tx) => {
+    const employeeId = oldUser.employee?.id;
+    if (employeeId) {
+      await tx.team.updateMany({ where: { teamLeaderId: employeeId }, data: { teamLeaderId: null } });
+      await tx.team.updateMany({ where: { alternateApproverId: employeeId }, data: { alternateApproverId: null } });
+      await tx.leaveRequest.updateMany({ where: { reviewedBy: employeeId }, data: { reviewedBy: null } });
+      await tx.overtimeRecord.updateMany({ where: { approvedBy: employeeId }, data: { approvedBy: null } });
+
+      await tx.timeLog.deleteMany({ where: { employeeId } });
+      await tx.leaveBalance.deleteMany({ where: { employeeId } });
+      await tx.leaveRequest.deleteMany({ where: { employeeId } });
+      await tx.overtimeRecord.deleteMany({ where: { employeeId } });
+      await tx.schedule.deleteMany({ where: { employeeId } });
+      await tx.defaultSchedule.deleteMany({ where: { employeeId } });
+      await tx.employeeDocument.deleteMany({ where: { employeeId } });
+      await tx.onboardingTask.deleteMany({ where: { employeeId } });
+      await tx.employee.delete({ where: { id: employeeId } });
+    }
+
+    await tx.session.deleteMany({ where: { userId: id } });
+    await tx.auditLog.deleteMany({ where: { userId: id } });
+    await tx.user.delete({ where: { id } });
+  });
 
   await auditLog(c.user!.userId, 'DELETE', 'user', id, oldUser, null);
 
@@ -171,6 +210,7 @@ usersRouter.post('/:id/activate-employee', requirePermission('employees.create')
       hireDate: data.hireDate ? new Date(data.hireDate) : new Date(),
       salary: data.salary || null,
       slackId: data.slackId || null,
+      slackChannel: data.slackChannel || null,
     },
   });
 

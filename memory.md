@@ -52,6 +52,11 @@
 | 2026-11-24 | Published the branch as PR #12 (gjagum/team-management ← noviesawangan:docs/omnitask-guide) via fork, since the local GitHub login has no write access to the upstream repo; `fork` remote added | DevOps | ✅ |
 | 2026-11-25 | Dashboard heading "Welcome Back" → "Your Dashboard"; "People & Access" renamed to "Employees" (sidebar + page title) | UI | ✅ |
 | 2026-11-25 | Role-based dashboard header: Employee/Manager/Admin (and Team Leader → Manager) title + subtitle copy, no eyebrow line | UI | ✅ |
+| 2026-11-25 | Employees page: removed name avatar, centred Action column, edit modal now covers employeeCode/department/salary/status, added CSV Import/Export; `PUT /users/:id` accepts employeeCode/department/salary and `DELETE` cascades employee records (fixes FK error on delete) | UI | ✅ |
+| 2026-11-26 | Schema: `leave_balances.leaveType` (unique per employee+year+type, VACATION/SICK defaults 5) and `employees.slackChannel` (db push). Leave page split into Apply Leave / Monitor Leaves with per-type summary cards, scrollable request list, allocation matrix + CSV import/export; Employees columns renamed/reordered; admin dashboard emptied; Quick Actions and page eyebrows removed | UI | ✅ |
+| 2026-11-26 | Leave sub-menus moved into the sidebar as indented children of Leave (`/leaves`, `/leaves/monitor`); Monitor hidden for employees with a redirect guard | UI | ✅ |
+| 2026-11-26 | Leave pages renamed to My Leave / Company Leave with their own headers; summary cards grouped in two bordered boxes side by side; Company Leave table denser with dark headers, "NO. OF EMPLOYEES: n" label and purple Import/Export buttons matching Apply Leave | UI | ✅ |
+| 2026-11-26 | Employees page: Team filter aligned with the ID No. column, New User / Import / Export buttons unified at 144x40 in purple shades, table rows compacted and header text darkened | UI | ✅ |
 | 2026-11-23 | Prisma Studio now loads data: pinned the Neon pooler hostname to its IPv4 (`13.228.46.236`) in the Windows hosts file, since the engine's IPv6-first resolution caused P1001 (`13.228.46.236 ep-purple-river-a1xah0gz-pooler.ap-southeast-1.aws.neon.tech`) | DevOps | ✅ |
 
 ## Active Task
