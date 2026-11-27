@@ -68,6 +68,8 @@
 | 2026-11-27 | Sidebar menu items compacted uniformly for every role: parent links 44→36px (`py-1.5`), sub-items 32→24px (`py-1`), logout/user block 44→36px | UI | ✅ |
 | 2026-11-27 | CSV/scope pass: Personal Leave exports its records for every role; Import CSV removed from Company/Team Leave; Personal Overtime gains From/To filters + Export; Company/Team Overtime filters and Export moved below the cards with Import removed; managers get Overtime submenus (Personal/Team) with team-scoped records; Team Leave label now "No. of Members" | UI | ✅ |
 | 2026-11-27 | Unified action buttons: shared `.btn-action` (112×36, 10px/900) for row actions (Edit/Del/Approve/Reject/Cancel) and `.btn-toolbar` (144×40, 12px/700) for toolbar actions (Apply/CSV/New), all centre-aligned; icon-only buttons normalised to 36×36 | UI | ✅ |
+| 2026-11-27 | Added `bun run dev:restart` (`scripts/dev-restart.ts`): frees ports 3000–3002 from orphaned processes, waits for release, then starts `bun run dev`; Employees toolbar now a single row (Team + search + New/Import/Export), Edit/Del narrowed to 72px and Role column centred | DevOps | ✅ |
+| 2026-11-27 | Employees toolbar: labels renamed to "Filter" (default All teams) and "Search", fields share a 208×40 size with a darker `zinc-100` fill and border, left group aligned to the table's ID column and the New User/Import/Export group pinned to the table's right edge | UI | ✅ |
 | 2026-11-23 | Prisma Studio now loads data: pinned the Neon pooler hostname to its IPv4 (`13.228.46.236`) in the Windows hosts file, since the engine's IPv6-first resolution caused P1001 (`13.228.46.236 ep-purple-river-a1xah0gz-pooler.ap-southeast-1.aws.neon.tech`) | DevOps | ✅ |
 
 ## Active Task

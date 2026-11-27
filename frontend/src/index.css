@@ -108,6 +108,9 @@
     letter-spacing: 0.08em;
     transition: background-color 0.15s ease, color 0.15s ease;
   }
+  .btn-action-sm {
+    width: 4.5rem;
+  }
 }
 
 /* Material Symbols configuration */

@@ -406,14 +406,14 @@ export default function Users() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex flex-col gap-3 pl-5">
-          <label className="flex items-center gap-3">
-            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em]">Team</span>
+      <div className="flex flex-wrap items-center justify-between gap-3 pl-5">
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em]">Filter</span>
             <select
               value={teamFilter}
               onChange={(e) => setTeamFilter(e.target.value)}
-              className="px-4 py-2 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+              className="w-52 h-10 px-3 bg-zinc-100 border border-zinc-200 rounded-lg text-sm font-medium text-zinc-700 focus:ring-1 focus:ring-primary focus:outline-none"
             >
               <option value="ALL">All teams</option>
               {teamNames.map((name) => (
@@ -424,19 +424,22 @@ export default function Users() {
             </select>
           </label>
 
-          <div className="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-lg w-full sm:w-72">
-            <span className="material-symbols-outlined text-zinc-400 text-lg">search</span>
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search ID No. or name"
-              className="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-full placeholder:text-zinc-400"
-            />
-          </div>
+          <label className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em]">Search</span>
+            <div className="flex items-center gap-2 w-52 h-10 px-3 bg-zinc-100 border border-zinc-200 rounded-lg">
+              <span className="material-symbols-outlined text-zinc-400 text-lg">search</span>
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="ID or name"
+                className="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-full placeholder:text-zinc-400"
+              />
+            </div>
+          </label>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-2 shrink-0">
           <input
             ref={fileInputRef}
             type="file"
@@ -487,7 +490,7 @@ export default function Users() {
                 <th className={th}>Team</th>
                 <th className={th}>Approver</th>
                 <th className={th}>Email</th>
-                <th className={th}>Role</th>
+                <th className={`${th} text-center`}>Role</th>
                 <th className={th}>Slack Channel</th>
                 <th className={th}>Slack ID</th>
                 <th className={th}>Status</th>
@@ -514,7 +517,7 @@ export default function Users() {
                     {user.employee?.team?.teamLeader?.user?.fullName || '—'}
                   </td>
                   <td className={`${td} whitespace-nowrap`}>{user.email}</td>
-                  <td className={td}>
+                  <td className={`${td} text-center`}>
                     <span
                       className={`inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded whitespace-nowrap ${getRoleBadge(
                         user.role,
@@ -538,13 +541,13 @@ export default function Users() {
                     <div className="flex items-center justify-center gap-2">
                       <button
                         onClick={() => handleEdit(user)}
-                        className="btn-action bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
+                        className="btn-action btn-action-sm bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(user.id)}
-                        className="btn-action bg-red-50 text-red-600 hover:bg-red-100"
+                        className="btn-action btn-action-sm bg-red-50 text-red-600 hover:bg-red-100"
                       >
                         Del
                       </button>
