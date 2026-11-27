@@ -105,7 +105,7 @@ export default function Dashboard() {
   const statCard = (label: string, value: string, icon: string, hint?: string) => (
     <div className="bg-surface-container-low p-6 rounded-xl border-b-4 border-primary/20">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.15em]">{label}</span>
+        <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">{label}</span>
         <span className="material-symbols-outlined text-zinc-300">{icon}</span>
       </div>
       <h3 className="text-3xl font-black text-on-surface tracking-tighter mt-3">{value}</h3>
@@ -223,7 +223,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-primary/20">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Leave Balance</span>
+                <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Leave Balance</span>
                 <span className="material-symbols-outlined text-zinc-300">calendar_today</span>
               </div>
               <div className="flex items-end justify-between">
@@ -238,7 +238,7 @@ export default function Dashboard() {
 
             <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-amber-200">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Pending Leaves</span>
+                <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Pending Leaves</span>
                 <span className="material-symbols-outlined text-zinc-300">pending_actions</span>
               </div>
               <div className="flex items-end justify-between">
@@ -251,7 +251,7 @@ export default function Dashboard() {
 
             <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-primary/20">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Overtime Hours</span>
+                <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Overtime Hours</span>
                 <span className="material-symbols-outlined text-zinc-300">schedule</span>
               </div>
               <div className="flex items-end justify-between">

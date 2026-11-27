@@ -126,14 +126,14 @@ export default function Employees() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-primary/20">
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Total Workforce</span>
+          <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Total Workforce</span>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-on-surface tracking-tighter">{employees.length}</h3>
             <span className="text-green-600 text-xs font-bold mb-2">Active</span>
           </div>
         </div>
         <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-zinc-300">
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Departments</span>
+          <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Departments</span>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-on-surface tracking-tighter">
               {new Set(employees.map(e => e.department).filter(Boolean)).size}
@@ -142,7 +142,7 @@ export default function Employees() {
           </div>
         </div>
         <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-primary/20">
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Retention Rate</span>
+          <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Retention Rate</span>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-primary tracking-tighter">
               {employees.length > 0 ? Math.round((employees.filter(e => e.user.isActive).length / employees.length) * 100) : 0}%

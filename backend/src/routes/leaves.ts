@@ -182,12 +182,31 @@ leavesRouter.get("/balance", requirePermission("leaves.read"), async (c) => {
   });
 });
 
-// Per-employee allocations for the Monitor Leaves matrix (managers/admins).
+// Per-employee allocations for the Monitor Leaves matrix.
+// Admins see everyone; managers/team leaders see only the teams they lead.
 leavesRouter.get("/overview", requirePermission("leaves.read"), async (c) => {
   const year = parseInt(c.req.query("year") || new Date().getFullYear().toString());
+  const role = c.user!.role;
+
+  let where: any = {};
+  if (role !== "ADMIN") {
+    const me = await getEmployeeByUserId(c.user!.userId);
+    if (!me) return c.json([]);
+    const teams = await prisma.team.findMany({
+      where: { OR: [{ teamLeaderId: me.id }, { alternateApproverId: me.id }] },
+      select: { id: true },
+    });
+    const teamIds = teams.map((t) => t.id);
+    if (teamIds.length === 0) return c.json([]);
+    where = { teamId: { in: teamIds } };
+  }
 
   const employees = await prisma.employee.findMany({
-    include: { user: { select: { fullName: true, email: true, role: true } } },
+    where,
+    include: {
+      user: { select: { fullName: true, email: true, role: true } },
+      team: { select: { id: true, name: true } },
+    },
     orderBy: { employeeCode: "asc" },
   });
 
@@ -205,6 +224,7 @@ leavesRouter.get("/overview", requirePermission("leaves.read"), async (c) => {
         employeeCode: employee.employeeCode,
         name: employee.user.fullName,
         email: employee.user.email,
+        team: employee.team?.name ?? null,
         year,
         vacation: summary(vacation),
         sick: summary(sick),

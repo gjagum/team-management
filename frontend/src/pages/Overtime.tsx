@@ -1,45 +1,39 @@
-import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, Navigate } from 'react-router-dom';
 import api from '../services/api';
 import { OvertimeRecord } from '../types';
-import { formatDate, formatDateTime, getStatusColor } from '../utils/helpers';
+import { formatDate, getStatusColor } from '../utils/helpers';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
 import Pagination from '../components/Pagination';
+
+const PAGE_SIZE = 10;
+
+const timeOf = (value: string) =>
+  new Date(value).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
 export default function Overtime() {
   const { showNotification } = useNotification();
   const location = useLocation();
   const navigate = useNavigate();
-  const [overtimeRecords, setOvertimeRecords] = useState<OvertimeRecord[]>([]);
-  const [page, setPage] = useState(1);
-  const PAGE_SIZE = 10;
-  const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({
-    date: '',
-    startTime: '',
-    endTime: '',
-    description: '',
-  });
   const { user } = useAuth();
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const [records, setRecords] = useState<OvertimeRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [page, setPage] = useState(1);
+  const [teamFilter, setTeamFilter] = useState('ALL');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [formData, setFormData] = useState({ date: '', startTime: '', endTime: '', description: '' });
 
-  // Opened from the dashboard "Record Overtime" quick action.
-  useEffect(() => {
-    if ((location.state as { openNew?: boolean } | null)?.openNew) {
-      setShowModal(true);
-      navigate(location.pathname, { replace: true, state: null });
-    }
-  }, [location.state, location.pathname, navigate]);
+  const isCompanyView = location.pathname.replace(/\/+$/, '').endsWith('/overtime/company');
 
   const fetchData = async () => {
     try {
-      const response = await api.get<OvertimeRecord[]>('/overtime');
-      setOvertimeRecords(response.data);
+      const url = isCompanyView ? '/overtime' : '/overtime/my-records';
+      const response = await api.get<OvertimeRecord[]>(url);
+      setRecords(response.data);
     } catch (error) {
       console.error('Failed to fetch overtime records:', error);
       showNotification('Failed to load overtime records', 'error');
@@ -48,12 +42,24 @@ export default function Overtime() {
     }
   };
 
+  useEffect(() => {
+    fetchData();
+  }, [isCompanyView]);
+
+  // Opened from a deep link with ?new=1 (kept for compatibility).
+  useEffect(() => {
+    if ((location.state as { openNew?: boolean } | null)?.openNew) {
+      setShowModal(true);
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.state, location.pathname, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const startDateTime = new Date(`${formData.date}T${formData.startTime}`);
       const endDateTime = new Date(`${formData.date}T${formData.endTime}`);
-      
+
       await api.post('/overtime', {
         ...formData,
         startTime: startDateTime.toISOString(),
@@ -61,16 +67,16 @@ export default function Overtime() {
       });
       setShowModal(false);
       setFormData({ date: '', startTime: '', endTime: '', description: '' });
-      showNotification('Overtime record submitted successfully', 'success');
+      showNotification('Overtime application submitted', 'success');
       fetchData();
     } catch (error: any) {
       showNotification(error.response?.data?.error || 'Failed to create overtime record', 'error');
     }
   };
 
-  const handleApproveReject = async (id: number, status: 'approved' | 'rejected', notes?: string) => {
+  const handleApproveReject = async (id: number, status: 'approved' | 'rejected') => {
     try {
-      await api.patch(`/overtime/${id}/approve`, { status, approvalNotes: notes });
+      await api.patch(`/overtime/${id}/approve`, { status });
       showNotification(`Overtime record ${status} successfully`, 'success');
       fetchData();
     } catch (error: any) {
@@ -89,6 +95,65 @@ export default function Overtime() {
     }
   };
 
+  const teamNames = useMemo(
+    () =>
+      Array.from(
+        new Set(records.map((r) => r.employee?.team?.name).filter((n): n is string => Boolean(n))),
+      ).sort(),
+    [records],
+  );
+
+  const visibleRecords = useMemo(() => {
+    return records.filter((r) => {
+      if (isCompanyView && teamFilter !== 'ALL' && r.employee?.team?.name !== teamFilter) return false;
+      const day = r.date.slice(0, 10);
+      if (fromDate && day < fromDate) return false;
+      if (toDate && day > toDate) return false;
+      return true;
+    });
+  }, [records, isCompanyView, teamFilter, fromDate, toDate]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [teamFilter, fromDate, toDate, isCompanyView]);
+
+  const paged = visibleRecords.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const approvedHours = visibleRecords
+    .filter((r) => r.status === 'APPROVED')
+    .reduce((acc, curr) => acc + Number(curr.hours), 0);
+  const pendingCount = visibleRecords.filter((r) => r.status === 'PENDING').length;
+
+  const handleExport = () => {
+    const header = isCompanyView
+      ? ['Team', 'Name', 'Email', 'Date', 'Start Time', 'End Time', 'Hours', 'Reason', 'Status']
+      : ['Date', 'Reason', 'Hours', 'Status'];
+    const rows = visibleRecords.map((r) =>
+      isCompanyView
+        ? [
+            r.employee?.team?.name ?? '',
+            r.employee?.user.fullName ?? '',
+            r.employee?.user.email ?? '',
+            r.date.slice(0, 10),
+            timeOf(r.startTime),
+            timeOf(r.endTime),
+            String(r.hours),
+            r.description ?? '',
+            r.status,
+          ]
+        : [r.date.slice(0, 10), r.description ?? '', String(r.hours), r.status],
+    );
+    const cell = (v: string) => (/[",\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+    const csv = [header, ...rows].map((r) => r.map(cell).join(',')).join('\r\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `overtime-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -97,163 +162,224 @@ export default function Overtime() {
     );
   }
 
-  const totalApprovedHours = overtimeRecords
-    .filter(r => r.status === 'APPROVED')
-    .reduce((acc, curr) => acc + Number(curr.hours), 0);
+  const canViewCompany = user?.role === 'ADMIN' || user?.role === 'MANAGER' || user?.role === 'TEAM_LEADER';
+  if (isCompanyView && !canViewCompany) {
+    return <Navigate to="/overtime" replace />;
+  }
 
-  const pendingCount = overtimeRecords.filter(r => r.status === 'PENDING').length;
+  const companyTitle = user?.role === 'ADMIN' ? 'Company Overtime' : 'Team Overtime';
+  const companyCaption =
+    user?.role === 'ADMIN' ? 'Overtime records of all employees.' : 'Overtime records of your team.';
+
+  const th = 'px-4 py-2.5 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] whitespace-nowrap';
+  const td = 'px-4 py-3 text-xs text-zinc-600 align-middle';
+
+  const statCard = (label: string, value: string, accent: string, hint: string) => (
+    <div className={`bg-surface-container-low p-6 rounded-xl flex flex-col justify-between h-32 border-b-4 ${accent}`}>
+      <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">{label}</span>
+      <div className="flex items-end justify-between">
+        <h3 className="text-4xl font-black text-on-surface tracking-tighter">{value}</h3>
+        <span className="text-zinc-500 text-[10px] font-bold mb-1 uppercase tracking-wider">{hint}</span>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
-                    <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
-            Overtime Ledger
+          <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
+            {isCompanyView ? companyTitle : 'Personal Overtime'}
           </h1>
           <p className="text-zinc-500 mt-1 max-w-md">
-            Track, authorize, and analyze extended work hours across all personnel.
+            {isCompanyView ? companyCaption : 'Overtime applications and records.'}
           </p>
         </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="primary-gradient text-white px-6 py-2.5 rounded-lg flex items-center gap-2 font-bold text-sm uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-primary/20"
-        >
-          <span className="material-symbols-outlined text-lg">add</span>
-          <span>New Record</span>
-        </button>
+        {!isCompanyView && (
+          <button
+            onClick={() => setShowModal(true)}
+            className="btn-toolbar primary-gradient text-white shadow-lg shadow-primary/20 active:scale-95"
+          >
+            <span className="material-symbols-outlined text-lg">add</span>
+            <span>Apply Overtime</span>
+          </button>
+        )}
       </div>
+
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-40 border-b-4 border-primary/20">
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Approved Hours</span>
-          <div className="flex items-end justify-between">
-            <h3 className="text-5xl font-black text-on-surface tracking-tighter">{totalApprovedHours.toFixed(1)}</h3>
-            <span className="text-green-600 text-xs font-bold mb-2">Validated</span>
-          </div>
-        </div>
-        <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-40 border-b-4 border-amber-200">
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Pending Review</span>
-          <div className="flex items-end justify-between">
-            <h3 className="text-5xl font-black text-on-surface tracking-tighter">{pendingCount}</h3>
-            <span className="text-amber-600 text-xs font-bold mb-2">Awaiting</span>
-          </div>
-        </div>
-        <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-40 border-b-4 border-zinc-300">
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Total Records</span>
-          <div className="flex items-end justify-between">
-            <h3 className="text-5xl font-black text-primary tracking-tighter">{overtimeRecords.length}</h3>
-            <span className="text-zinc-500 text-xs font-bold mb-2">Logged</span>
-          </div>
-        </div>
+        {statCard('Approved Hours', approvedHours.toFixed(1), 'border-primary/20', 'Validated')}
+        {isCompanyView
+          ? statCard('Pending Overtime Requests', String(pendingCount), 'border-amber-200', 'Awaiting')
+          : statCard('Pending Review', String(pendingCount), 'border-amber-200', 'Awaiting')}
+        {statCard('Total Records', String(visibleRecords.length), 'border-zinc-200', 'Logged')}
       </div>
 
-      {/* Overtime Table */}
+      {/* Filters + export, directly above the list */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {isCompanyView && (
+            <label className="flex items-center gap-2">
+              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em]">Team</span>
+              <select
+                value={teamFilter}
+                onChange={(e) => setTeamFilter(e.target.value)}
+                className="px-3 py-1.5 bg-surface-container-low border-none rounded-lg text-xs font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+              >
+                <option value="ALL">All teams</option>
+                {teamNames.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          <label className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em]">From</span>
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="px-3 py-1.5 bg-surface-container-low border-none rounded-lg text-xs font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+            />
+          </label>
+          <label className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em]">To</span>
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="px-3 py-1.5 bg-surface-container-low border-none rounded-lg text-xs font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+            />
+          </label>
+        </div>
+        <button
+          onClick={handleExport}
+          className="btn-toolbar bg-violet-800 hover:bg-violet-900 text-white shadow-lg shadow-violet-900/20 active:scale-95"
+        >
+          Export CSV
+        </button>
+      </div>
+
+      {/* Table */}
       <div className="bg-surface-container-low p-1 rounded-xl">
-        <div className="bg-surface-container-lowest editorial-shadow rounded-lg overflow-hidden">
+        <div className="bg-surface-container-lowest editorial-shadow rounded-lg overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-zinc-50">
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Personnel</th>
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Date</th>
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Time Block</th>
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Hours</th>
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Description</th>
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Status</th>
-                <th className="px-8 py-6 text-right"></th>
+                {isCompanyView ? (
+                  <>
+                    <th className={th}>Team</th>
+                    <th className={th}>Name</th>
+                    <th className={th}>Date</th>
+                    <th className={th}>Start Time</th>
+                    <th className={th}>End Time</th>
+                    <th className={th}>Hours</th>
+                    <th className={th}>Reason</th>
+                    <th className={th}>Status</th>
+                    <th className={`${th} text-center`}>Action</th>
+                  </>
+                ) : (
+                  <>
+                    <th className={th}>Date</th>
+                    <th className={th}>Reason</th>
+                    <th className={th}>Hours</th>
+                    <th className={th}>Status</th>
+                    <th className={`${th} text-center`}>Action</th>
+                  </>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
-              {overtimeRecords.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((record) => (
-                <tr key={record.id} className="hover:bg-zinc-50 transition-colors duration-200 group">
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-600 font-bold text-sm group-hover:bg-primary group-hover:text-white transition-all duration-500">
-                        {record.employee?.user.fullName?.charAt(0).toUpperCase() || '?'}
-                      </div>
-                      <p className="font-bold text-on-surface tracking-tight">
-                        {record.employee?.user.fullName}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <p className="text-zinc-700 font-medium text-sm">{formatDate(record.date)}</p>
-                  </td>
-                  <td className="px-8 py-6">
-                    <p className="text-zinc-500 text-sm font-medium">
-                      {formatDateTime(record.startTime).split(' ')[1]} - {formatDateTime(record.endTime).split(' ')[1]}
-                    </p>
-                  </td>
-                  <td className="px-8 py-6">
-                    <p className="font-black text-on-surface text-lg tracking-tight">{record.hours}h</p>
-                  </td>
-                  <td className="px-8 py-6">
-                    <p className="text-zinc-500 text-sm font-medium italic max-w-xs truncate">
-                      {record.description || '—'}
-                    </p>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded ${getStatusColor(record.status)}`}>
-                      {record.status}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      {record.status === 'PENDING' && (
-                        <>
+              {paged.map((record) => (
+                <tr key={record.id} className="hover:bg-zinc-50 transition-colors duration-200">
+                  {isCompanyView ? (
+                    <>
+                      <td className={`${td} whitespace-nowrap`}>{record.employee?.team?.name || '—'}</td>
+                      <td className={`${td} font-bold text-on-surface whitespace-nowrap`}>
+                        {record.employee?.user.fullName || '—'}
+                      </td>
+                      <td className={`${td} whitespace-nowrap`}>{formatDate(record.date)}</td>
+                      <td className={`${td} whitespace-nowrap`}>{timeOf(record.startTime)}</td>
+                      <td className={`${td} whitespace-nowrap`}>{timeOf(record.endTime)}</td>
+                      <td className={`${td} font-bold text-on-surface whitespace-nowrap`}>{Number(record.hours)}h</td>
+                      <td className={`${td} max-w-[14rem] truncate`} title={record.description || ''}>
+                        {record.description || '—'}
+                      </td>
+                      <td className={td}>
+                        <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded whitespace-nowrap ${getStatusColor(record.status)}`}>
+                          {record.status}
+                        </span>
+                      </td>
+                      <td className={`${td} text-center whitespace-nowrap`}>
+                        <div className="flex items-center justify-center gap-2">
+                          {record.status === 'PENDING' && (
+                            <>
+                              <button
+                                onClick={() => handleApproveReject(record.id, 'approved')}
+                                className="btn-action bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleApproveReject(record.id, 'rejected')}
+                                className="btn-action bg-red-50 text-red-600 hover:bg-red-100"
+                              >
+                                Reject
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className={`${td} whitespace-nowrap`}>{formatDate(record.date)}</td>
+                      <td className={`${td} max-w-[18rem] truncate`} title={record.description || ''}>
+                        {record.description || '—'}
+                      </td>
+                      <td className={`${td} font-bold text-on-surface whitespace-nowrap`}>{Number(record.hours)}h</td>
+                      <td className={td}>
+                        <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded whitespace-nowrap ${getStatusColor(record.status)}`}>
+                          {record.status}
+                        </span>
+                      </td>
+                      <td className={`${td} text-center whitespace-nowrap`}>
+                        {record.status === 'PENDING' && (
                           <button
-                            onClick={() => handleApproveReject(record.id, 'approved')}
-                            className="p-2 hover:bg-green-50 rounded-lg text-green-600 hover:text-green-800 transition-colors"
-                            title="Approve"
+                            onClick={() => handleCancel(record.id)}
+                            className="btn-action bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
                           >
-                            <span className="material-symbols-outlined text-lg">check_circle</span>
+                            Cancel
                           </button>
-                          <button
-                            onClick={() => handleApproveReject(record.id, 'rejected')}
-                            className="p-2 hover:bg-red-50 rounded-lg text-red-600 hover:text-red-800 transition-colors"
-                            title="Reject"
-                          >
-                            <span className="material-symbols-outlined text-lg">cancel</span>
-                          </button>
-                        </>
-                      )}
-                      {record.status === 'PENDING' && record.employeeId === user?.id && (
-                        <button
-                          onClick={() => handleCancel(record.id)}
-                          className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500 hover:text-red-700 hover:bg-zinc-100 rounded-lg transition-colors"
-                        >
-                          Cancel
-                        </button>
-                      )}
-                    </div>
-                  </td>
+                        )}
+                      </td>
+                    </>
+                  )}
                 </tr>
               ))}
+              {visibleRecords.length === 0 && (
+                <tr>
+                  <td colSpan={isCompanyView ? 9 : 5} className="px-6 py-10 text-center text-zinc-400 font-medium">
+                    No overtime records yet.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
-        <Pagination page={page} pageSize={PAGE_SIZE} total={overtimeRecords.length} onPageChange={setPage} />
+        <Pagination page={page} pageSize={PAGE_SIZE} total={visibleRecords.length} onPageChange={setPage} />
       </div>
 
-      {/* Footer */}
-      <div className="flex items-center justify-between">
-        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-          Displaying {overtimeRecords.length} Record{overtimeRecords.length !== 1 ? 's' : ''}
-        </p>
-      </div>
-
-      {/* Modal */}
+      {/* Apply Overtime modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-surface-container-lowest editorial-shadow-lg rounded-xl p-8 w-full max-w-md">
             <div className="mb-6">
-              <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] block mb-1">
-                Time Registry
-              </span>
-              <h2 className="text-2xl font-black text-on-surface tracking-tighter">
-                New Overtime Record
-              </h2>
+              <h2 className="text-2xl font-black text-on-surface tracking-tighter">Apply Overtime</h2>
             </div>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
@@ -296,7 +422,7 @@ export default function Overtime() {
               </div>
               <div>
                 <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-2">
-                  Description
+                  Reason
                 </label>
                 <textarea
                   value={formData.description}

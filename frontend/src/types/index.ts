@@ -121,6 +121,7 @@ export interface OvertimeRecord {
   updatedAt: string;
   employee?: {
     user: User;
+    team?: { id: number; name: string } | null;
   };
   approver?: {
     user: User;
@@ -154,6 +155,7 @@ export interface LeaveOverviewRow {
   employeeCode: string;
   name: string;
   email: string;
+  team?: string | null;
   year: number;
   vacation: { totalLeaves: number; usedLeaves: number; availableLeaves: number };
   sick: { totalLeaves: number; usedLeaves: number; availableLeaves: number };

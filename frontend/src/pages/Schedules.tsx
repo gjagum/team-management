@@ -366,7 +366,7 @@ export default function Schedules() {
               {displayDates.map(d => {
                 const isToday = formatDateKey(d) === formatDateKey(new Date());
                 return (
-                  <th key={formatDateKey(d)} className={`px-1 py-3 text-center text-[10px] font-black uppercase tracking-[0.15em] ${viewMode === 'month' ? 'min-w-[80px]' : 'min-w-[130px]'} ${isToday ? 'text-primary bg-primary/5' : 'text-zinc-700'}`}>
+                  <th key={formatDateKey(d)} className={`px-1 py-3 text-center text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] ${viewMode === 'month' ? 'min-w-[80px]' : 'min-w-[130px]'} ${isToday ? 'bg-primary/5' : ''}`}>
                     <div>{DAY_NAMES[d.getDay()]}</div>
                     <div className="text-sm">{d.getDate()}</div>
                   </th>

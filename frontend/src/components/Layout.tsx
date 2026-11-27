@@ -44,19 +44,42 @@ export default function Layout() {
     children?: NavChild[];
   }
 
+  // The Leave entry is role-aware: employees get a single link, managers see
+  // their team's leave, admins see the whole company.
+  const leaveItem: NavItem =
+    user?.role === 'EMPLOYEE'
+      ? { name: 'Leave', href: '/leaves', icon: 'event_busy' }
+      : {
+          name: 'Leave',
+          href: '/leaves',
+          icon: 'event_busy',
+          children: [
+            { name: 'Personal Leave', href: '/leaves' },
+            {
+              name: user?.role === 'ADMIN' ? 'Company Leave' : 'Team Leave',
+              href: '/leaves/monitor',
+            },
+          ],
+        };
+
   const navigation: NavItem[] = [
     { name: "Dashboard", href: "/dashboard", icon: "dashboard" },
     { name: "Schedules", href: "/schedules", icon: "calendar_month" },
-    {
-      name: "Leave",
-      href: "/leaves",
-      icon: "event_busy",
-      children: [
-        { name: "Personal Leave", href: "/leaves" },
-        { name: "Company Leave", href: "/leaves/monitor", roles: ["ADMIN", "MANAGER", "TEAM_LEADER"] },
-      ],
-    },
-    { name: "Overtime", href: "/overtime", icon: "schedule" },
+    leaveItem,
+    user?.role === 'ADMIN' || user?.role === 'MANAGER' || user?.role === 'TEAM_LEADER'
+      ? {
+          name: 'Overtime',
+          href: '/overtime',
+          icon: 'schedule',
+          children: [
+            { name: 'Personal Overtime', href: '/overtime' },
+            {
+              name: user?.role === 'ADMIN' ? 'Company Overtime' : 'Team Overtime',
+              href: '/overtime/company',
+            },
+          ],
+        }
+      : { name: 'Overtime', href: '/overtime', icon: 'schedule' },
     {
       name: "Employees",
       href: "/users",
@@ -206,7 +229,7 @@ export default function Layout() {
                 <Link
                   to={item.href}
                   onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm tracking-wide uppercase transition-all duration-300 ${
+                  className={`flex items-center gap-3 px-4 py-1.5 rounded-lg font-medium text-sm tracking-wide uppercase transition-all duration-300 ${
                     isActive
                       ? "text-violet-700 bg-zinc-200/50 border-r-4 border-violet-700"
                       : "text-zinc-600 hover:text-violet-700 hover:translate-x-1"
@@ -222,7 +245,7 @@ export default function Layout() {
                       key={child.name}
                       to={child.href}
                       onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center pl-12 pr-4 py-2 rounded-lg text-xs font-semibold tracking-wide uppercase transition-colors duration-200 ${
+                      className={`flex items-center pl-12 pr-4 py-1 rounded-lg text-xs font-semibold tracking-wide uppercase transition-colors duration-200 ${
                         childActive
                           ? "text-violet-700 bg-zinc-200/40"
                           : "text-zinc-500 hover:text-violet-700 hover:bg-zinc-100"
@@ -238,7 +261,7 @@ export default function Layout() {
         </nav>
 
         <div className="mt-auto flex flex-col gap-1 border-t border-zinc-200 pt-6">
-          <div className="flex items-center gap-3 px-4 py-3 mb-2">
+          <div className="flex items-center gap-3 px-4 py-2 mb-1">
             <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
               {user?.fullName?.charAt(0).toUpperCase() || "U"}
             </div>
@@ -253,7 +276,7 @@ export default function Layout() {
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-600 hover:text-violet-700 hover:translate-x-1 transition-all duration-300 font-medium text-sm tracking-wide uppercase"
+            className="flex items-center gap-3 px-4 py-1.5 rounded-lg text-zinc-600 hover:text-violet-700 hover:translate-x-1 transition-all duration-300 font-medium text-sm tracking-wide uppercase"
           >
             <span className="material-symbols-outlined">logout</span>
             <span>Logout</span>

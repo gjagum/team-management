@@ -389,14 +389,14 @@ export default function EmployeeDetail() {
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => handleDownload(doc)}
-                              className="p-2 hover:bg-zinc-100 rounded-lg text-zinc-400 hover:text-primary transition-colors"
+                              className="w-9 h-9 inline-flex items-center justify-center rounded-lg text-zinc-400 hover:text-primary hover:bg-zinc-100 transition-colors"
                               title="Download"
                             >
                               <span className="material-symbols-outlined text-lg">download</span>
                             </button>
                             <button
                               onClick={() => handleDeleteDoc(doc.id)}
-                              className="p-2 hover:bg-red-50 rounded-lg text-zinc-400 hover:text-red-600 transition-colors"
+                              className="w-9 h-9 inline-flex items-center justify-center rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                               title="Delete"
                             >
                               <span className="material-symbols-outlined text-lg">delete</span>
@@ -502,7 +502,7 @@ export default function EmployeeDetail() {
                         )}
                         <button
                           onClick={() => handleDeleteTask(task.id)}
-                          className="p-2 hover:bg-red-50 rounded-lg text-zinc-400 hover:text-red-600 transition-colors"
+                          className="w-9 h-9 inline-flex items-center justify-center rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                           title="Delete task"
                         >
                           <span className="material-symbols-outlined text-base">close</span>

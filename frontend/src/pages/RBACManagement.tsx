@@ -283,7 +283,7 @@ export default function RBACManagement() {
                       <td className="px-8 py-6 text-right">
                         <button
                           onClick={() => handleDeletePermission(perm.id)}
-                          className="p-2 hover:bg-red-50 rounded-lg text-zinc-400 hover:text-red-600 transition-colors"
+                          className="w-9 h-9 inline-flex items-center justify-center rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                           title="Delete"
                         >
                           <span className="material-symbols-outlined text-lg">delete</span>

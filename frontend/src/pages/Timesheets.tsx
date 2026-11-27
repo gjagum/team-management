@@ -200,15 +200,15 @@ export default function Timesheets() {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-surface-container-low p-6 rounded-xl border-b-4 border-zinc-200">
-              <span className="text-label">Regular Time</span>
+              <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Regular Time</span>
               <h3 className="text-3xl font-black text-on-surface tracking-tighter mt-2">{preview.summary.totalRegularHours.toFixed(2)} <span className="text-sm font-bold text-zinc-400">HRS</span></h3>
             </div>
             <div className="bg-surface-container-low p-6 rounded-xl border-b-4 border-zinc-200">
-              <span className="text-label">Overtime</span>
+              <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Overtime</span>
               <h3 className="text-3xl font-black text-on-surface tracking-tighter mt-2">{preview.summary.totalOvertimeHours.toFixed(2)} <span className="text-sm font-bold text-zinc-400">HRS</span></h3>
             </div>
             <div className="bg-surface-container-low p-6 rounded-xl border-b-4 border-primary/20">
-              <span className="text-label">Hourly Rate</span>
+              <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Hourly Rate</span>
               <h3 className="text-3xl font-black text-on-surface tracking-tighter mt-2">{formatCurrency(preview.summary.hourlyRate, preview.summary.currency)}</h3>
             </div>
             <div className="bg-primary p-6 rounded-xl editorial-shadow-lg flex flex-col justify-between">
