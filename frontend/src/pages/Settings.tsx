@@ -248,14 +248,14 @@ export default function Settings() {
   }
 
   return (
-    <div className="space-y-12 max-w-4xl">
+    <div className="space-y-6 max-w-4xl">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
                     <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
             Settings
           </h1>
-          <p className="text-zinc-500 mt-2 max-w-md">
+          <p className="text-zinc-500 mt-1 max-w-md">
             Configure application-wide settings for employee management.
           </p>
         </div>
@@ -334,7 +334,7 @@ export default function Settings() {
                   return (
                     <div
                       key={setting.key}
-                      className={`px-8 py-6 flex items-start gap-6 transition-colors ${isChanged ? 'bg-primary/[0.02]' : 'hover:bg-zinc-50/50'}`}
+                      className={`px-8 py-6 flex items-start gap-4 transition-colors ${isChanged ? 'bg-primary/[0.02]' : 'hover:bg-zinc-50/50'}`}
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">

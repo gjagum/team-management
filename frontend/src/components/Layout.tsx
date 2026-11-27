@@ -1,12 +1,29 @@
 import React from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.tsx";
+import api from "../services/api.ts";
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [quote, setQuote] = React.useState<{ text: string; author: string } | null>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    api
+      .get<{ text: string; author: string }>("/quotes/daily")
+      .then((res) => {
+        if (!cancelled) setQuote(res.data);
+      })
+      .catch(() => {
+        /* keep the fallback line below */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -35,7 +52,7 @@ export default function Layout() {
       href: "/leaves",
       icon: "event_busy",
       children: [
-        { name: "My Leave", href: "/leaves" },
+        { name: "Personal Leave", href: "/leaves" },
         { name: "Company Leave", href: "/leaves/monitor", roles: ["ADMIN", "MANAGER", "TEAM_LEADER"] },
       ],
     },
@@ -63,6 +80,12 @@ export default function Layout() {
       href: "/rbac",
       icon: "security",
       roles: ["ADMIN"],
+    },
+    {
+      name: "Activity Log",
+      href: "/activity",
+      icon: "history",
+      roles: ["ADMIN", "MANAGER"],
     },
     { name: "Settings", href: "/settings", icon: "settings", roles: ["ADMIN"] },
   ];
@@ -156,7 +179,7 @@ export default function Layout() {
 
       {/* Side Navigation */}
       <aside
-        className={`fixed left-0 top-0 h-full w-64 bg-zinc-50 flex-col py-8 px-4 gap-6 pt-24 lg:pt-28 z-40 transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 h-full w-64 bg-zinc-50 flex-col py-8 px-4 gap-4 pt-24 lg:pt-28 z-40 transform transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen
             ? "translate-x-0 flex"
             : "-translate-x-full lg:flex hidden lg:block"
@@ -240,11 +263,17 @@ export default function Layout() {
 
       {/* Main Content */}
       <div className="lg:pl-64 pt-16 min-h-screen">
-        <main className="max-w-[1200px] mx-auto p-8 lg:p-12">
-          {/* Reminder shown on every page */}
-          <div className="bg-primary/5 border border-primary/15 rounded-xl px-6 py-4 mb-10">
+        <main className="max-w-[1200px] mx-auto p-6 lg:p-8">
+          {/* Quote of the Day (changes daily, same for everyone) */}
+          <div className="bg-primary/5 border border-primary/15 rounded-xl px-6 py-4 mb-6">
+            <p className="text-[9px] font-bold text-primary/70 uppercase tracking-[0.2em] mb-1">
+              Quote of the Day
+            </p>
             <p className="font-bold text-primary tracking-tight">
-              A small update today saves a big correction later.
+              &ldquo;{quote?.text ?? 'A small update today saves a big correction later.'}&rdquo;
+              {quote?.author ? (
+                <span className="font-medium text-primary/80"> &mdash; {quote.author}</span>
+              ) : null}
             </p>
           </div>
           <Outlet />

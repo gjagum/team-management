@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { Team, Employee } from '../types';
+import Pagination from '../components/Pagination';
 
 export default function Teams() {
   const [teams, setTeams] = useState<Team[]>([]);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 6;
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -151,8 +154,8 @@ export default function Teams() {
           <p className="text-zinc-500">Create your first team to organize employees and manage approvals.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {teams.map((team) => (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {teams.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((team) => (
             <div key={team.id} className="bg-white rounded-xl border border-zinc-200 overflow-hidden hover:shadow-md transition-shadow">
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
@@ -240,6 +243,8 @@ export default function Teams() {
           ))}
         </div>
       )}
+
+      <Pagination page={page} pageSize={PAGE_SIZE} total={teams.length} onPageChange={setPage} />
 
       {/* Create/Edit Team Modal */}
       {showModal && (

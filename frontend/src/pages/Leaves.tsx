@@ -5,6 +5,7 @@ import { LeaveRequest, LeaveBalance, LeaveOverviewRow } from '../types/index.ts'
 import { formatDate, getStatusColor } from '../utils/helpers.tsx';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import { useNotification } from '../contexts/NotificationContext.tsx';
+import Pagination from '../components/Pagination.tsx';
 
 type LeaveView = 'apply' | 'monitor';
 
@@ -30,6 +31,9 @@ export default function Leaves() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [personalPage, setPersonalPage] = useState(1);
+  const [companyPage, setCompanyPage] = useState(1);
+  const PAGE_SIZE = 10;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [formData, setFormData] = useState({
     leaveType: 'VACATION',
@@ -266,6 +270,9 @@ export default function Leaves() {
     [leaves, canMonitor, user?.employee?.id],
   );
 
+  const pagedLeaves = myLeaves.slice((personalPage - 1) * PAGE_SIZE, personalPage * PAGE_SIZE);
+  const pagedOverview = overview.slice((companyPage - 1) * PAGE_SIZE, companyPage * PAGE_SIZE);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -279,10 +286,10 @@ export default function Leaves() {
     return <Navigate to="/leaves" replace />;
   }
 
-  const th = 'px-6 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] whitespace-nowrap';
+  const th = 'px-6 py-5 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] whitespace-nowrap';
   const td = 'px-6 py-4 text-xs text-zinc-600 align-middle';
   // Company Leave table is denser than the request list.
-  const mth = 'px-4 py-2 text-[10px] font-black text-zinc-700 uppercase tracking-[0.12em] whitespace-nowrap';
+  const mth = 'px-4 py-2 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] whitespace-nowrap';
   const mtd = 'px-4 py-2 text-xs text-zinc-600';
   // Same footprint for the three action buttons; only the purple shade differs.
   const actionButton =
@@ -300,7 +307,7 @@ export default function Leaves() {
     data: { totalLeaves: number; usedLeaves: number; availableLeaves: number } | undefined,
   ) => (
     <div className="border border-zinc-200 rounded-xl p-5 bg-surface-container-lowest">
-      <h2 className="text-base font-black text-on-surface tracking-tight mb-4">{title}</h2>
+      <h2 className="text-base font-black text-on-surface tracking-tight mb-3">{title}</h2>
       <div className="grid grid-cols-3 gap-3">
         {summaryCard('Total Allocation', Number(data?.totalLeaves ?? 0).toFixed(2), 'border-primary/20')}
         {summaryCard('Used Days', Number(data?.usedLeaves ?? 0).toFixed(2), 'border-amber-200')}
@@ -310,17 +317,17 @@ export default function Leaves() {
   );
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
           <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
-            {view === 'monitor' ? 'Company Leave' : 'My Leave'}
+            {view === 'monitor' ? 'Company Leave' : 'Personal Leave'}
           </h1>
-          <p className="text-zinc-500 mt-2 max-w-md">
+          <p className="text-zinc-500 mt-1 max-w-md">
             {view === 'monitor'
               ? 'Leave balances of all employees.'
-              : 'Leave balances, application, and records.'}
+              : 'Leave application, balances and records.'}
           </p>
         </div>
         {view === 'apply' && (
@@ -337,8 +344,8 @@ export default function Leaves() {
       {/* Sub-menu lives in the sidebar under Leave */}
 
       {view === 'apply' && (
-        <div className="space-y-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {allocationSection('Paid Vacation Leave', vacation)}
             {allocationSection('Paid Sick Leave', sick)}
           </div>
@@ -360,7 +367,7 @@ export default function Leaves() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-100">
-                    {myLeaves.map((leave) => (
+                    {pagedLeaves.map((leave) => (
                       <tr key={leave.id} className="hover:bg-zinc-50 transition-colors duration-200">
                         <td className={`${td} whitespace-nowrap font-medium text-on-surface`}>
                           {labelFor(leave.leaveType)}
@@ -422,6 +429,7 @@ export default function Leaves() {
                   </tbody>
                 </table>
               </div>
+              <Pagination page={personalPage} pageSize={PAGE_SIZE} total={myLeaves.length} onPageChange={setPersonalPage} />
             </div>
           </div>
 
@@ -481,7 +489,7 @@ export default function Leaves() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
-                  {overview.map((row) => (
+                  {pagedOverview.map((row) => (
                     <tr key={row.employeeId} className="hover:bg-zinc-50 transition-colors duration-200">
                       <td className={`${mtd} font-bold text-on-surface whitespace-nowrap`}>{row.name}</td>
                       <td className={`${mtd} text-center`}>{Number(row.vacation.totalLeaves).toFixed(2)}</td>
@@ -500,6 +508,7 @@ export default function Leaves() {
                 </tbody>
               </table>
             </div>
+            <Pagination page={companyPage} pageSize={PAGE_SIZE} total={overview.length} onPageChange={setCompanyPage} />
           </div>
         </div>
       )}

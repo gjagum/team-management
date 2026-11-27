@@ -193,13 +193,13 @@ export default function EmployeeDetail() {
   ];
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
                     <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
             {employee.user?.fullName || employee.id}
           </h1>
-          <p className="text-zinc-500 mt-2 max-w-md flex items-center gap-3">
+          <p className="text-zinc-500 mt-1 max-w-md flex items-center gap-3">
             <span className="inline-block px-3 py-1 bg-zinc-100 text-zinc-600 text-[10px] font-bold uppercase tracking-wider rounded">
               {employee.employeeCode}
             </span>
@@ -290,7 +290,7 @@ export default function EmployeeDetail() {
 
       {/* Documents Tab */}
       {activeTab === 'documents' && (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Upload Form */}
           <div className="bg-surface-container-lowest editorial-shadow rounded-xl p-8">
             <h3 className="text-lg font-black text-on-surface tracking-tight mb-6">Upload Document</h3>
@@ -342,10 +342,10 @@ export default function EmployeeDetail() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-zinc-50">
-                    <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">File</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Type</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Size</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Uploaded</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">File</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Type</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Size</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Uploaded</th>
                     <th className="px-8 py-5 text-right"></th>
                   </tr>
                 </thead>
@@ -415,7 +415,7 @@ export default function EmployeeDetail() {
 
       {/* Onboarding Tab */}
       {activeTab === 'onboarding' && (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Progress Card */}
           {onboarding && onboarding.tasks.length > 0 && (
             <div className="bg-surface-container-lowest editorial-shadow rounded-xl p-8">

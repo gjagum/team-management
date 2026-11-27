@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import api from '../services/api';
 import { User as UserType } from '../types';
 import { formatDate } from '../utils/helpers';
+import Pagination from '../components/Pagination';
 
 interface TeamOption {
   id: number;
@@ -17,6 +18,8 @@ export default function Users() {
   const [activatingUser, setActivatingUser] = useState<UserType | null>(null);
   const [editingUser, setEditingUser] = useState<UserType | null>(null);
   const [teamFilter, setTeamFilter] = useState<string>('ALL');
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [importing, setImporting] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [formData, setFormData] = useState({
@@ -182,9 +185,23 @@ export default function Users() {
   }, [users]);
 
   const visibleUsers = useMemo(() => {
-    if (teamFilter === 'ALL') return users;
-    return users.filter((u) => u.employee?.team?.name === teamFilter);
-  }, [users, teamFilter]);
+    const term = search.trim().toLowerCase();
+    return users.filter((u) => {
+      if (teamFilter !== 'ALL' && u.employee?.team?.name !== teamFilter) return false;
+      if (!term) return true;
+      return (
+        (u.employee?.employeeCode ?? '').toLowerCase().includes(term) ||
+        u.fullName.toLowerCase().includes(term)
+      );
+    });
+  }, [users, teamFilter, search]);
+
+  const PAGE_SIZE = 10;
+  const pagedUsers = visibleUsers.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  useEffect(() => {
+    setPage(1);
+  }, [teamFilter, search]);
 
   const csvCell = (value: string) => (/[",\r\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value);
 
@@ -377,34 +394,47 @@ export default function Users() {
     'w-36 h-10 rounded-lg inline-flex items-center justify-center gap-2 font-bold text-xs uppercase tracking-wider transition-all active:scale-95';
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-6">
       {/* Page Header */}
       <div>
                 <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
           Employees
         </h1>
-        <p className="text-zinc-500 mt-2 max-w-xl">
+        <p className="text-zinc-500 mt-1 max-w-xl">
           Manage employee profiles, roles and system access in one place.
         </p>
       </div>
 
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <label className="flex items-center gap-3 pl-5">
-          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em]">Team</span>
-          <select
-            value={teamFilter}
-            onChange={(e) => setTeamFilter(e.target.value)}
-            className="px-4 py-2 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
-          >
-            <option value="ALL">All teams</option>
-            {teamNames.map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="flex flex-col gap-3 pl-5">
+          <label className="flex items-center gap-3">
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em]">Team</span>
+            <select
+              value={teamFilter}
+              onChange={(e) => setTeamFilter(e.target.value)}
+              className="px-4 py-2 bg-surface-container-low border-none rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+            >
+              <option value="ALL">All teams</option>
+              {teamNames.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-lg w-full sm:w-72">
+            <span className="material-symbols-outlined text-zinc-400 text-lg">search</span>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search ID No. or name"
+              className="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-full placeholder:text-zinc-400"
+            />
+          </div>
+        </div>
 
         <div className="flex items-center gap-2">
           <input
@@ -465,7 +495,7 @@ export default function Users() {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
-              {visibleUsers.map((user) => (
+              {pagedUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-zinc-50 transition-colors duration-200 group">
                   <td className={`${td} font-bold text-primary whitespace-nowrap font-mono`}>
                     {user.employee?.employeeCode || '—'}
@@ -532,6 +562,7 @@ export default function Users() {
             </tbody>
           </table>
         </div>
+        <Pagination page={page} pageSize={PAGE_SIZE} total={visibleUsers.length} onPageChange={setPage} />
       </div>
 
       {/* Create / edit modal */}

@@ -100,14 +100,14 @@ export default function RBACManagement() {
   });
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
                     <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
             Roles & Permissions
           </h1>
-          <p className="text-zinc-500 mt-2 max-w-md">
+          <p className="text-zinc-500 mt-1 max-w-md">
             Configure role-based access control, manage permissions, and define resource-level authorization rules.
           </p>
         </div>
@@ -149,7 +149,7 @@ export default function RBACManagement() {
 
       {/* Matrix View */}
       {activeTab === 'matrix' && summary && (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {summary.roles.map(({ role, permissions: rolePerms }: { role: Role; permissions: { id: number; permissionId: number; name: string; resource: string; action: string }[] }) => (
             <div key={role} className="bg-surface-container-lowest editorial-shadow rounded-xl overflow-hidden">
               <div className="px-8 py-5 bg-zinc-50 border-b border-zinc-100 flex items-center justify-between">
@@ -169,7 +169,7 @@ export default function RBACManagement() {
               <div className="p-8">
                 {Object.entries(groupedPermissions).map(([resource, perms]) => (
                   <div key={resource} className="mb-6 last:mb-0">
-                    <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-3">
+                    <h3 className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] mb-3">
                       {resource}
                     </h3>
                     <div className="flex flex-wrap gap-2">
@@ -235,11 +235,11 @@ export default function RBACManagement() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-zinc-50">
-                  <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Name</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Resource</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Action</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Description</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Roles</th>
+                  <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Name</th>
+                  <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Resource</th>
+                  <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Action</th>
+                  <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Description</th>
+                  <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Roles</th>
                   <th className="px-8 py-6 text-right"></th>
                 </tr>
               </thead>

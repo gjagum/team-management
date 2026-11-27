@@ -5,12 +5,15 @@ import { OvertimeRecord } from '../types';
 import { formatDate, formatDateTime, getStatusColor } from '../utils/helpers';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
+import Pagination from '../components/Pagination';
 
 export default function Overtime() {
   const { showNotification } = useNotification();
   const location = useLocation();
   const navigate = useNavigate();
   const [overtimeRecords, setOvertimeRecords] = useState<OvertimeRecord[]>([]);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -101,14 +104,14 @@ export default function Overtime() {
   const pendingCount = overtimeRecords.filter(r => r.status === 'PENDING').length;
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
                     <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
             Overtime Ledger
           </h1>
-          <p className="text-zinc-500 mt-2 max-w-md">
+          <p className="text-zinc-500 mt-1 max-w-md">
             Track, authorize, and analyze extended work hours across all personnel.
           </p>
         </div>
@@ -122,7 +125,7 @@ export default function Overtime() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-40 border-b-4 border-primary/20">
           <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Approved Hours</span>
           <div className="flex items-end justify-between">
@@ -152,17 +155,17 @@ export default function Overtime() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-zinc-50">
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Personnel</th>
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Date</th>
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Time Block</th>
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Hours</th>
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Description</th>
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Status</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Personnel</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Date</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Time Block</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Hours</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Description</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Status</th>
                 <th className="px-8 py-6 text-right"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
-              {overtimeRecords.map((record) => (
+              {overtimeRecords.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((record) => (
                 <tr key={record.id} className="hover:bg-zinc-50 transition-colors duration-200 group">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
@@ -230,6 +233,7 @@ export default function Overtime() {
             </tbody>
           </table>
         </div>
+        <Pagination page={page} pageSize={PAGE_SIZE} total={overtimeRecords.length} onPageChange={setPage} />
       </div>
 
       {/* Footer */}

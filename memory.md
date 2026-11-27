@@ -57,6 +57,11 @@
 | 2026-11-26 | Leave sub-menus moved into the sidebar as indented children of Leave (`/leaves`, `/leaves/monitor`); Monitor hidden for employees with a redirect guard | UI | ✅ |
 | 2026-11-26 | Leave pages renamed to My Leave / Company Leave with their own headers; summary cards grouped in two bordered boxes side by side; Company Leave table denser with dark headers, "NO. OF EMPLOYEES: n" label and purple Import/Export buttons matching Apply Leave | UI | ✅ |
 | 2026-11-26 | Employees page: Team filter aligned with the ID No. column, New User / Import / Export buttons unified at 144x40 in purple shades, table rows compacted and header text darkened | UI | ✅ |
+| 2026-11-27 | Dashboard banner now shows a "Quote of the Day" from a public quote API (`GET /api/quotes/daily`), picked deterministically by date so it is stable all day and changes daily; falls back to a bundled list offline | UI | ✅ |
+| 2026-11-27 | Quote of the Day switched to a curated pool tagged optimism / teamwork / work values / healthy environment / mental wellness; the theme rotates daily (5-day cycle) and the quote is date-picked, so it stays stable all day | UI | ✅ |
+| 2026-11-27 | Admin dashboard: six company metrics (`/api/dashboard/stats`) plus an audit-driven activity feed with All/Leave/Overtime/Employees/System filters and a paginated Activity Log page (`/activity`); Employees gains an ID/name search; shared pagination applied to Employees, leave lists, Overtime, Teams and Activity | UI | ✅ |
+| 2026-11-27 | Compacted vertical rhythm across pages: section spacing 32–48px → 24px, card grid gaps 20–24px → 16px, heading→caption 8px → 4px, banner margin 40px → 24px, main padding 32/48px → 24/32px | UI | ✅ |
+| 2026-11-27 | Standardised every table header to one style: 10px, black weight, zinc-700, uppercase, 0.15em tracking (Employees, Leave lists, Overtime, Timesheets, Schedules, RBAC, Employee Detail); dashboard activity feed now uses category badges like the Activity Log | UI | ✅ |
 | 2026-11-23 | Prisma Studio now loads data: pinned the Neon pooler hostname to its IPv4 (`13.228.46.236`) in the Windows hosts file, since the engine's IPv6-first resolution caused P1001 (`13.228.46.236 ep-purple-river-a1xah0gz-pooler.ap-southeast-1.aws.neon.tech`) | DevOps | ✅ |
 
 ## Active Task

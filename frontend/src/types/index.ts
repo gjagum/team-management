@@ -159,6 +159,36 @@ export interface LeaveOverviewRow {
   sick: { totalLeaves: number; usedLeaves: number; availableLeaves: number };
 }
 
+export interface DashboardStats {
+  activeEmployees: number;
+  onLeaveToday: number;
+  pendingLeaves: number;
+  leaveUtilization: { used: number; total: number; percent: number };
+  pendingOvertime: number;
+  overtimeThisMonth: { hours: number; average: number };
+}
+
+export type ActivityCategory = 'all' | 'leave' | 'overtime' | 'employees' | 'system';
+
+export interface ActivityItem {
+  id: number;
+  at: string;
+  actor: string;
+  actorEmail: string;
+  action: string;
+  entityType: string;
+  entityId: number | null;
+  category: Exclude<ActivityCategory, 'all'>;
+  summary: string;
+}
+
+export interface ActivityResponse {
+  total: number;
+  page: number;
+  pageSize: number;
+  items: ActivityItem[];
+}
+
 export interface Permission {
   id: number;
   name: string;
