@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, Navigate } from 'react-router-dom';
 import api from '../services/api.ts';
 import { LeaveRequest, LeaveBalance, LeaveOverviewRow } from '../types/index.ts';
 import { formatDate, getStatusColor } from '../utils/helpers.tsx';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import { useNotification } from '../contexts/NotificationContext.tsx';
+import Pagination from '../components/Pagination.tsx';
 
 type LeaveView = 'apply' | 'monitor';
 
@@ -29,8 +30,10 @@ export default function Leaves() {
   const [overview, setOverview] = useState<LeaveOverviewRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [importing, setImporting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [personalPage, setPersonalPage] = useState(1);
+  const [companyPage, setCompanyPage] = useState(1);
+  const [teamFilter, setTeamFilter] = useState('ALL');
+  const PAGE_SIZE = 10;
   const [formData, setFormData] = useState({
     leaveType: 'VACATION',
     startDate: '',
@@ -154,110 +157,6 @@ export default function Leaves() {
     URL.revokeObjectURL(url);
   };
 
-  const parseCsv = (text: string): string[][] => {
-    const rows: string[][] = [];
-    let row: string[] = [];
-    let field = '';
-    let quoted = false;
-    const src = text.replace(/^\uFEFF/, '');
-    for (let i = 0; i < src.length; i++) {
-      const ch = src[i];
-      if (quoted) {
-        if (ch === '"' && src[i + 1] === '"') {
-          field += '"';
-          i++;
-        } else if (ch === '"') {
-          quoted = false;
-        } else {
-          field += ch;
-        }
-      } else if (ch === '"') {
-        quoted = true;
-      } else if (ch === ',') {
-        row.push(field);
-        field = '';
-      } else if (ch === '\n' || ch === '\r') {
-        if (ch === '\r' && src[i + 1] === '\n') i++;
-        row.push(field);
-        rows.push(row);
-        row = [];
-        field = '';
-      } else {
-        field += ch;
-      }
-    }
-    if (field.length > 0 || row.length > 0) {
-      row.push(field);
-      rows.push(row);
-    }
-    return rows.filter((r) => r.some((c) => c.trim() !== ''));
-  };
-
-  const handleImportFile = async (file: File) => {
-    setImporting(true);
-    try {
-      const table = parseCsv(await file.text());
-      if (table.length < 2) {
-        alert('That CSV has no data rows.');
-        return;
-      }
-      const header = table[0].map((h) => h.trim().toLowerCase());
-      const col = (...names: string[]) => {
-        for (const n of names) {
-          const i = header.indexOf(n);
-          if (i >= 0) return i;
-        }
-        return -1;
-      };
-      const get = (row: string[], ...names: string[]) => {
-        const i = col(...names);
-        return i >= 0 ? (row[i] ?? '').trim() : '';
-      };
-      const byEmail = new Map(overview.map((r) => [r.email.toLowerCase(), r]));
-
-      let updated = 0;
-      const failures: string[] = [];
-      for (const row of table.slice(1)) {
-        const email = get(row, 'email', 'email address');
-        const target = email ? byEmail.get(email.toLowerCase()) : undefined;
-        if (!target) {
-          if (email) failures.push(`${email}: not found`);
-          continue;
-        }
-        const vacationTotal = get(row, 'paid vacation leave - total allocation', 'vacation total', 'vacation');
-        const sickTotal = get(row, 'paid sick leave - total allocation', 'sick total', 'sick');
-        try {
-          if (vacationTotal !== '') {
-            await api.put(`/leaves/allocations/${target.employeeId}`, {
-              leaveType: 'VACATION',
-              totalLeaves: Number(vacationTotal),
-            });
-          }
-          if (sickTotal !== '') {
-            await api.put(`/leaves/allocations/${target.employeeId}`, {
-              leaveType: 'SICK',
-              totalLeaves: Number(sickTotal),
-            });
-          }
-          updated++;
-        } catch (err: any) {
-          failures.push(`${email}: ${err.response?.data?.error || err.message}`);
-        }
-      }
-
-      await fetchOverview();
-      alert(
-        `Import finished.\nUpdated: ${updated}\nFailed: ${failures.length}` +
-          (failures.length ? `\n\n${failures.slice(0, 5).join('\n')}` : ''),
-      );
-    } catch (err: any) {
-      alert(`Import failed: ${err.message}`);
-    } finally {
-      setImporting(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
-  };
-
   const myLeaves = useMemo(
     () =>
       canMonitor
@@ -265,6 +164,43 @@ export default function Leaves() {
         : leaves.filter((l) => l.employeeId === user?.employee?.id),
     [leaves, canMonitor, user?.employee?.id],
   );
+
+  const pagedLeaves = myLeaves.slice((personalPage - 1) * PAGE_SIZE, personalPage * PAGE_SIZE);
+
+  const handleExportPersonal = () => {
+    const header = ['Type', 'Start Date', 'End Date', 'Duration', 'Reason', 'Status'];
+    const rows = myLeaves.map((l) => [
+      labelFor(l.leaveType),
+      l.startDate.slice(0, 10),
+      l.endDate.slice(0, 10),
+      Number(l.days).toFixed(2),
+      l.reason ?? '',
+      l.status,
+    ]);
+    const cell = (v: string) => (/[",\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+    const csv = [header, ...rows].map((r) => r.map(cell).join(',')).join('\r\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `personal-leave-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const isAdmin = user?.role === 'ADMIN';
+  const monitorTitle = isAdmin ? 'Company Leave' : 'Team Leave';
+  const monitorCaption = isAdmin ? 'Leave balances of all employees.' : 'Leave balances of your team.';
+
+  const teamNames = useMemo(
+    () => Array.from(new Set(overview.map((r) => r.team).filter((t): t is string => Boolean(t)))).sort(),
+    [overview],
+  );
+  const visibleOverview = useMemo(
+    () => (teamFilter === 'ALL' ? overview : overview.filter((r) => r.team === teamFilter)),
+    [overview, teamFilter],
+  );
+  const pagedOverview = visibleOverview.slice((companyPage - 1) * PAGE_SIZE, companyPage * PAGE_SIZE);
 
   if (loading) {
     return (
@@ -279,18 +215,17 @@ export default function Leaves() {
     return <Navigate to="/leaves" replace />;
   }
 
-  const th = 'px-6 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] whitespace-nowrap';
+  const th = 'px-6 py-5 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] whitespace-nowrap';
   const td = 'px-6 py-4 text-xs text-zinc-600 align-middle';
   // Company Leave table is denser than the request list.
-  const mth = 'px-4 py-2 text-[10px] font-black text-zinc-700 uppercase tracking-[0.12em] whitespace-nowrap';
+  const mth = 'px-4 py-2 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] whitespace-nowrap';
   const mtd = 'px-4 py-2 text-xs text-zinc-600';
-  // Same footprint for the three action buttons; only the purple shade differs.
-  const actionButton =
-    'w-44 h-11 rounded-lg inline-flex items-center justify-center gap-2 font-bold text-sm uppercase tracking-wider transition-all active:scale-95';
+  // Same footprint for the toolbar buttons; only the purple shade differs.
+  const actionButton = 'btn-toolbar active:scale-95';
 
   const summaryCard = (label: string, value: string, accent: string) => (
     <div className={`bg-surface-container-low px-3 py-3 rounded-lg flex flex-col justify-between h-24 border-b-4 ${accent}`}>
-      <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.1em] leading-tight">{label}</span>
+      <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] leading-tight">{label}</span>
       <h3 className="text-2xl font-black text-on-surface tracking-tighter">{value}</h3>
     </div>
   );
@@ -300,7 +235,7 @@ export default function Leaves() {
     data: { totalLeaves: number; usedLeaves: number; availableLeaves: number } | undefined,
   ) => (
     <div className="border border-zinc-200 rounded-xl p-5 bg-surface-container-lowest">
-      <h2 className="text-base font-black text-on-surface tracking-tight mb-4">{title}</h2>
+      <h2 className="text-base font-black text-on-surface tracking-tight mb-3">{title}</h2>
       <div className="grid grid-cols-3 gap-3">
         {summaryCard('Total Allocation', Number(data?.totalLeaves ?? 0).toFixed(2), 'border-primary/20')}
         {summaryCard('Used Days', Number(data?.usedLeaves ?? 0).toFixed(2), 'border-amber-200')}
@@ -310,17 +245,17 @@ export default function Leaves() {
   );
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
           <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
-            {view === 'monitor' ? 'Company Leave' : 'My Leave'}
+            {view === 'monitor' ? monitorTitle : 'Personal Leave'}
           </h1>
-          <p className="text-zinc-500 mt-2 max-w-md">
+          <p className="text-zinc-500 mt-1 max-w-md">
             {view === 'monitor'
-              ? 'Leave balances of all employees.'
-              : 'Leave balances, application, and records.'}
+              ? monitorCaption
+              : 'Leave application, balances and records.'}
           </p>
         </div>
         {view === 'apply' && (
@@ -337,13 +272,22 @@ export default function Leaves() {
       {/* Sub-menu lives in the sidebar under Leave */}
 
       {view === 'apply' && (
-        <div className="space-y-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {allocationSection('Paid Vacation Leave', vacation)}
             {allocationSection('Paid Sick Leave', sick)}
           </div>
 
           {/* Applied leaves */}
+          <div className="flex items-center justify-end">
+            <button
+              onClick={handleExportPersonal}
+              className={`${actionButton} bg-violet-800 hover:bg-violet-900 text-white shadow-lg shadow-violet-900/20`}
+            >
+              Export CSV
+            </button>
+          </div>
+
           <div className="bg-surface-container-low p-1 rounded-xl">
             <div className="bg-surface-container-lowest editorial-shadow rounded-lg overflow-hidden">
               <div className="max-h-[28rem] overflow-y-auto">
@@ -360,7 +304,7 @@ export default function Leaves() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-100">
-                    {myLeaves.map((leave) => (
+                    {pagedLeaves.map((leave) => (
                       <tr key={leave.id} className="hover:bg-zinc-50 transition-colors duration-200">
                         <td className={`${td} whitespace-nowrap font-medium text-on-surface`}>
                           {labelFor(leave.leaveType)}
@@ -379,30 +323,28 @@ export default function Leaves() {
                           </span>
                         </td>
                         {canApprove && (
-                          <td className={`${td} text-right whitespace-nowrap`}>
-                            <div className="flex items-center justify-end gap-2">
+                          <td className={`${td} text-center whitespace-nowrap`}>
+                            <div className="flex items-center justify-center gap-2">
                               {leave.status === 'PENDING' && (
                                 <>
                                   <button
                                     onClick={() => handleApproveReject(leave.id, 'approved')}
-                                    className="p-2 hover:bg-green-50 rounded-lg text-green-600 hover:text-green-800 transition-colors"
-                                    title="Approve"
+                                    className="btn-action bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                                   >
-                                    <span className="material-symbols-outlined text-lg">check_circle</span>
+                                    Approve
                                   </button>
                                   <button
                                     onClick={() => handleApproveReject(leave.id, 'rejected')}
-                                    className="p-2 hover:bg-red-50 rounded-lg text-red-600 hover:text-red-800 transition-colors"
-                                    title="Reject"
+                                    className="btn-action bg-red-50 text-red-600 hover:bg-red-100"
                                   >
-                                    <span className="material-symbols-outlined text-lg">cancel</span>
+                                    Reject
                                   </button>
                                 </>
                               )}
                               {leave.status === 'PENDING' && leave.employeeId === user?.employee?.id && (
                                 <button
                                   onClick={() => handleCancel(leave.id)}
-                                  className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500 hover:text-red-700 hover:bg-zinc-100 rounded-lg transition-colors"
+                                  className="btn-action bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
                                 >
                                   Cancel
                                 </button>
@@ -422,6 +364,7 @@ export default function Leaves() {
                   </tbody>
                 </table>
               </div>
+              <Pagination page={personalPage} pageSize={PAGE_SIZE} total={myLeaves.length} onPageChange={setPersonalPage} />
             </div>
           </div>
 
@@ -434,27 +377,32 @@ export default function Leaves() {
       {view === 'monitor' && canMonitor && (
         <div className="space-y-6">
           <div className="flex items-center justify-between gap-4">
-            <p className="pl-5 text-[11px] font-bold text-zinc-700 uppercase tracking-[0.15em]">
-              No. of Employees: {overview.length}
-            </p>
+            <div className="flex items-center gap-3 pl-5">
+              {isAdmin && (
+                <label className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em]">Team</span>
+                  <select
+                    value={teamFilter}
+                    onChange={(e) => {
+                      setTeamFilter(e.target.value);
+                      setCompanyPage(1);
+                    }}
+                    className="px-3 py-1.5 bg-surface-container-low border-none rounded-lg text-xs font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                  >
+                    <option value="ALL">All teams</option>
+                    {teamNames.map((name) => (
+                      <option key={name} value={name}>
+                        {name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              <p className="text-[11px] font-bold text-zinc-700 uppercase tracking-[0.15em]">
+                {isAdmin ? 'No. of Employees' : 'No. of Members'}: {visibleOverview.length}
+              </p>
+            </div>
             <div className="flex items-center gap-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,text/csv"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) void handleImportFile(file);
-                }}
-              />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={importing}
-                className={`${actionButton} bg-violet-500 hover:bg-violet-600 text-white shadow-lg shadow-violet-500/20 disabled:opacity-50`}
-              >
-                {importing ? 'Importing…' : 'Import CSV'}
-              </button>
               <button
                 onClick={handleExport}
                 className={`${actionButton} bg-violet-800 hover:bg-violet-900 text-white shadow-lg shadow-violet-900/20`}
@@ -469,6 +417,7 @@ export default function Leaves() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-zinc-50">
+                    {isAdmin && <th className={mth} rowSpan={2}>Team</th>}
                     <th className={mth} rowSpan={2}>Name</th>
                     <th className={`${mth} text-center`} colSpan={2}>Paid Vacation Leave</th>
                     <th className={`${mth} text-center`} colSpan={2}>Paid Sick Leave</th>
@@ -481,8 +430,9 @@ export default function Leaves() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
-                  {overview.map((row) => (
+                  {pagedOverview.map((row) => (
                     <tr key={row.employeeId} className="hover:bg-zinc-50 transition-colors duration-200">
+                      {isAdmin && <td className={`${mtd} whitespace-nowrap`}>{row.team || '—'}</td>}
                       <td className={`${mtd} font-bold text-on-surface whitespace-nowrap`}>{row.name}</td>
                       <td className={`${mtd} text-center`}>{Number(row.vacation.totalLeaves).toFixed(2)}</td>
                       <td className={`${mtd} text-center`}>{Number(row.vacation.usedLeaves).toFixed(2)}</td>
@@ -492,14 +442,15 @@ export default function Leaves() {
                   ))}
                   {overview.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="px-6 py-8 text-center text-zinc-400 font-medium">
-                        No employees yet.
+                      <td colSpan={isAdmin ? 6 : 5} className="px-6 py-8 text-center text-zinc-400 font-medium">
+                        {isAdmin ? 'No employees yet.' : 'No employees are assigned to your team yet.'}
                       </td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
+            <Pagination page={companyPage} pageSize={PAGE_SIZE} total={visibleOverview.length} onPageChange={setCompanyPage} />
           </div>
         </div>
       )}

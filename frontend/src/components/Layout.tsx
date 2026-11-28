@@ -1,12 +1,29 @@
 import React from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.tsx";
+import api from "../services/api.ts";
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [quote, setQuote] = React.useState<{ text: string; author: string } | null>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    api
+      .get<{ text: string; author: string }>("/quotes/daily")
+      .then((res) => {
+        if (!cancelled) setQuote(res.data);
+      })
+      .catch(() => {
+        /* keep the fallback line below */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -27,19 +44,42 @@ export default function Layout() {
     children?: NavChild[];
   }
 
+  // The Leave entry is role-aware: employees get a single link, managers see
+  // their team's leave, admins see the whole company.
+  const leaveItem: NavItem =
+    user?.role === 'EMPLOYEE'
+      ? { name: 'Leave', href: '/leaves', icon: 'event_busy' }
+      : {
+          name: 'Leave',
+          href: '/leaves',
+          icon: 'event_busy',
+          children: [
+            { name: 'Personal Leave', href: '/leaves' },
+            {
+              name: user?.role === 'ADMIN' ? 'Company Leave' : 'Team Leave',
+              href: '/leaves/monitor',
+            },
+          ],
+        };
+
   const navigation: NavItem[] = [
     { name: "Dashboard", href: "/dashboard", icon: "dashboard" },
     { name: "Schedules", href: "/schedules", icon: "calendar_month" },
-    {
-      name: "Leave",
-      href: "/leaves",
-      icon: "event_busy",
-      children: [
-        { name: "My Leave", href: "/leaves" },
-        { name: "Company Leave", href: "/leaves/monitor", roles: ["ADMIN", "MANAGER", "TEAM_LEADER"] },
-      ],
-    },
-    { name: "Overtime", href: "/overtime", icon: "schedule" },
+    leaveItem,
+    user?.role === 'ADMIN' || user?.role === 'MANAGER' || user?.role === 'TEAM_LEADER'
+      ? {
+          name: 'Overtime',
+          href: '/overtime',
+          icon: 'schedule',
+          children: [
+            { name: 'Personal Overtime', href: '/overtime' },
+            {
+              name: user?.role === 'ADMIN' ? 'Company Overtime' : 'Team Overtime',
+              href: '/overtime/company',
+            },
+          ],
+        }
+      : { name: 'Overtime', href: '/overtime', icon: 'schedule' },
     {
       name: "Employees",
       href: "/users",
@@ -63,6 +103,12 @@ export default function Layout() {
       href: "/rbac",
       icon: "security",
       roles: ["ADMIN"],
+    },
+    {
+      name: "Activity Log",
+      href: "/activity",
+      icon: "history",
+      roles: ["ADMIN", "MANAGER"],
     },
     { name: "Settings", href: "/settings", icon: "settings", roles: ["ADMIN"] },
   ];
@@ -156,7 +202,7 @@ export default function Layout() {
 
       {/* Side Navigation */}
       <aside
-        className={`fixed left-0 top-0 h-full w-64 bg-zinc-50 flex-col py-8 px-4 gap-6 pt-24 lg:pt-28 z-40 transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 h-full w-64 bg-zinc-50 flex-col py-8 px-4 gap-4 pt-24 lg:pt-28 z-40 transform transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen
             ? "translate-x-0 flex"
             : "-translate-x-full lg:flex hidden lg:block"
@@ -183,7 +229,7 @@ export default function Layout() {
                 <Link
                   to={item.href}
                   onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm tracking-wide uppercase transition-all duration-300 ${
+                  className={`flex items-center gap-3 px-4 py-1.5 rounded-lg font-medium text-sm tracking-wide uppercase transition-all duration-300 ${
                     isActive
                       ? "text-violet-700 bg-zinc-200/50 border-r-4 border-violet-700"
                       : "text-zinc-600 hover:text-violet-700 hover:translate-x-1"
@@ -199,7 +245,7 @@ export default function Layout() {
                       key={child.name}
                       to={child.href}
                       onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center pl-12 pr-4 py-2 rounded-lg text-xs font-semibold tracking-wide uppercase transition-colors duration-200 ${
+                      className={`flex items-center pl-12 pr-4 py-1 rounded-lg text-xs font-semibold tracking-wide uppercase transition-colors duration-200 ${
                         childActive
                           ? "text-violet-700 bg-zinc-200/40"
                           : "text-zinc-500 hover:text-violet-700 hover:bg-zinc-100"
@@ -215,7 +261,7 @@ export default function Layout() {
         </nav>
 
         <div className="mt-auto flex flex-col gap-1 border-t border-zinc-200 pt-6">
-          <div className="flex items-center gap-3 px-4 py-3 mb-2">
+          <div className="flex items-center gap-3 px-4 py-2 mb-1">
             <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
               {user?.fullName?.charAt(0).toUpperCase() || "U"}
             </div>
@@ -230,7 +276,7 @@ export default function Layout() {
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-600 hover:text-violet-700 hover:translate-x-1 transition-all duration-300 font-medium text-sm tracking-wide uppercase"
+            className="flex items-center gap-3 px-4 py-1.5 rounded-lg text-zinc-600 hover:text-violet-700 hover:translate-x-1 transition-all duration-300 font-medium text-sm tracking-wide uppercase"
           >
             <span className="material-symbols-outlined">logout</span>
             <span>Logout</span>
@@ -240,11 +286,17 @@ export default function Layout() {
 
       {/* Main Content */}
       <div className="lg:pl-64 pt-16 min-h-screen">
-        <main className="max-w-[1200px] mx-auto p-8 lg:p-12">
-          {/* Reminder shown on every page */}
-          <div className="bg-primary/5 border border-primary/15 rounded-xl px-6 py-4 mb-10">
+        <main className="max-w-[1200px] mx-auto p-6 lg:p-8">
+          {/* Quote of the Day (changes daily, same for everyone) */}
+          <div className="bg-primary/5 border border-primary/15 rounded-xl px-6 py-4 mb-6">
+            <p className="text-[9px] font-bold text-primary/70 uppercase tracking-[0.2em] mb-1">
+              Quote of the Day
+            </p>
             <p className="font-bold text-primary tracking-tight">
-              A small update today saves a big correction later.
+              &ldquo;{quote?.text ?? 'A small update today saves a big correction later.'}&rdquo;
+              {quote?.author ? (
+                <span className="font-medium text-primary/80"> &mdash; {quote.author}</span>
+              ) : null}
             </p>
           </div>
           <Outlet />

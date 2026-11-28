@@ -32,14 +32,14 @@ export default function Employees() {
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
                     <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
             Global Directory
           </h1>
-          <p className="text-zinc-500 mt-2 max-w-md">
+          <p className="text-zinc-500 mt-1 max-w-md">
             Access and manage the centralized repository of talent across all departments.
           </p>
         </div>
@@ -59,11 +59,11 @@ export default function Employees() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-zinc-50">
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Employee Identity</th>
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Division</th>
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Designation</th>
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Hire Date</th>
-                <th className="px-8 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Status</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Employee Identity</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Division</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Designation</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Hire Date</th>
+                <th className="px-8 py-6 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
@@ -124,16 +124,16 @@ export default function Employees() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-primary/20">
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Total Workforce</span>
+          <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Total Workforce</span>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-on-surface tracking-tighter">{employees.length}</h3>
             <span className="text-green-600 text-xs font-bold mb-2">Active</span>
           </div>
         </div>
         <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-zinc-300">
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Departments</span>
+          <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Departments</span>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-on-surface tracking-tighter">
               {new Set(employees.map(e => e.department).filter(Boolean)).size}
@@ -142,7 +142,7 @@ export default function Employees() {
           </div>
         </div>
         <div className="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between h-48 border-b-4 border-primary/20">
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Retention Rate</span>
+          <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Retention Rate</span>
           <div className="flex items-end justify-between">
             <h3 className="text-5xl font-black text-primary tracking-tighter">
               {employees.length > 0 ? Math.round((employees.filter(e => e.user.isActive).length / employees.length) * 100) : 0}%

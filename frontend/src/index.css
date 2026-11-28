@@ -78,6 +78,39 @@
     letter-spacing: 0.2em;
     color: #a1a1aa;
   }
+  /* Shared action-button sizes so every list/toolbar lines up. */
+  .btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 7rem;
+    height: 2.25rem;
+    border-radius: 0.5rem;
+    font-size: 10px;
+    font-weight: 900;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .btn-toolbar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 9rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .btn-action-sm {
+    width: 4.5rem;
+  }
 }
 
 /* Material Symbols configuration */

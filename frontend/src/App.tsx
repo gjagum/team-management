@@ -9,6 +9,7 @@ import Leaves from './pages/Leaves.tsx';
 import Overtime from './pages/Overtime.tsx';
 import Users from './pages/Users.tsx';
 import EmployeeDetail from './pages/EmployeeDetail.tsx';
+import Activity from './pages/Activity.tsx';
 import Schedules from './pages/Schedules.tsx';
 import Settings from './pages/Settings.tsx';
 import RBACManagement from './pages/RBACManagement.tsx';
@@ -51,7 +52,9 @@ function App() {
               <Route path="leaves" element={<Leaves />} />
               <Route path="leaves/monitor" element={<Leaves />} />
               <Route path="overtime" element={<Overtime />} />
+              <Route path="overtime/company" element={<Overtime />} />
               <Route path="users" element={<Users />} />
+              <Route path="activity" element={<Activity />} />
               <Route path="employees" element={<Navigate to="/users" replace />} />
               <Route path="employees/:id" element={<EmployeeDetail />} />
               <Route path="schedules" element={<Schedules />} />

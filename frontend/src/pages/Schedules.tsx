@@ -306,7 +306,7 @@ export default function Schedules() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
                     <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">Schedules</h1>
-          <p className="text-zinc-500 mt-2 max-w-md">Manage shifts and workforce allocation across the organization.</p>
+          <p className="text-zinc-500 mt-1 max-w-md">Manage shifts and workforce allocation across the organization.</p>
         </div>
         {isAdmin && (
           <button
@@ -360,20 +360,20 @@ export default function Schedules() {
         <table className="w-full">
           <thead>
             <tr className="bg-zinc-50">
-              <th className="px-4 py-3 text-left text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] sticky left-0 bg-zinc-50 min-w-[160px] z-10">
+              <th className="px-4 py-3 text-left text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] sticky left-0 bg-zinc-50 min-w-[160px] z-10">
                 Employee
               </th>
               {displayDates.map(d => {
                 const isToday = formatDateKey(d) === formatDateKey(new Date());
                 return (
-                  <th key={formatDateKey(d)} className={`px-1 py-3 text-center text-[10px] font-black uppercase tracking-[0.2em] ${viewMode === 'month' ? 'min-w-[80px]' : 'min-w-[130px]'} ${isToday ? 'text-primary bg-primary/5' : 'text-zinc-400'}`}>
+                  <th key={formatDateKey(d)} className={`px-1 py-3 text-center text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] ${viewMode === 'month' ? 'min-w-[80px]' : 'min-w-[130px]'} ${isToday ? 'bg-primary/5' : ''}`}>
                     <div>{DAY_NAMES[d.getDay()]}</div>
                     <div className="text-sm">{d.getDate()}</div>
                   </th>
                 );
               })}
               {isAdmin && (
-                <th className="px-2 py-3 text-center text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] sticky right-0 bg-zinc-50 min-w-[80px] z-10">
+                <th className="px-2 py-3 text-center text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] sticky right-0 bg-zinc-50 min-w-[80px] z-10">
                   Actions
                 </th>
               )}

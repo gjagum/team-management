@@ -132,14 +132,14 @@ export default function Timesheets() {
   };
 
   return (
-    <div className="space-y-12 animate-fade-in">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
                     <h1 className="text-4xl md:text-5xl font-black text-on-surface tracking-tighter">
             Timesheet Generator
           </h1>
-          <p className="text-zinc-500 mt-2 max-w-md">
+          <p className="text-zinc-500 mt-1 max-w-md">
             Generate professional reference timesheets for employees based on verified time logs.
           </p>
         </div>
@@ -147,7 +147,7 @@ export default function Timesheets() {
 
       {/* Configuration Bar */}
       <div className="bg-surface-container-lowest editorial-shadow rounded-xl p-6 lg:p-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {!isEmployee && (
             <div className="space-y-2">
               <label className="text-label block">Select Employee</label>
@@ -198,17 +198,17 @@ export default function Timesheets() {
       ) : preview ? (
         <>
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-surface-container-low p-6 rounded-xl border-b-4 border-zinc-200">
-              <span className="text-label">Regular Time</span>
+              <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Regular Time</span>
               <h3 className="text-3xl font-black text-on-surface tracking-tighter mt-2">{preview.summary.totalRegularHours.toFixed(2)} <span className="text-sm font-bold text-zinc-400">HRS</span></h3>
             </div>
             <div className="bg-surface-container-low p-6 rounded-xl border-b-4 border-zinc-200">
-              <span className="text-label">Overtime</span>
+              <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Overtime</span>
               <h3 className="text-3xl font-black text-on-surface tracking-tighter mt-2">{preview.summary.totalOvertimeHours.toFixed(2)} <span className="text-sm font-bold text-zinc-400">HRS</span></h3>
             </div>
             <div className="bg-surface-container-low p-6 rounded-xl border-b-4 border-primary/20">
-              <span className="text-label">Hourly Rate</span>
+              <span className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Hourly Rate</span>
               <h3 className="text-3xl font-black text-on-surface tracking-tighter mt-2">{formatCurrency(preview.summary.hourlyRate, preview.summary.currency)}</h3>
             </div>
             <div className="bg-primary p-6 rounded-xl editorial-shadow-lg flex flex-col justify-between">
@@ -234,12 +234,12 @@ export default function Timesheets() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-zinc-50">
-                    <th className="px-8 py-5 text-label">Date</th>
-                    <th className="px-8 py-5 text-label text-center">Clock In</th>
-                    <th className="px-8 py-5 text-label text-center">Clock Out</th>
-                    <th className="px-8 py-5 text-label text-center">Regular (hrs)</th>
-                    <th className="px-8 py-5 text-label text-center">Overtime (hrs)</th>
-                    <th className="px-8 py-5 text-label">Notes</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Date</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] text-center">Clock In</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] text-center">Clock Out</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] text-center">Regular (hrs)</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em] text-center">Overtime (hrs)</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-zinc-700 uppercase tracking-[0.15em]">Notes</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">

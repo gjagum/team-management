@@ -17,12 +17,24 @@ async function getEmployeeByUserId(userId: number) {
 
 overtimeRouter.get("/", requirePermission("overtime.read"), async (c) => {
   const employee = await getEmployeeByUserId(c.user!.userId);
+  const role = c.user!.role;
 
-  // Admins and managers see all; employees only see their own
-  const where =
-    c.user!.role === "ADMIN" || c.user!.role === "MANAGER"
-      ? {}
-      : { employeeId: employee?.id };
+  // Admins see everything; managers/team leaders see their teams; employees their own.
+  let where: any = {};
+  if (role === "ADMIN") {
+    where = {};
+  } else if (role === "MANAGER" || role === "TEAM_LEADER") {
+    if (!employee) return c.json([]);
+    const teams = await prisma.team.findMany({
+      where: { OR: [{ teamLeaderId: employee.id }, { alternateApproverId: employee.id }] },
+      select: { id: true },
+    });
+    const teamIds = teams.map((t) => t.id);
+    if (teamIds.length === 0) return c.json([]);
+    where = { employee: { teamId: { in: teamIds } } };
+  } else {
+    where = { employeeId: employee?.id };
+  }
 
   const records = await prisma.overtimeRecord.findMany({
     where,
@@ -36,6 +48,7 @@ overtimeRouter.get("/", requirePermission("overtime.read"), async (c) => {
               fullName: true,
             },
           },
+          team: { select: { id: true, name: true } },
         },
       },
       approver: {
@@ -181,6 +194,76 @@ overtimeRouter.post("/", requirePermission("overtime.create"), async (c) => {
   );
 
   return c.json(record, 201);
+});
+
+// Bulk import for admins (Company Overtime -> Import CSV).
+overtimeRouter.post("/import", requirePermission("overtime.create"), async (c) => {
+  if (c.user!.role !== "ADMIN") {
+    return c.json({ error: "Only admins can import overtime records" }, 403);
+  }
+
+  const rows = await c.req.json();
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return c.json({ error: "Expected a non-empty array of rows" }, 400);
+  }
+
+  let created = 0;
+  const failures: string[] = [];
+
+  for (const row of rows) {
+    const email = String(row.email || "").trim().toLowerCase();
+    try {
+      if (!email) throw new Error("missing email");
+      const employee = await prisma.employee.findFirst({
+        where: { user: { email: { equals: email, mode: "insensitive" } } },
+      });
+      if (!employee) throw new Error("employee not found");
+
+      const date = new Date(row.date);
+      if (isNaN(date.getTime())) throw new Error("invalid date");
+
+      const start = row.startTime
+        ? new Date(row.startTime)
+        : row.start
+          ? new Date(`${row.date}T${row.start}`)
+          : null;
+      const end = row.endTime
+        ? new Date(row.endTime)
+        : row.end
+          ? new Date(`${row.date}T${row.end}`)
+          : null;
+
+      let hours = Number(row.hours);
+      if (!Number.isFinite(hours) || hours <= 0) {
+        if (start && end && !isNaN(start.getTime()) && !isNaN(end.getTime())) {
+          hours = Math.round(((end.getTime() - start.getTime()) / 3_600_000) * 100) / 100;
+        }
+      }
+      if (!Number.isFinite(hours) || hours <= 0) throw new Error("hours missing");
+
+      await prisma.overtimeRecord.create({
+        data: {
+          employeeId: employee.id,
+          date,
+          startTime: start && !isNaN(start.getTime()) ? start : date,
+          endTime: end && !isNaN(end.getTime()) ? end : date,
+          hours,
+          description: row.reason || row.description || null,
+          status: "PENDING",
+        },
+      });
+      created++;
+    } catch (error: any) {
+      failures.push(`${email || "(no email)"}: ${error?.message || "failed"}`);
+    }
+  }
+
+  await auditLog(c.user!.userId, "CREATE", "overtime_record", null, null, {
+    imported: created,
+    failed: failures.length,
+  });
+
+  return c.json({ created, failed: failures.length, failures: failures.slice(0, 10) });
 });
 
 overtimeRouter.patch(

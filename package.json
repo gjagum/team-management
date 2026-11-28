@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "dev": "bun run --filter '*' dev",
+    "dev:restart": "bun scripts/dev-restart.ts",
     "dev:stack": "bun scripts/dev-stack.ts",
     "dev:backend": "bun run --filter @team-management/backend dev",
     "dev:frontend": "bun run --filter @team-management/frontend dev",
